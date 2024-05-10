@@ -51,6 +51,11 @@ export class ProjectService {
         description: true,
         createdAt: true,
       },
+      orderBy: [
+        {
+          createdAt: 'desc',
+        },
+      ],
     });
   }
 }

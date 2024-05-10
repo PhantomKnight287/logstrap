@@ -15,7 +15,7 @@ export default function LogInfoPage({ data }: { data: Log }) {
                 ? JSON.stringify(JSON.parse(data.requestBody), null, "\t")
                 : JSON.stringify({})
             }
-            theme="one-dark-pro"
+            theme="ayu-dark"
           />
         </div>
         <div className="flex flex-col items-start gap-4">
@@ -27,7 +27,7 @@ export default function LogInfoPage({ data }: { data: Log }) {
                 ? JSON.stringify(data.requestHeaders, null, "\t")
                 : JSON.stringify({})
             }
-            theme="one-dark-pro"
+            theme="ayu-dark"
           />
         </div>
         <div className="flex flex-col items-start gap-4">
@@ -39,7 +39,7 @@ export default function LogInfoPage({ data }: { data: Log }) {
                 ? JSON.stringify(JSON.parse(data.responseBody), null, "\t")
                 : JSON.stringify({})
             }
-            theme="one-dark-pro"
+            theme="ayu-dark"
           />
         </div>
         <div className="flex flex-col items-start gap-4">
@@ -52,14 +52,14 @@ export default function LogInfoPage({ data }: { data: Log }) {
                 ? JSON.stringify(data.responseHeaders, null, "\t")
                 : JSON.stringify({})
             }
-            theme="one-dark-pro"
+            theme="ayu-dark"
           />
         </div>
       </div>
       {data.stackTrace ? (
         <div className="w-full flex flex-col items-start mt-4">
           <h3 className="text-lg font-medium">Stack Trace</h3>
-          <Code lang="bash" code={data.stackTrace} theme="one-dark-pro" />
+          <Code lang="bash" code={data.stackTrace} theme="ayu-dark" />
         </div>
       ) : null}
     </div>

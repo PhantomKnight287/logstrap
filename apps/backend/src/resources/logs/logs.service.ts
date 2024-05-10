@@ -72,17 +72,16 @@ export class LogsService {
     }
     const grouped = await prisma.$queryRaw`
     SELECT
-      TO_CHAR(DATE(l."createdAt"),'DD/MM/YY') AS date,
-      COUNT(*) AS total,
-      SUM(CASE WHEN l."statusCode" >= 200 AND l."statusCode" < 400 THEN 1 ELSE 0 END) AS "Successful",
-      SUM(CASE WHEN l."statusCode" < 200 OR l."statusCode" >= 400 THEN 1 ELSE 0 END) AS "Failed"
+      TO_CHAR(DATE(l."createdAt"), 'DD/MM/YY') AS date,
+      COUNT(CASE WHEN l."statusCode" >= 200 AND l."statusCode" < 400 THEN 1 END) AS "Successful",
+      COUNT(CASE WHEN l."statusCode" < 200 OR l."statusCode" >= 400 THEN 1 END) AS "Failed"
     FROM
       "Log" l
     JOIN
       "Project" p ON l."projectId" = ${projectId}
     WHERE 
       p."userId"=${userId}
-    GROUP BY
+    GROUP BY  
       DATE(l."createdAt")
     ORDER BY
       DATE(l."createdAt") ASC;

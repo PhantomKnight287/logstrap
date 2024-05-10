@@ -1,6 +1,6 @@
 "use client";
 
-import { LineChart } from "@tremor/react";
+import { AreaChart } from "@tremor/react";
 import { DataTable } from "./data-table";
 import { columns } from "./columns";
 import { API_URL, COOKIE_NAME } from "@/constants";
@@ -11,7 +11,7 @@ import { useInView } from "react-intersection-observer";
 
 export default function Chart({ data }: { data: any }) {
   return (
-    <LineChart
+    <AreaChart
       className="mt-4 h-72"
       data={data}
       index="date"

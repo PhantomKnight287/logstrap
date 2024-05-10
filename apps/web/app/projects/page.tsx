@@ -31,6 +31,7 @@ async function Projects() {
       authorization: `Bearer ${token.value}`,
     },
   });
+  
   if (!req.ok) return notFound();
   const data: {
     name: string;
@@ -38,7 +39,6 @@ async function Projects() {
     createdAt: string;
     id: string;
   }[] = await req.json();
-
   return (
     <div className="container">
       <div className="flex flex-row">
@@ -48,15 +48,17 @@ async function Projects() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 my-5">
         {data.map((data) => (
           <Link key={data.id} href={`/projects/${data.id}`}>
-            <Card>
-              <CardHeader>
-                <CardTitle>{data.name}</CardTitle>
-                <CardDescription>{data.description}</CardDescription>
-              </CardHeader>
-              <CardFooter>
+            <div className="h-full rounded-lg border bg-card text-card-foreground shadow-sm p-4 flex flex-col">
+              <h3 className="text-2xl font-semibold leading-none tracking-tight">
+                {data.name}
+              </h3>
+              <p className="text-sm text-muted-foreground py-2">
+                {data.description}
+              </p>
+              <div className="mt-auto">
                 <p>{dayjs(data.createdAt).fromNow()}</p>
-              </CardFooter>
-            </Card>
+              </div>
+            </div>
           </Link>
         ))}
       </div>

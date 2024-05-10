@@ -1,11 +1,5 @@
 import { codeToHtml } from "shiki";
-import {
-  transformerNotationHighlight,
-  transformerNotationDiff,
-} from "@shikijs/transformers";
 import type { BundledLanguage, BundledTheme } from "shiki";
-import CopyToClipboard from "./copy-to-clipboard";
-import { ScrollArea, ScrollBar } from "../ui/scroll-area";
 
 type Props = {
   code: string;
