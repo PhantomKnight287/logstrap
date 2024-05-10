@@ -1,5 +1,7 @@
 //@ts-expect-error creating custom implementation of toJSON
-BigInt.prototype.toJSON = function () { return this.toString(); };
+BigInt.prototype.toJSON = function () {
+  return this.toString();
+};
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import helmet from 'helmet';
@@ -15,6 +17,7 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.use(json({ limit: '50mb' }));
+  const port = process.env.PORT || 8000;
   if (process.env.LOGSTRAP_KEY && process.env.LOGSTRAP_PATH)
     errorSubject$.subscribe(async (payload) => {
       if (payload.path === '/logs') return;
@@ -27,10 +30,11 @@ async function bootstrap() {
           'content-type': 'application/json',
         },
       })
-      .then(d=>d.json())
-      .then(console.log)
-      .catch(() => {});
+        .then((d) => d.json())
+        .then(console.log)
+        .catch(() => {});
     });
   await app.listen(process.env.PORT || 8000);
+  console.log(`Up and running at port: ${port}`);
 }
 bootstrap();
