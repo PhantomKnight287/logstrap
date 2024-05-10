@@ -7,7 +7,7 @@ import Chart, { Table } from "./page.client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
 
-export const dyanmic = "force-dynamic";
+export const dynamic = "force-dynamic";
 
 async function ProjectInfo({ params }: { params: { id: string } }) {
   const cookiesStore = cookies();
