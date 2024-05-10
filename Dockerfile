@@ -67,15 +67,6 @@ RUN addgroup --system --gid 1001 nodejs \
 # Copy project files from the installer stage
 COPY --from=installer --chown=nestjs:nodejs /app/ .
 
-# Install necessary packages for Chromium and fonts
-RUN apk add --no-cache \
-      chromium \
-      nss \
-      freetype \
-      harfbuzz \
-      ca-certificates \
-      ttf-freefont
-
 # Switch to the nestjs user and set the default command
 USER nestjs
 CMD ["pnpm", "start"]
