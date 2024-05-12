@@ -29,10 +29,7 @@ async function bootstrap() {
           'X-API-KEY': process.env.LOGSTRAP_KEY,
           'content-type': 'application/json',
         },
-      })
-        .then((d) => d.json())
-        .then(console.log)
-        .catch(() => {});
+      }).catch(() => {});
     });
   await app.listen(process.env.PORT || 8000);
   console.log(`Up and running at port: ${port}`);
