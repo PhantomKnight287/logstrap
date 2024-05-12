@@ -3,9 +3,15 @@ import { cookies } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 import { Log } from "./type";
 import { Metadata } from "next";
-import Chart, { Table } from "./page.client";
+import Chart from "./page.client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
+import nextDynamic from "next/dynamic";
+
+const Table = nextDynamic(
+  () => import("./page.client").then((mod) => mod.Table),
+  { ssr: false, loading: () => <p>Loading...</p> }
+);
 
 export const dynamic = "force-dynamic";
 

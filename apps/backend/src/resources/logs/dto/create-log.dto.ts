@@ -48,4 +48,8 @@ export class CreateLogDTO {
   @IsString()
   @IsOptional()
   method: string;
+
+  @IsString()
+  @IsOptional()
+  name: string;
 }

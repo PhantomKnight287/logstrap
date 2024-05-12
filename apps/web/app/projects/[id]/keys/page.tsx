@@ -38,7 +38,7 @@ async function ApiKeys({ params }: { params: { id: string } }) {
         /> */}
       </div>
       <div className="my-5 px-auto">
-        <DataTable columns={columns} data={data} />
+        <DataTable filterName="name" columns={columns} data={data} />
       </div>
     </div>
   );

@@ -20,6 +20,7 @@ export class LogsService {
         stackTrace: body.stackTrace,
         statusCode: body.statusCode,
         method: body.method,
+        name: body.name,
         key: {
           connect: {
             id: key,

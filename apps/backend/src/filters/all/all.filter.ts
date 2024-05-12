@@ -45,13 +45,14 @@ export class AllExceptionsFilter implements ExceptionFilter {
       errorSubject$.next({
         statusCode: status,
         path: request.originalUrl,
-        message: `${exception.name}: ${exception.message}`,
+        message: exception.message,
         requestHeaders: request.headers,
         requestBody: JSON.stringify(request.body),
         responseHeader: response.getHeaders(),
         responseBody: JSON.stringify(errorMessage),
         stackTrace: exception.stack,
         method: request.method,
+        name: exception.name,
       });
     }
 

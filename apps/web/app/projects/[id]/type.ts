@@ -13,4 +13,6 @@ export type Log = {
   updatedAt: string;
 
   projectId: string;
+
+  name?: string;
 };

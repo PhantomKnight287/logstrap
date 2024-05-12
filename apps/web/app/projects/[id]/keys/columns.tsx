@@ -3,8 +3,8 @@
 import { ColumnDef } from "@tanstack/react-table";
 import { APIKey } from "./type";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
 import { useState } from "react";
+import { Timestamp } from "../[log]/page.client";
 
 export const columns: ColumnDef<APIKey>[] = [
   {
@@ -21,10 +21,8 @@ export const columns: ColumnDef<APIKey>[] = [
   {
     accessorKey: "createdAt",
     header: "Timestamp",
-    cell: ({ renderValue }) => {
-      return (
-        <span>{dayjs(renderValue() as string).format("DD/MM/YY HH:MM")}</span>
-      );
+    cell: ({ renderValue, row }) => {
+      return <Timestamp t={row.original.createdAt} />;
     },
   },
 ];

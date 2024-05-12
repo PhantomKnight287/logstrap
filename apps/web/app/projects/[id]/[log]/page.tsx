@@ -5,7 +5,7 @@ import { Log } from "../type";
 import dayjs from "dayjs";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import LogInfoPage from "./page.client";
+import LogInfoPage, { Timestamp } from "./page.client";
 import { Callout } from "@/components/callout";
 
 async function LogInfo({ params }: { params: { id: string; log: string } }) {
@@ -29,9 +29,7 @@ async function LogInfo({ params }: { params: { id: string; log: string } }) {
       <div className="mt-2 flex items-center flex-row gap-4 text-base flex-wrap justify-center md:justify-start">
         <div className="flex flex-col items-center h-full justify-between">
           <span className="text-muted-foreground ">Created</span>
-          <span className="text-sm">
-            {dayjs(body.createdAt).format("DD/MM/YY HH:mm")}
-          </span>
+          <Timestamp t={body.createdAt} />
         </div>
         <div className="flex flex-col items-center">
           <span className="text-muted-foreground ">Method</span>
@@ -64,7 +62,7 @@ async function LogInfo({ params }: { params: { id: string; log: string } }) {
         </div>
       </div>
       {body.message ? (
-        <Callout title={"Error"} type="error">
+        <Callout title={body.name || "Error"} type="error">
           {body.message}
         </Callout>
       ) : null}

@@ -2,10 +2,9 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Log } from "./type";
-import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import dayjs from "dayjs";
+import { Timestamp } from "./[log]/page.client";
 
 export const columns: ColumnDef<Log>[] = [
   {
@@ -68,10 +67,8 @@ export const columns: ColumnDef<Log>[] = [
   {
     accessorKey: "createdAt",
     header: "Timestamp",
-    cell: ({ renderValue }) => {
-      return (
-        <span>{dayjs(renderValue() as string).format("DD/MM/YY HH:MM")}</span>
-      );
+    cell: ({ renderValue, row }) => {
+      return <Timestamp t={row.original.createdAt} />;
     },
   },
 ];

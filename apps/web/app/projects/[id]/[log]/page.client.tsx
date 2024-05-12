@@ -2,6 +2,7 @@
 
 import Code from "@/components/code";
 import { Log } from "../type";
+import dayjs from "dayjs";
 export default function LogInfoPage({ data }: { data: Log }) {
   return (
     <div className="flex flex-col items-center mt-5">
@@ -64,4 +65,8 @@ export default function LogInfoPage({ data }: { data: Log }) {
       ) : null}
     </div>
   );
+}
+
+export function Timestamp({ t }: { t: string }) {
+  return <span className="text-sm">{dayjs(t).format("DD/MM/YY HH:mm")}</span>;
 }
