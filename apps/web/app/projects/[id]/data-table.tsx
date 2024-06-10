@@ -21,12 +21,41 @@ import {
 } from "@/components/ui/table";
 import { useState } from "react";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
 }
 
+const httpStatusCodes = [
+  200, // OK
+  201, // Created
+  202, // Accepted
+  204, // No Content
+  301, // Moved Permanently
+  302, // Found
+  304, // Not Modified
+  400, // Bad Request
+  401, // Unauthorized
+  403, // Forbidden
+  404, // Not Found
+  405, // Method Not Allowed
+  409, // Conflict
+  410, // Gone
+  500, // Internal Server Error
+  501, // Not Implemented
+  502, // Bad Gateway
+  503, // Service Unavailable
+  504, // Gateway Timeout
+  505,
+];
 export function DataTable<TData, TValue>({
   columns,
   data,
@@ -49,7 +78,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 gap-2">
         <Input
           placeholder={`Filter ${filterName ?? "Path"}...`}
           value={
@@ -64,6 +93,24 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <Select
+          onValueChange={(v) => {
+            table?.getColumn("method")?.setFilterValue(v);
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Method" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="GET">GET</SelectItem>
+            <SelectItem value="POST">POST</SelectItem>
+            <SelectItem value="PUT">PUT</SelectItem>
+            <SelectItem value="DELETE">DELETE</SelectItem>
+            <SelectItem value="PATCH">PATCH</SelectItem>
+            <SelectItem value="OPTIONS">OPTIONS</SelectItem>
+          </SelectContent>
+        </Select>
+       
       </div>
       <div className="rounded-md border">
         <Table>

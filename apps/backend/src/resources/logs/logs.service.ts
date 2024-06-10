@@ -21,6 +21,10 @@ export class LogsService {
         statusCode: body.statusCode,
         method: body.method,
         name: body.name,
+        type:
+          body.statusCode >= 200 && body.statusCode < 400
+            ? 'Successful'
+            : 'Failed',
         key: {
           connect: {
             id: key,
@@ -71,22 +75,6 @@ export class LogsService {
       });
       return logs;
     }
-    const grouped = await prisma.$queryRaw`
-    SELECT
-      TO_CHAR(DATE(l."createdAt"), 'DD/MM/YY') AS date,
-      COUNT(CASE WHEN l."statusCode" >= 200 AND l."statusCode" < 400 THEN 1 END) AS "Successful",
-      COUNT(CASE WHEN l."statusCode" < 200 OR l."statusCode" >= 400 THEN 1 END) AS "Failed"
-    FROM
-      "Log" l
-    JOIN
-      "Project" p ON l."projectId" = ${projectId}
-    WHERE 
-      p."userId"=${userId}
-    GROUP BY  
-      DATE(l."createdAt")
-    ORDER BY
-      DATE(l."createdAt") ASC;
-  `;
     const logs = await prisma.$queryRaw`
      SELECT
       l."statusCode",l."message",l."path",l."method",l."createdAt",l."projectId",l."id"
@@ -104,7 +92,6 @@ export class LogsService {
       ;
       `;
     return {
-      grouped,
       logs,
     };
   }

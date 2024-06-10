@@ -26,12 +26,6 @@ async function ProjectInfo({ params }: { params: { id: string } }) {
     },
   });
   const data: {
-    grouped: {
-      date: string;
-      total: string;
-      Successful: string;
-      Failed: string;
-    }[];
     logs: Log[];
   } = await req.json();
 
@@ -55,30 +49,6 @@ async function ProjectInfo({ params }: { params: { id: string } }) {
         </Link>
       </div>
 
-      <div className="flex flex-row items-start gap-4">
-        <div className="flex flex-col items-center">
-          <h3 className="text-tremor-default text-tremor-content dark:text-dark-tremor-content mt-2">
-            Successful
-          </h3>
-          <p className="text-tremor-metric text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold">
-            {data.grouped
-              .map((data) => Number(data.Successful))
-              .reduce((partial, a) => partial + a, 0)}{" "}
-          </p>
-        </div>
-        <div className="flex flex-col items-center">
-          <h3 className="text-tremor-default text-tremor-content dark:text-dark-tremor-content mt-2">
-            Failed
-          </h3>
-          <p className="text-tremor-metric text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold">
-            {data.grouped
-              .map((data) => Number(data.Failed))
-              .reduce((partial, a) => partial + a, 0)}{" "}
-          </p>
-        </div>
-      </div>
-
-      <Chart data={data.grouped} />
       <Table projectId={params.id} data={data.logs} />
     </div>
   );
