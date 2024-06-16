@@ -11,7 +11,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN apk add --no-cache libc6-compat \
     && apk update \
     && corepack enable \
-    && pnpm i -g turbo@1.10.16
+    && pnpm i -g turbo
 
 # Create a builder stage
 FROM base AS builder
@@ -49,7 +49,7 @@ RUN corepack enable \
     && pnpm install
 
 # Build the project
-RUN pnpx turbo run build --filter backend
+RUN pnpm turbo run build --filter backend
 
 # Create a runner stage
 FROM base AS runner
