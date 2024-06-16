@@ -13,6 +13,6 @@
   "author": "Gurpal Singh",
   "license": "ISC",
   "dependencies": {
-    "turbo": "^1.13.3"
+    "turbo": "1.10.16"
   }
 }
