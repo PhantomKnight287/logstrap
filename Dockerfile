@@ -11,7 +11,7 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN apk add --no-cache libc6-compat \
     && apk update \
     && corepack enable \
-    && pnpm i -g turbo
+    && pnpm i -g turbo@1.10.16
 
 # Create a builder stage
 FROM base AS builder
@@ -25,7 +25,7 @@ WORKDIR /app
 COPY . .
 
 # Prune dependencies using Turbo
-RUN turbo prune backend --docker
+RUN turbo prune --scope backend --docker
 
 # Create an installer stage
 FROM base AS installer

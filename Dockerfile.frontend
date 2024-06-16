@@ -15,9 +15,9 @@ RUN apk update
 WORKDIR /app
 # this is required to use pnpm
 RUN corepack enable 
-RUN pnpm i -g turbo
+RUN pnpm i -g turbo@1.10.16
 COPY . .
-RUN turbo prune web --docker
+RUN turbo prune --scope web --docker
 
 
 FROM base AS installer

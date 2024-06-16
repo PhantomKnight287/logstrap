@@ -13,7 +13,7 @@
   "author": "Gurpal Singh",
   "license": "ISC",
   "dependencies": {
-    "turbo": "2.0.4"
+    "turbo": "1.10.16"
   },
   "packageManager": "pnpm@8.14.1"
 }
