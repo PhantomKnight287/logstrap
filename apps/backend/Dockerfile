@@ -14,6 +14,7 @@ RUN apk add --no-cache libc6-compat \
 WORKDIR /app
 COPY . .
 
+RUN pnpm install
 RUN pnpm build
 
 CMD [ "pnpm","start:prod" ]
