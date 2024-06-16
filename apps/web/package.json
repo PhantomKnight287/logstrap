@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "packageManager": "pnpm@8.14.1",
   "dependencies": {
     "@headlessui/react": "^2.0.3",
     "@headlessui/tailwindcss": "^0.2.0",
