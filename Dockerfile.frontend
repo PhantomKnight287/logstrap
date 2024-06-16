@@ -31,7 +31,7 @@ COPY .gitignore .gitignore
 COPY --from=builder /app/out/full/ .
 COPY --from=builder /app/.env .
 RUN pnpm install
-RUN pnpm turbo run build --filter web 
+RUN pnpx turbo run build --filter web 
 
 FROM base AS runner
 WORKDIR /app

@@ -49,7 +49,7 @@ RUN corepack enable \
     && pnpm install
 
 # Build the project
-RUN pnpm turbo run build --filter backend
+RUN pnpx turbo run build --filter backend
 
 # Create a runner stage
 FROM base AS runner
