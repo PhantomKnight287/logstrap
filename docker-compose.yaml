@@ -12,7 +12,7 @@ services:
 
   frontend:
     build:
-      context: ./apps/frontend
+      context: ./apps/web
       dockerfile: Dockerfile
     networks:
       - config-manager_proxy
