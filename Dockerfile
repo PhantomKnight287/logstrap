@@ -25,7 +25,7 @@ WORKDIR /app
 COPY . .
 
 # Prune dependencies using Turbo
-RUN turbo prune --scope backend --docker
+RUN turbo prune backend --docker
 
 # Create an installer stage
 FROM base AS installer
