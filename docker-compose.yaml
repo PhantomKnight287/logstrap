@@ -9,6 +9,7 @@ services:
     container_name: logstrap-backend
     networks:
       - config-manager_proxy
+      - logstrap
 
   frontend:
     build:
@@ -16,6 +17,7 @@ services:
       dockerfile: Dockerfile
     networks:
       - config-manager_proxy
+      - logstrap
     restart: always
     container_name: logstrap-frontend
     depends_on:
@@ -33,6 +35,10 @@ services:
     restart: always
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - logstrap
+      - config-manager_proxy
+
 
 
 volumes:
@@ -42,3 +48,4 @@ volumes:
 networks:
   config-manager_proxy:
     external: true
+  logstrap:
