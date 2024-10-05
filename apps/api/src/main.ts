@@ -58,7 +58,7 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), {
       strategy: 'exposeAll',
-      excludeExtraneousValues: true,
+      excludeExtraneousValues: true, 
     }),
   );
   writeFileSync('./openapi.spec.json', JSON.stringify(document, undefined, 2));

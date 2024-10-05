@@ -1,16 +1,16 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { LoginDTO } from './dto/login.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { db } from '~/db';
 import { eq } from 'drizzle-orm';
 import { users } from '@logstrap/db';
 import { hash, verify as verifyPassword } from 'argon2';
 import { ConfigService } from '@nestjs/config';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
 import { plainToInstance } from 'class-transformer';
 import {
   LoginSuccessfulEntity,
   RegisterSuccessfulEntity,
+  UserEntity,
 } from './entities/auth.entity';
 import { RegisterDTO } from './dto/register.dto';
 
@@ -20,18 +20,18 @@ export class AuthService {
   constructor(protected configService: ConfigService) {}
   async login(body: LoginDTO) {
     const { email, password } = body;
-    this.logger.log(`Login attempt for email: ${email}`);
+    this.logger.log(`Login attempt initiated`);
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
     if (!user) {
-      this.logger.warn(`No user found for email: ${email}`);
+      this.logger.warn(`No user found for given email`);
       throw new HttpException(
         'No user found with given email',
         HttpStatus.NOT_FOUND,
       );
     }
-    this.logger.log(`User found for email: ${email}`);
+    this.logger.log(`User found for given email`);
     const isPasswordCorrect = verifyPassword(user.password, password);
     if (isPasswordCorrect) {
       this.logger.log(`Correct password supplied. Generating JWT Token...`);
@@ -47,7 +47,7 @@ export class AuthService {
       this.logger.log('Generated Token. Login successful');
       return plainToInstance(LoginSuccessfulEntity, { user, token });
     }
-    this.logger.warn(`Incorrect Login password for email: ${email}`);
+    this.logger.warn(`Incorrect Login password`);
     throw new HttpException(
       'Incorrect email or password',
       HttpStatus.UNAUTHORIZED,
@@ -56,12 +56,12 @@ export class AuthService {
 
   async register(body: RegisterDTO) {
     const { email, name, password } = body;
-    this.logger.log(`Register attempt for: ${email}`);
+    this.logger.log(`Register attempt for: ${name}`);
     const user = await db.query.users.findFirst({
       where: eq(users.email, email),
     });
     if (user) {
-      this.logger.warn(`email ${email} already taken`);
+      this.logger.warn(`email already taken`);
       throw new HttpException('Email already taken', HttpStatus.CONFLICT);
     }
     const [newUser] = await db
@@ -75,7 +75,7 @@ export class AuthService {
     this.logger.log(`Created new user with id: ${newUser.id}`);
     const token = sign(
       {
-        id: user.id,
+        id: newUser.id,
       },
       this.configService.getOrThrow('JWT_SECRET'),
       {
@@ -83,22 +83,31 @@ export class AuthService {
       },
     );
     this.logger.log('Generated Token.');
-    return plainToInstance(RegisterSuccessfulEntity, { user, token });
+    return plainToInstance(RegisterSuccessfulEntity, { user: newUser, token });
   }
 
-  findAll() {
-    return `This action returns all auth`;
-  }
+  async hydrate(token: string) {
+    [token] = token.split(' ');
+    try {
+      const { id } = verify(
+        token,
+        this.configService.getOrThrow('JWT_SECRET'),
+      ) as { id: string };
+      const user = await db.query.users.findFirst({
+        where: eq(users.id, id),
+      });
 
-  findOne(id: number) {
-    return `This action returns a #${id} auth`;
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} auth`;
+      if (!user) {
+        this.logger.warn(`No user found with token: ${token}`);
+        throw new HttpException('No user found', HttpStatus.NOT_FOUND);
+      }
+      this.logger.log(`Found user with id: ${user.id}`);
+      return plainToInstance(UserEntity, user);
+    } catch (e) {
+      if (e instanceof HttpException) {
+        throw new HttpException(e.message, e.getStatus());
+      }
+      throw new HttpException(e.message, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
   }
 }

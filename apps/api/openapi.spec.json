@@ -127,6 +127,54 @@
           "Authentication"
         ]
       }
+    },
+    "/auth/@me": {
+      "get": {
+        "operationId": "AuthController_hydrate",
+        "summary": "Get current user",
+        "description": "Get current user",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No user found with given token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
     }
   },
   "info": {
@@ -178,9 +226,6 @@
             "type": "string",
             "description": "ISO8601 timestamp"
           },
-          "email": {
-            "type": "string"
-          },
           "walletBalance": {
             "type": "number"
           }
@@ -189,7 +234,6 @@
           "id",
           "name",
           "createdAt",
-          "email",
           "walletBalance"
         ]
       },

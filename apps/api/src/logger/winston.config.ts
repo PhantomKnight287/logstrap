@@ -3,7 +3,7 @@ import { format as formatDate } from 'date-fns';
 
 const customFormat = format.printf(
   ({ timestamp, level, stack, message, context }) => {
-    const formatedDate = formatDate(timestamp, 'yyyy-MM-dd HH:mm:ss');
+    const formatedDate = formatDate(timestamp, 'dd/MM/yyyy HH:mm:ss');
     return `${formatedDate} -  [${level}] [${context}] - ${stack || message}`;
   },
 );

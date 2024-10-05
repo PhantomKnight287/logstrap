@@ -60,33 +60,21 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/auth": {
+    "/auth/@me": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["AuthController_findAll"];
+        /**
+         * Get current user
+         * @description Get current user
+         */
+        get: operations["AuthController_hydrate"];
         put?: never;
         post?: never;
         delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/auth/{id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get: operations["AuthController_findOne"];
-        put?: never;
-        post?: never;
-        delete: operations["AuthController_remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -105,7 +93,6 @@ export interface components {
             name: string;
             /** @description ISO8601 timestamp */
             createdAt: string;
-            email: string;
             walletBalance: number;
         };
         LoginSuccessfulEntity: {
@@ -243,7 +230,7 @@ export interface operations {
             };
         };
     };
-    AuthController_findAll: {
+    AuthController_hydrate: {
         parameters: {
             query?: never;
             header?: never;
@@ -256,45 +243,26 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["UserEntity"];
+                };
             };
-        };
-    };
-    AuthController_findOne: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
+            /** @description No user found with given token */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
             };
-        };
-    };
-    AuthController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
+            500: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
             };
         };
     };
