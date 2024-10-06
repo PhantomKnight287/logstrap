@@ -6,6 +6,8 @@
       "@/*": ["./src/*"]
     },
     "declaration": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo"
   }
 }

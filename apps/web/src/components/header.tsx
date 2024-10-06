@@ -26,7 +26,7 @@ export function Header() {
   const [showBottomBorder, setShowBottomBorder] = useState(false);
 
   useEffect(() => {
-    function scrollListener(e: Event) {
+    function scrollListener() {
       if (window.scrollY > 0) {
         setShowBottomBorder(true);
       } else {
@@ -88,10 +88,10 @@ export function Header() {
         <div className="flex items-center gap-4">
           <div className="hidden md:flex md:gap-4">
             <Button variant="outline" asChild>
-              <Link href="/login">Login</Link>
+              <Link href="/auth/login">Login</Link>
             </Button>
             <Button asChild>
-              <Link href="/register">Register</Link>
+              <Link href="/auth/register">Register</Link>
             </Button>
           </div>
           <Sheet>

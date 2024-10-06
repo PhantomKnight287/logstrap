@@ -1,7 +1,0 @@
-{
-  "extends": [
-    "@vercel/style-guide/eslint",
-    "next/core-web-vitals",
-    "next/typescript"
-  ]
-}
