@@ -80,6 +80,46 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch all projects
+         * @description Fetch all projects
+         */
+        get: operations["ProjectsController_findAll"];
+        put?: never;
+        /**
+         * Create new project
+         * @description Create new project
+         */
+        post: operations["ProjectsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["ProjectsController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["ProjectsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["ProjectsController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -93,7 +133,8 @@ export interface components {
             name: string;
             /** @description ISO8601 timestamp */
             createdAt: string;
-            walletBalance: number;
+            /** @description a decimal with precision upto 2 digits */
+            walletBalance: string;
         };
         LoginSuccessfulEntity: {
             user: components["schemas"]["UserEntity"];
@@ -112,6 +153,34 @@ export interface components {
             user: components["schemas"]["UserEntity"];
             /** @description JWT token */
             token: string;
+        };
+        CreateProjectDto: {
+            name: string;
+            description?: string;
+            url?: string;
+        };
+        ProjectIdEntity: {
+            id: string;
+        };
+        /** @enum {string} */
+        ProjectMode: "test" | "live";
+        Project: {
+            id: string;
+            name: string;
+            description?: string;
+            url?: string;
+            mode: components["schemas"]["ProjectMode"];
+        };
+        FetchAllProjectsResponse: {
+            items: components["schemas"]["Project"][];
+            totalItems: number;
+            /** @default 6 */
+            itemsPerQuery: number;
+        };
+        UpdateProjectDto: {
+            name?: string;
+            description?: string;
+            url?: string;
         };
     };
     responses: never;
@@ -136,6 +205,15 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
             };
         };
     };
@@ -187,6 +265,15 @@ export interface operations {
                     "application/json": components["schemas"]["GenericErrorEntity"];
                 };
             };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
         };
     };
     AuthController_register: {
@@ -228,6 +315,15 @@ export interface operations {
                     "application/json": components["schemas"]["GenericErrorEntity"];
                 };
             };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
         };
     };
     AuthController_hydrate: {
@@ -256,6 +352,160 @@ export interface operations {
                     "application/json": components["schemas"]["GenericErrorEntity"];
                 };
             };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    ProjectsController_findAll: {
+        parameters: {
+            query: {
+                /** @description The no of page */
+                page: string;
+                /** @description The no of items to fetch, defaults to 6 */
+                limit?: string;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FetchAllProjectsResponse"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    ProjectsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateProjectDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectIdEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    ProjectsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    ProjectsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    ProjectsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateProjectDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
             500: {
                 headers: {
                     [name: string]: unknown;

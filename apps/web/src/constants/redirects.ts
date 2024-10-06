@@ -4,4 +4,8 @@
 export const Redirects = {
   AFTER_AUTH: '/dashboard',
   UNAUTHENTICATED: '/auth/login',
+  ERROR: '/',
+  AFTER_PROJECT_CREATED(id: string) {
+    return `${this.AFTER_AUTH}/${id}`;
+  },
 };

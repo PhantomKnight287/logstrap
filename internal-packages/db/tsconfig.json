@@ -8,6 +8,7 @@
     "declaration": true,
     "outDir": "dist",
     "incremental": true,
-    "tsBuildInfoFile": ".tsbuildinfo"
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "strict": true
   }
 }

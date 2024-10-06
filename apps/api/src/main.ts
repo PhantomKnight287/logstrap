@@ -58,9 +58,26 @@ async function bootstrap() {
   app.useGlobalInterceptors(
     new ClassSerializerInterceptor(app.get(Reflector), {
       strategy: 'exposeAll',
-      excludeExtraneousValues: true, 
+      excludeExtraneousValues: true,
     }),
   );
+  Object.values(document.paths).forEach((path: any) => {
+    Object.values(path).forEach((method: any) => {
+      if (!method.responses) {
+        method.responses = {};
+      }
+      method.responses['500'] = {
+        description: 'Internal server error.',
+        content: {
+          'application/json': {
+            schema: {
+              $ref: '#/components/schemas/GenericErrorEntity',
+            },
+          },
+        },
+      };
+    });
+  });
   writeFileSync('./openapi.spec.json', JSON.stringify(document, undefined, 2));
   app.use(
     '/reference',
@@ -71,7 +88,7 @@ async function bootstrap() {
       layout: 'modern',
       isEditable: false,
       metaData: {
-        title: 'LogsTrap',
+        title: 'LogsTrap - Api Reference',
         description: 'LogsTrap API Documentation',
       },
     }),

@@ -5,7 +5,8 @@
   "main": "dist/schema.js",
   "types": "dist/schema.d.ts",
   "scripts": {
-    "dev": "tsup --watch"
+    "dev": "tsup --watch",
+    "build": "tsup"
   },
   "keywords": [],
   "author": "",

@@ -20,10 +20,12 @@ export class UserEntity {
   @Expose()
   createdAt: string;
 
-  @ApiProperty({})
-  @IsDecimal()
+  @ApiProperty({
+    description: 'a decimal with precision upto 2 digits',
+  })
+  @IsString()
   @Expose()
-  walletBalance: number;
+  walletBalance: string;
 }
 
 export class LoginSuccessfulEntity {

@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './resources/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
+import { ProjectsModule } from './resources/projects/projects.module';
 
 @Module({
   imports: [
@@ -11,6 +12,7 @@ import { ConfigModule } from '@nestjs/config';
       envFilePath: ['../../.env'],
       isGlobal: true,
     }),
+    ProjectsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
