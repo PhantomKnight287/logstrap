@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { Menu } from 'lucide-react';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,10 +21,12 @@ import {
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { ComponentProps, useEffect, useState } from 'react';
 import { cn } from '@/lib/utils';
+import useFetchUser from '@/hooks/use-fetch-user';
+import { Redirects } from '@/constants/redirects';
 
 export function Header() {
   const [showBottomBorder, setShowBottomBorder] = useState(false);
-
+  const { loading } = useFetchUser();
   useEffect(() => {
     function scrollListener() {
       if (window.scrollY > 0) {
@@ -86,14 +88,23 @@ export function Header() {
           </NavigationMenu>
         </div>
         <div className="flex items-center gap-4">
-          <div className="hidden md:flex md:gap-4">
-            <Button variant="outline" asChild>
-              <Link href="/auth/login">Login</Link>
-            </Button>
-            <Button asChild>
-              <Link href="/auth/register">Register</Link>
-            </Button>
-          </div>
+          {loading ? (
+            <div className="hidden md:flex md:gap-4">
+              <Button variant="outline" asChild>
+                <Link href="/auth/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/auth/register">Register</Link>
+              </Button>
+            </div>
+          ) : (
+            <Link
+              href={'/dashboad'}
+              className={buttonVariants({ className: 'hidden md:flex' })}
+            >
+              Dashboard
+            </Link>
+          )}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="md:hidden">
@@ -121,12 +132,23 @@ export function Header() {
                     ))}
                   </DropdownMenuContent>
                 </DropdownMenu>
-                <Link href="/auth/login" className="text-lg font-medium">
-                  Login
-                </Link>
-                <Link href="/auth/register" className="text-lg font-medium">
-                  Register
-                </Link>
+                {loading ? (
+                  <>
+                    <Link href="/auth/login" className="text-lg font-medium">
+                      Login
+                    </Link>
+                    <Link href="/auth/register" className="text-lg font-medium">
+                      Register
+                    </Link>
+                  </>
+                ) : (
+                  <Link
+                    href={Redirects.AFTER_AUTH}
+                    className="text-lg font-medium"
+                  >
+                    Dashboard
+                  </Link>
+                )}
               </nav>
             </SheetContent>
           </Sheet>
