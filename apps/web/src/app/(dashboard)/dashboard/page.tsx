@@ -8,6 +8,8 @@ import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import ProjectItem from './_components/item';
 
+export const dynamic = 'force-dynamic';
+
 export default async function Dashboard({
   searchParams,
 }: {

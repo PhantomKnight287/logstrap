@@ -1,19 +1,31 @@
-import { Redirects } from '@/constants/redirects';
-import { CircleAlert, Home, User } from 'lucide-react';
-export const LINKS = (id: string) => [
+import { CircleAlert, Code2, Home, Settings2, User } from 'lucide-react';
+export const LINKS = [
   {
-    href: Redirects.AFTER_PROJECT_CREATED(id),
+    href: '',
     icon: <Home className="h-4 w-4" />,
     label: 'Home',
   },
   {
-    href: `${Redirects.AFTER_PROJECT_CREATED(id)}/app-events`,
+    href: `/app-events`,
     label: 'App Events',
     icon: <User className="h-4 w-4" />,
   },
   {
-    href: `${Redirects.AFTER_PROJECT_CREATED(id)}/api-requests`,
+    href: `/api-requests`,
     label: 'API Requests',
     icon: <CircleAlert className="h-4 w-4" />,
+  },
+  {
+    type: 'separator',
+  },
+  {
+    href: `/keys`,
+    label: 'API Keys',
+    icon: <Code2 className="h-4 w-4" />,
+  },
+  {
+    href: `/settings`,
+    label: 'Settings',
+    icon: <Settings2 className="h-4 w-4" />,
   },
 ];

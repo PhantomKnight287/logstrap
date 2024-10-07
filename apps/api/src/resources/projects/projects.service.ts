@@ -1,13 +1,13 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { db } from '~/db';
 import { projects as projectsModel } from '@logstrap/db';
-import { eq, sql } from 'drizzle-orm';
+import { and, eq, sql } from 'drizzle-orm';
 import { ITEMS_PER_QUERY } from '~/constants';
 import { plainToInstance } from 'class-transformer';
 import { FetchAllProjectsResponse } from './entities/response.entity';
-import { ProjectIdEntity } from './entities/project.entity';
+import { Project, ProjectIdEntity } from './entities/project.entity';
 
 @Injectable()
 export class ProjectsService {
@@ -54,8 +54,17 @@ export class ProjectsService {
     });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} project`;
+  async findOne(id: string, userId: string) {
+    this.logger.log(`Finding project with id: ${id}`);
+    const project = await db.query.projects.findFirst({
+      where: and(eq(projectsModel.id, id), eq(projectsModel.userId, userId)),
+    });
+    if (!project) {
+      this.logger.warn(`No project found with id: ${id}`);
+      throw new HttpException('No project found', HttpStatus.NOT_FOUND);
+    }
+    this.logger.log(`Found project with id: ${id}`);
+    return plainToInstance(Project, project);
   }
 
   update(id: number, updateProjectDto: UpdateProjectDto) {

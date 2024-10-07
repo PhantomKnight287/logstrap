@@ -43,9 +43,7 @@ export const projects = pgTable('projects', {
   name: text('name').notNull(),
   description: text('description').default(null),
   url: text('url').default(null),
-  livePublicKey: text('public_key').default(null),
-  testPublicKey: text('test_public_key').default(null),
-  // start a project by default in test mode.
+  // start a project by default in test mode, live mode needs email verification. Test logs live for only 1hr and incur no extra cost
   mode: projectMode('project_mode').default('test'),
   userId: text('user_id')
     .notNull()
@@ -53,11 +51,46 @@ export const projects = pgTable('projects', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
+export const ApiKeys = pgTable('api_keys', {
+  id: text('id')
+    .unique()
+    .$defaultFn(() => `ak_${createId()}`),
+  key: text('key').notNull(),
+  description: text('description'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  userId: text('user_id')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  mode: projectMode('project_mode').default('test'),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
+});
+
+export const UserKeysRelation = relations(users, ({ many }) => ({
+  keys: many(ApiKeys),
+}));
+
+export const KeysUserRelation = relations(ApiKeys, ({ one }) => ({
+  user: one(users, { fields: [ApiKeys.userId], references: [users.id] }),
+}));
+
+export const ProjectKeysRelation = relations(projects, ({ many }) => ({
+  keys: many(ApiKeys),
+}));
+
+export const KeysProjectRelation = relations(ApiKeys, ({ one }) => ({
+  project: one(projects, {
+    fields: [ApiKeys.projectId],
+    references: [projects.id],
+  }),
+}));
+
 export const UserProjectRelation = relations(users, ({ many }) => ({
   projects: many(projects),
 }));
 
-export const projectUserRelation = relations(projects, ({ one }) => ({
+export const ProjectUserRelation = relations(projects, ({ one }) => ({
   author: one(users, { fields: [projects.userId], references: [users.id] }),
 }));
 

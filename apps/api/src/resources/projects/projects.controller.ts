@@ -17,8 +17,10 @@ import { AuthGuard } from '~/guards/auth/auth.guard';
 import {
   ApiBearerAuth,
   ApiCreatedResponse,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
+  ApiParam,
   ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
@@ -26,7 +28,8 @@ import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '../auth/entities/auth.entity';
 import { ITEMS_PER_QUERY } from '~/constants';
 import { FetchAllProjectsResponse } from './entities/response.entity';
-import { ProjectIdEntity } from './entities/project.entity';
+import { Project, ProjectIdEntity } from './entities/project.entity';
+import { GenericErrorEntity } from '~/entity';
 
 @Controller('projects')
 @UseGuards(AuthGuard)
@@ -79,8 +82,23 @@ export class ProjectsController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.projectsService.findOne(+id);
+  @ApiOperation({
+    description: 'Find a project with id',
+    summary: 'Find a project with id',
+  })
+  @ApiOkResponse({ type: Project, description: 'Project found' })
+  @ApiNotFoundResponse({
+    type: GenericErrorEntity,
+    description: 'Project not found',
+  })
+  @ApiParam({
+    type: String,
+    required: true,
+    name: 'id',
+    description: 'The id of the project',
+  })
+  findOne(@Param('id') id: string, @User() user: UserEntity) {
+    return this.projectsService.findOne(id, user.id);
   }
 
   @Patch(':id')

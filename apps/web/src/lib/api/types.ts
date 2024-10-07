@@ -111,6 +111,10 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
+        /**
+         * Find a project with id
+         * @description Find a project with id
+         */
         get: operations["ProjectsController_findOne"];
         put?: never;
         post?: never;
@@ -433,17 +437,30 @@ export interface operations {
             query?: never;
             header?: never;
             path: {
+                /** @description The id of the project */
                 id: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
+            /** @description Project found */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["Project"];
+                };
+            };
+            /** @description Project not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
             };
             /** @description Internal server error. */
             500: {

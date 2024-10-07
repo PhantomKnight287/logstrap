@@ -6,9 +6,12 @@ import Link from 'next/link';
 import { LINKS } from './links';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
+import { Fragment } from 'react';
+import { Separator } from '@/components/ui/separator';
+import { Redirects } from '@/constants/redirects';
 
 export default function NavSheet(props: { name: string; id: string }) {
-  const pathname = usePathname();
+  const pathname = usePathname().replace(`/dashboard/${props.id}`, '');
 
   return (
     <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
@@ -27,21 +30,28 @@ export default function NavSheet(props: { name: string; id: string }) {
             >
               <span className="sr-only">{props.name}</span>
             </Link>
-            {LINKS(props.id).map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className={cn(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary',
-                  {
-                    'text-primary bg-muted': pathname === link.href,
-                    'text-muted-foreground': pathname !== link.href,
-                  },
-                )}
+            {LINKS.map((link, index) => (
+              <Fragment
+                key={link.type === 'separator' ? index.toString() : link.href!}
               >
-                {link.icon}
-                {link.label}
-              </Link>
+                {link.type === 'separator' ? (
+                  <Separator />
+                ) : (
+                  <Link
+                    href={`${Redirects.AFTER_PROJECT_CREATED(props.id)}${link.href!}`}
+                    className={cn(
+                      'flex items-center gap-3 rounded-lg px-3 py-2 transition-all hover:text-primary',
+                      {
+                        'text-primary bg-muted': pathname === link.href,
+                        'text-muted-foreground': pathname !== link.href,
+                      },
+                    )}
+                  >
+                    {link.icon}
+                    {link.label}
+                  </Link>
+                )}
+              </Fragment>
             ))}
           </nav>
         </SheetContent>

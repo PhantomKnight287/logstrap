@@ -312,11 +312,14 @@
     "/projects/{id}": {
       "get": {
         "operationId": "ProjectsController_findOne",
+        "summary": "Find a project with id",
+        "description": "Find a project with id",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "The id of the project",
             "schema": {
               "type": "string"
             }
@@ -324,7 +327,24 @@
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "Project found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Project"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error.",
@@ -426,6 +446,228 @@
           {
             "JWT-auth": []
           }
+        ]
+      }
+    },
+    "/projects/{id}/keys": {
+      "post": {
+        "operationId": "KeysController_create",
+        "summary": "Create a new API key",
+        "description": "Create a new API Key",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateKeyResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Tried creating a 'live' key without verified email",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "No project found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
+        ]
+      },
+      "get": {
+        "operationId": "KeysController_findAll",
+        "summary": "Fetch all keys related to project",
+        "description": "Fetch all keys related to project",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchAllKeysResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
+        ]
+      }
+    },
+    "/projects/{id}/keys/{id}": {
+      "get": {
+        "operationId": "KeysController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
+        ]
+      },
+      "patch": {
+        "operationId": "KeysController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
+        ]
+      },
+      "delete": {
+        "operationId": "KeysController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
         ]
       }
     }
@@ -647,6 +889,95 @@
           },
           "url": {
             "type": "string"
+          }
+        }
+      },
+      "CreateKeyDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ProjectMode"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description for the key"
+          }
+        },
+        "required": [
+          "mode"
+        ]
+      },
+      "CreateKeyResponse": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "API Key, must be stored as it can't be seen again"
+          },
+          "id": {
+            "type": "string",
+            "description": "Id of key in db"
+          }
+        },
+        "required": [
+          "key",
+          "id"
+        ]
+      },
+      "Key": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "mode": {
+            "$ref": "#/components/schemas/ProjectMode"
+          }
+        },
+        "required": [
+          "id",
+          "createdAt",
+          "mode"
+        ]
+      },
+      "FetchAllKeysResponse": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Key"
+            }
+          },
+          "totalItems": {
+            "type": "number"
+          },
+          "itemsPerQuery": {
+            "type": "number",
+            "default": 6
+          }
+        },
+        "required": [
+          "items",
+          "totalItems",
+          "itemsPerQuery"
+        ]
+      },
+      "UpdateKeyDto": {
+        "type": "object",
+        "properties": {
+          "mode": {
+            "$ref": "#/components/schemas/ProjectMode"
+          },
+          "description": {
+            "type": "string",
+            "description": "Description for the key"
           }
         }
       }

@@ -99,7 +99,7 @@ export function Header() {
             </div>
           ) : (
             <Link
-              href={'/dashboad'}
+              href={Redirects.AFTER_AUTH}
               className={buttonVariants({ className: 'hidden md:flex' })}
             >
               Dashboard

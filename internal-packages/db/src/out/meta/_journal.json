@@ -43,6 +43,13 @@
       "when": 1728233767076,
       "tag": "0005_volatile_patriot",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1728294557689,
+      "tag": "0006_tiresome_elektra",
+      "breakpoints": true
     }
   ]
 }
