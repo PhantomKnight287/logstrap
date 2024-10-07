@@ -7,7 +7,10 @@ import { ApiKeys, projects, users } from '@logstrap/db';
 import { init } from '@paralleldrive/cuid2';
 import { hash } from 'argon2';
 import { plainToInstance } from 'class-transformer';
-import { CreateKeyResponse } from './entities/response.entity';
+import {
+  CreateKeyResponse,
+  FetchAllKeysResponse,
+} from './entities/response.entity';
 import { ITEMS_PER_QUERY } from '~/constants';
 
 const createId = init({
@@ -54,6 +57,7 @@ export class KeysService {
         projectId,
         userId,
         key: hashedKey,
+        name: body.name,
       })
       .returning();
     this.logger.log(`Created key: ${key.id} for ${projectId}`);
@@ -80,10 +84,12 @@ export class KeysService {
         return [operators.desc(fields.createdAt)];
       },
       columns: {
-        createdAt: true,
-        description: true,
         id: true,
+        name: true,
+        description: true,
+        createdAt: true,
         mode: true,
+        projectId: true,
       },
     });
     const [{ count }] = await db
@@ -92,11 +98,15 @@ export class KeysService {
       })
       .from(ApiKeys);
 
-    return {
+    this.logger.log(
+      `Fetched ${count} keys for ${projectId}. Requested by user: ${userId}`,
+    );
+    this.logger.log(keys);
+    return plainToInstance(FetchAllKeysResponse, {
       items: keys,
       totalItems: count,
       itemsPerQuery: ITEMS_PER_QUERY,
-    };
+    });
   }
 
   findOne(id: number) {

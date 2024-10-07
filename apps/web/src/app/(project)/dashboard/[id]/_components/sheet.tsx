@@ -14,7 +14,7 @@ export default function NavSheet(props: { name: string; id: string }) {
   const pathname = usePathname().replace(`/dashboard/${props.id}`, '');
 
   return (
-    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+    <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:!h-[60px] lg:px-6">
       <Sheet>
         <SheetTrigger asChild>
           <Button variant="outline" size="icon" className="shrink-0 md:hidden">
@@ -35,7 +35,7 @@ export default function NavSheet(props: { name: string; id: string }) {
                 key={link.type === 'separator' ? index.toString() : link.href!}
               >
                 {link.type === 'separator' ? (
-                  <Separator />
+                  <Separator className="my-2" />
                 ) : (
                   <Link
                     href={`${Redirects.AFTER_PROJECT_CREATED(props.id)}${link.href!}`}

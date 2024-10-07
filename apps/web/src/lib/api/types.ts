@@ -124,6 +124,46 @@ export interface paths {
         patch: operations["ProjectsController_update"];
         trace?: never;
     };
+    "/projects/{id}/keys": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch all keys related to project
+         * @description Fetch all keys related to project
+         */
+        get: operations["KeysController_findAll"];
+        put?: never;
+        /**
+         * Create a new API key
+         * @description Create a new API Key
+         */
+        post: operations["KeysController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}/keys/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["KeysController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["KeysController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["KeysController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -139,6 +179,7 @@ export interface components {
             createdAt: string;
             /** @description a decimal with precision upto 2 digits */
             walletBalance: string;
+            emailVerified: boolean;
         };
         LoginSuccessfulEntity: {
             user: components["schemas"]["UserEntity"];
@@ -185,6 +226,39 @@ export interface components {
             name?: string;
             description?: string;
             url?: string;
+        };
+        CreateKeyDto: {
+            mode: components["schemas"]["ProjectMode"];
+            /** @description Description for the key */
+            description?: string;
+            /** @description Name of the API Key, will be used for searching and sorting */
+            name: string;
+        };
+        CreateKeyResponse: {
+            /** @description API Key, must be stored as it can't be seen again */
+            key: string;
+            /** @description Id of key in db */
+            id: string;
+        };
+        Key: {
+            id: string;
+            projectId: string;
+            createdAt: string;
+            description?: string;
+            mode: components["schemas"]["ProjectMode"];
+        };
+        FetchAllKeysResponse: {
+            items: components["schemas"]["Key"][];
+            totalItems: number;
+            /** @default 6 */
+            itemsPerQuery: number;
+        };
+        UpdateKeyDto: {
+            mode?: components["schemas"]["ProjectMode"];
+            /** @description Description for the key */
+            description?: string;
+            /** @description Name of the API Key, will be used for searching and sorting */
+            name?: string;
         };
     };
     responses: never;
@@ -513,6 +587,181 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateProjectDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_findAll: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FetchAllKeysResponse"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateKeyDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateKeyResponse"];
+                };
+            };
+            /** @description Tried creating a 'live' key without verified email */
+            403: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+            /** @description No project found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateKeyDto"];
             };
         };
         responses: {

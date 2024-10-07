@@ -23,3 +23,12 @@ Content-Type: application/json
 ###
 GET {{url}}/auth/@me
 Authorization: Bearer {{token}}
+
+###
+GET {{url}}/projects/pj_dc5m03j76kbrku4ahn64ober/keys
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+    "name":"ok"
+}

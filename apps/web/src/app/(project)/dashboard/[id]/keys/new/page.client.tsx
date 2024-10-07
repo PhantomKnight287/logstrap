@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { useForm } from 'react-hook-form';
 import { z } from 'zod';
-import { createNewProjectSchema } from './schema';
+import { createNewApiKeySchema } from './schema';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Form,
@@ -17,48 +17,68 @@ import {
 import useLoading from '@/hooks/use-loading';
 import { client } from '@/lib/api';
 import toast from 'react-hot-toast';
-
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { readCookie } from '@/utils/cookie';
 import { COOKIE_NAME } from '@/constants';
 import { useRouter } from 'next/navigation';
 import { Redirects } from '@/constants/redirects';
 import { Textarea } from '@/components/ui/textarea';
+import useFetchUser from '@/hooks/use-fetch-user';
+import { purgeCache } from '@/lib/revalidate';
 
-export default function CreateNewProjectClient() {
+export default function CreateNewApiKeyClient({ id }: { id: string }) {
   const { replace } = useRouter();
   const { loading, toggle } = useLoading();
-
-  const form = useForm<z.infer<typeof createNewProjectSchema>>({
-    resolver: zodResolver(createNewProjectSchema),
+  const { user } = useFetchUser();
+  const form = useForm<z.infer<typeof createNewApiKeySchema>>({
+    resolver: zodResolver(createNewApiKeySchema),
     defaultValues: {
       name: '',
+      mode: 'test',
     },
   });
 
-  async function onSubmit(values: z.infer<typeof createNewProjectSchema>) {
-    const token = readCookie(COOKIE_NAME);
-    toggle(true);
-    const req = await client.POST('/projects', {
-      body: values,
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    if (req.error) {
-      toast.error(req.error.message);
+  async function onSubmit(values: z.infer<typeof createNewApiKeySchema>) {
+    try {
+      const token = readCookie(COOKIE_NAME);
+      toggle(true);
+      const req = await client.POST('/projects/{id}/keys', {
+        body: values,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        params: {
+          path: {
+            id,
+          },
+        },
+      });
+      if (req.error) {
+        toast.error(req.error.message);
+        toggle();
+        return;
+      }
+      toast.success(`New Key Created`);
+      await purgeCache(`api-keys::${id}`);
       toggle();
-      return;
+      replace(`${Redirects.AFTER_PROJECT_CREATED(id)}/keys`);
+    } catch (e) {
+      toggle();
+      toast.error((e as Error)?.message);
     }
-    toast.success(`New Project Created`);
-    toggle();
-    replace(Redirects.AFTER_PROJECT_CREATED(req.data.id));
   }
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-center">
-          Lets create your project
+          Create API Key
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -84,30 +104,44 @@ export default function CreateNewProjectClient() {
               />
               <FormField
                 control={form.control}
+                name="mode"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mode</FormLabel>
+                    <Select
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a key mode" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="test">Test</SelectItem>
+                        <SelectItem value="live">Live</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <FormMessage />
+                    {field.value == 'live' && !user?.emailVerified ? (
+                      <p className="text-sm text-muted-foreground">
+                        Generating keys for live mode requires your email to be
+                        verified.
+                      </p>
+                    ) : null}
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
                 name="description"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
-                        placeholder="A project that I will never abandon"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="url"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Url</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Url of your project"
-                        type="url"
+                        placeholder="Describe this api key(optional)"
                         {...field}
                       />
                     </FormControl>

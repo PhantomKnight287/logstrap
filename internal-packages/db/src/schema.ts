@@ -55,6 +55,7 @@ export const ApiKeys = pgTable('api_keys', {
   id: text('id')
     .unique()
     .$defaultFn(() => `ak_${createId()}`),
+  name: text('name').notNull(),
   key: text('key').notNull(),
   description: text('description'),
   createdAt: timestamp('created_at').defaultNow().notNull(),

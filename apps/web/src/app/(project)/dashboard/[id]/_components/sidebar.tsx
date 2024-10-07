@@ -19,7 +19,7 @@ export default function SidebarNav(props: { id: string }) {
             key={link.type === 'separator' ? index.toString() : link.href!}
           >
             {link.type === 'separator' ? (
-              <Separator />
+              <Separator className="my-2" />
             ) : (
               <Link
                 href={`${Redirects.AFTER_PROJECT_CREATED(props.id)}${link.href!}`}

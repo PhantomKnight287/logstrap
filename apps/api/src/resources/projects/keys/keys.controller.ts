@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  UseGuards,
 } from '@nestjs/common';
 import { KeysService } from './keys.service';
 import { CreateKeyDto } from './dto/create-key.dto';
@@ -26,6 +27,7 @@ import {
 import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '~/resources/auth/entities/auth.entity';
 import { GenericErrorEntity } from '~/entity';
+import { AuthGuard } from '~/guards/auth/auth.guard';
 
 @ApiParam({
   name: 'id',
@@ -34,6 +36,7 @@ import { GenericErrorEntity } from '~/entity';
 })
 @Controller('projects/:id/keys')
 @ApiTags('Keys')
+@UseGuards(AuthGuard)
 export class KeysController {
   constructor(private readonly keysService: KeysService) {}
 

@@ -1,4 +1,4 @@
-import { CircleAlert, Code2, Home, Settings2, User } from 'lucide-react';
+import { ChartBar, CircleAlert, Code2, Home, Settings2 } from 'lucide-react';
 export const LINKS = [
   {
     href: '',
@@ -8,12 +8,12 @@ export const LINKS = [
   {
     href: `/app-events`,
     label: 'App Events',
-    icon: <User className="h-4 w-4" />,
+    icon: <CircleAlert className="h-4 w-4" />,
   },
   {
     href: `/api-requests`,
     label: 'API Requests',
-    icon: <CircleAlert className="h-4 w-4" />,
+    icon: <ChartBar className="h-4 w-4" />,
   },
   {
     type: 'separator',

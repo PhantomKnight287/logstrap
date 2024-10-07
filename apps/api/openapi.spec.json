@@ -724,13 +724,17 @@
           "walletBalance": {
             "type": "string",
             "description": "a decimal with precision upto 2 digits"
+          },
+          "emailVerified": {
+            "type": "boolean"
           }
         },
         "required": [
           "id",
           "name",
           "createdAt",
-          "walletBalance"
+          "walletBalance",
+          "emailVerified"
         ]
       },
       "LoginSuccessfulEntity": {
@@ -901,10 +905,15 @@
           "description": {
             "type": "string",
             "description": "Description for the key"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the API Key, will be used for searching and sorting"
           }
         },
         "required": [
-          "mode"
+          "mode",
+          "name"
         ]
       },
       "CreateKeyResponse": {
@@ -930,6 +939,9 @@
           "id": {
             "type": "string"
           },
+          "projectId": {
+            "type": "string"
+          },
           "createdAt": {
             "type": "string"
           },
@@ -942,6 +954,7 @@
         },
         "required": [
           "id",
+          "projectId",
           "createdAt",
           "mode"
         ]
@@ -978,6 +991,10 @@
           "description": {
             "type": "string",
             "description": "Description for the key"
+          },
+          "name": {
+            "type": "string",
+            "description": "Name of the API Key, will be used for searching and sorting"
           }
         }
       }

@@ -12,6 +12,11 @@ export class Key {
   @ApiProperty({})
   @Expose()
   @IsString()
+  projectId: string;
+
+  @ApiProperty({})
+  @Expose()
+  @IsString()
   createdAt: string;
 
   @ApiProperty({ required: false })

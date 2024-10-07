@@ -1,6 +1,6 @@
 import { projectMode } from '@logstrap/db';
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsOptional, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class CreateKeyDto {
   @ApiProperty({
@@ -14,4 +14,11 @@ export class CreateKeyDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiProperty({
+    description: 'Name of the API Key, will be used for searching and sorting',
+  })
+  @IsString()
+  @IsNotEmpty()
+  name: string;
 }

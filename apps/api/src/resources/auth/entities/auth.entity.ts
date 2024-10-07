@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { Expose, Type } from 'class-transformer';
-import { IsDecimal, IsString } from 'class-validator';
+import { IsBoolean, IsDecimal, IsString } from 'class-validator';
 
 export class Auth {}
 
@@ -26,6 +26,13 @@ export class UserEntity {
   @IsString()
   @Expose()
   walletBalance: string;
+
+  @ApiProperty({
+    type: Boolean,
+  })
+  @IsBoolean()
+  @Expose()
+  emailVerified: boolean;
 }
 
 export class LoginSuccessfulEntity {
