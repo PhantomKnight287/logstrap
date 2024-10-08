@@ -1,12 +1,22 @@
-import { LogsTrapInitOptions } from './types';
+import { LoggerOptions } from 'winston';
 
-export class LogsTrap {
+import { LogsTrapInitOptions } from './types';
+import Logger from './logger';
+export default class LogsTrap {
   protected apiKey: string;
   protected projectId: string;
   protected endpoint: string;
-  constructor({ apiKey, projectId, endpoint }: LogsTrapInitOptions) {
+
+  logger: Logger;
+  constructor(
+    { apiKey, projectId, endpoint }: LogsTrapInitOptions,
+    loggingOptions: LoggerOptions,
+  ) {
     this.apiKey = apiKey;
     this.endpoint = `${endpoint ?? 'https://logstrap-api.procrastinator.fyi'}/projects/${projectId}/logs`;
     this.projectId = projectId;
+
+    this.logger = new Logger();
+    
   }
 }

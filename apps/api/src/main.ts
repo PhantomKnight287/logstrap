@@ -10,7 +10,21 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { WinstonModule } from 'nest-winston';
 import { loggerInstance } from '~/logger/winston.config';
 import { CustomValidationPipe } from './pipes/validation/validation.pipe';
-import path from 'node:path';
+import * as LogsTrap from '@logstrap/core';
+import { promisify } from 'node:util';
+
+const wait = promisify(setTimeout)
+
+
+const logstrap = new LogsTrap.default(
+  {
+    apiKey: 'key_unzrxstuw5',
+    projectId: 'pj_dc5m03j76kbrku4ahn64ober',
+  },
+  {
+    transports: new winston.default.transports.Console()
+  },
+);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -102,5 +116,7 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.PORT || 5000);
+  await wait(5000)
+  logstrap.logger.warn("IDK")
 }
 bootstrap();

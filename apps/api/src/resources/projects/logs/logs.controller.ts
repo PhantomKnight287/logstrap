@@ -32,6 +32,7 @@ export class LogsController {
     summary: 'Create Logs',
   })
   create(@Body() createLogDto: CreateLogDto) {
+    console.log(createLogDto);
     return this.logsService.create(createLogDto);
   }
 

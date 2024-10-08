@@ -13,3 +13,4 @@ export interface LogsTrapInitOptions {
    */
   endpoint?: string;
 }
+
