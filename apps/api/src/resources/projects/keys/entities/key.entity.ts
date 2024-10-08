@@ -28,4 +28,9 @@ export class Key {
   @Expose()
   @IsEnum(projectMode.enumValues)
   mode: string;
+
+  @ApiProperty({})
+  @Expose()
+  @IsString()
+  name: string;
 }

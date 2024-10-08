@@ -246,6 +246,7 @@ export interface components {
             createdAt: string;
             description?: string;
             mode: components["schemas"]["ProjectMode"];
+            name: string;
         };
         FetchAllKeysResponse: {
             items: components["schemas"]["Key"][];

@@ -7,6 +7,8 @@ import {
   text,
   decimal,
   timestamp,
+  jsonb,
+  integer,
 } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
 
@@ -97,3 +99,141 @@ export const ProjectUserRelation = relations(projects, ({ one }) => ({
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+
+// Enum for log levels
+export const LogLevelEnum = pgEnum('log_level', [
+  'debug',
+  'info',
+  'warn',
+  'error',
+  'fatal',
+]);
+
+// Helper function to create prefixed IDs
+const createPrefixedId = (prefix: string) =>
+  text('id')
+    .primaryKey()
+    .$defaultFn(() => `${prefix}_${createId()}`);
+
+// Request logs table (serves as the base table)
+export const requestLogs = pgTable('request_logs', {
+  id: createPrefixedId('rl'),
+  projectId: text('project_id')
+    .references(() => projects.id)
+    .notNull(),
+  apiKeyId: text('api_key_id')
+    .references(() => ApiKeys.id)
+    .notNull(),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
+  method: text('method').notNull(),
+  url: text('url').notNull(),
+  statusCode: text('status_code'),
+  requestBody: jsonb('request_body'),
+  responseBody: jsonb('response_body'),
+  requestHeaders: jsonb('request_headers'),
+  responseHeaders: jsonb('response_headers'),
+  cookies: jsonb('cookies'),
+  ip: text('ip'),
+  userAgent: text('user_agent'),
+});
+
+// Application logs table
+export const applicationLogs = pgTable('application_logs', {
+  id: createPrefixedId('al'),
+  requestId: text('request_id')
+    .references(() => requestLogs.id)
+    .notNull(),
+  projectId: text('project_id')
+    .references(() => projects.id)
+    .notNull(),
+  apiKeyId: text('api_key_id')
+    .references(() => ApiKeys.id)
+    .notNull(),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
+  level: LogLevelEnum('level').notNull(),
+  message: text('message').notNull(),
+  component: text('component'),
+  functionName: text('function_name'),
+  additionalInfo: jsonb('additional_info'),
+});
+
+// System logs table
+export const systemLogs = pgTable('system_logs', {
+  id: createPrefixedId('sl'),
+  requestId: text('request_id')
+    .references(() => requestLogs.id)
+    .notNull(),
+  projectId: text('project_id')
+    .references(() => projects.id)
+    .notNull(),
+  apiKeyId: text('api_key_id').references(() => ApiKeys.id),
+  timestamp: timestamp('timestamp').defaultNow().notNull(),
+  level: LogLevelEnum('level').notNull(),
+  message: text('message').notNull(),
+  eventType: text('event_type'),
+  details: jsonb('details'),
+});
+
+// Relationships
+export const projectsRelations = relations(projects, ({ many }) => ({
+  apiKeys: many(ApiKeys),
+  requestLogs: many(requestLogs),
+  applicationLogs: many(applicationLogs),
+  systemLogs: many(systemLogs),
+}));
+
+export const apiKeysRelations = relations(ApiKeys, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [ApiKeys.projectId],
+    references: [projects.id],
+  }),
+  requestLogs: many(requestLogs),
+  applicationLogs: many(applicationLogs),
+  systemLogs: many(systemLogs),
+}));
+
+export const requestLogsRelations = relations(requestLogs, ({ one, many }) => ({
+  project: one(projects, {
+    fields: [requestLogs.projectId],
+    references: [projects.id],
+  }),
+  apiKey: one(ApiKeys, {
+    fields: [requestLogs.apiKeyId],
+    references: [ApiKeys.id],
+  }),
+  applicationLogs: many(applicationLogs),
+  systemLogs: many(systemLogs),
+}));
+
+export const applicationLogsRelations = relations(
+  applicationLogs,
+  ({ one }) => ({
+    request: one(requestLogs, {
+      fields: [applicationLogs.requestId],
+      references: [requestLogs.id],
+    }),
+    project: one(projects, {
+      fields: [applicationLogs.projectId],
+      references: [projects.id],
+    }),
+    apiKey: one(ApiKeys, {
+      fields: [applicationLogs.apiKeyId],
+      references: [ApiKeys.id],
+    }),
+  }),
+);
+
+export const systemLogsRelations = relations(systemLogs, ({ one }) => ({
+  request: one(requestLogs, {
+    fields: [systemLogs.requestId],
+    references: [requestLogs.id],
+  }),
+  project: one(projects, {
+    fields: [systemLogs.projectId],
+    references: [projects.id],
+  }),
+  apiKey: one(ApiKeys, {
+    fields: [systemLogs.apiKeyId],
+    references: [ApiKeys.id],
+  }),
+}));

@@ -57,6 +57,13 @@
       "when": 1728307855188,
       "tag": "0007_plain_ultron",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1728372740915,
+      "tag": "0008_high_korvac",
+      "breakpoints": true
     }
   ]
 }

@@ -21,7 +21,7 @@ export const LINKS = [
   {
     href: `/keys`,
     label: 'API Keys',
-    icon: <Code2 className="h-4 w-4" />,
+    icon: <Code2 className="size-4" />,
   },
   {
     href: `/settings`,

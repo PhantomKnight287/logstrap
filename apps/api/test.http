@@ -1,6 +1,8 @@
 @url = http://localhost:5000
 @token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXJfancwNnVrNXg0anpubTRqbGl3OGRrZ3F3IiwiaWF0IjoxNzI4MTUwNDcxLCJleHAiOjE3MzA3NDI0NzF9.VOOfRq1zAfcRsF-5lKRtqXbh_ZC4omuf0yfB37KvvT0
 
+@apiKey=key_unzrxstuw5
+
 ###
 POST {{url}}/auth/login
 Content-Type: application/json
@@ -32,3 +34,5 @@ Authorization: Bearer {{token}}
 {
     "name":"ok"
 }
+
+###

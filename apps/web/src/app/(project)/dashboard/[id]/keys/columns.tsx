@@ -9,7 +9,7 @@ export const columns: ColumnDef<
   components['schemas']['FetchAllKeysResponse']['items'][0]
 >[] = [
   {
-    accessorKey: 'mode',
+    accessorKey: 'name',
     header: 'Name',
     cell: ({ row }) => {
       return (
@@ -17,7 +17,7 @@ export const columns: ColumnDef<
           href={`/dashboard/${row.original.projectId}/keys/${row.original.id}`}
           className="underline text-left"
         >
-          {row.original.id}
+          {row.original.name}
         </Link>
       );
     },

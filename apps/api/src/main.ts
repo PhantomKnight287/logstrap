@@ -53,6 +53,14 @@ async function bootstrap() {
       },
       'JWT-auth',
     )
+    .addApiKey(
+      {
+        type: 'apiKey',
+        name: 'x-api-key',
+        in: 'header',
+      },
+      'Api-Key',
+    )
     .build();
   const document = SwaggerModule.createDocument(app, openAPIConfig);
   app.useGlobalInterceptors(

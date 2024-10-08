@@ -1,14 +1,14 @@
 import {
-  Injectable,
   CanActivate,
   ExecutionContext,
+  Injectable,
   UnauthorizedException,
 } from '@nestjs/common';
 import { Request } from 'express';
 import { AuthService } from '~/resources/auth/auth.service';
 
 @Injectable()
-export class AuthGuard implements CanActivate {
+export class ApiKeyGuard implements CanActivate {
   constructor(private authService: AuthService) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -28,7 +28,8 @@ export class AuthGuard implements CanActivate {
   }
 
   private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
+    const [type, token] =
+      (request.headers['x-api-key'] as string)?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }
 }

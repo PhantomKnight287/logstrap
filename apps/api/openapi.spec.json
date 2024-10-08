@@ -670,6 +670,193 @@
           "Keys"
         ]
       }
+    },
+    "/project/{id}/logs": {
+      "post": {
+        "operationId": "LogsController_create",
+        "summary": "Create Logs",
+        "description": "Create logs",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of project",
+            "schema": {}
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ],
+        "security": [
+          {
+            "Api-Key": []
+          }
+        ]
+      },
+      "get": {
+        "operationId": "LogsController_findAll",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of project",
+            "schema": {}
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ]
+      }
+    },
+    "/project/{id}/logs/{id}": {
+      "get": {
+        "operationId": "LogsController_findOne",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ]
+      },
+      "patch": {
+        "operationId": "LogsController_update",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLogDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ]
+      },
+      "delete": {
+        "operationId": "LogsController_remove",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ]
+      }
     }
   },
   "info": {
@@ -690,6 +877,11 @@
         "description": "Enter JWT token",
         "in": "header",
         "x-tokenName": "Token"
+      },
+      "Api-Key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
       }
     },
     "schemas": {
@@ -950,13 +1142,17 @@
           },
           "mode": {
             "$ref": "#/components/schemas/ProjectMode"
+          },
+          "name": {
+            "type": "string"
           }
         },
         "required": [
           "id",
           "projectId",
           "createdAt",
-          "mode"
+          "mode",
+          "name"
         ]
       },
       "FetchAllKeysResponse": {
@@ -995,6 +1191,192 @@
           "name": {
             "type": "string",
             "description": "Name of the API Key, will be used for searching and sorting"
+          }
+        }
+      },
+      "LogLevel": {
+        "type": "string",
+        "description": "Log level",
+        "enum": [
+          "debug",
+          "info",
+          "warn",
+          "error",
+          "fatal"
+        ]
+      },
+      "CreateApplicationLogDto": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "description": "Timestamp of the log entry",
+            "format": "date-time"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LogLevel"
+          },
+          "message": {
+            "type": "string",
+            "description": "Log message"
+          },
+          "component": {
+            "type": "string",
+            "description": "Component that generated the log"
+          },
+          "functionName": {
+            "type": "string",
+            "description": "Function name where the log was generated"
+          },
+          "additionalInfo": {
+            "type": "object",
+            "description": "Additional information"
+          }
+        },
+        "required": [
+          "level",
+          "message"
+        ]
+      },
+      "RequestLogDTO": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "date-time",
+            "description": "timestamp when log was created"
+          },
+          "method": {
+            "type": "string",
+            "description": "Request method"
+          },
+          "url": {
+            "type": "string",
+            "description": "The url where request was made(/api/v1..., https://api.com/v1/)"
+          },
+          "statusCode": {
+            "type": "number",
+            "description": "Status code of this request"
+          },
+          "requestBody": {
+            "type": "object",
+            "description": "The request body(only supports json)"
+          },
+          "responseBody": {
+            "type": "object",
+            "description": "The response body(only supports json)"
+          },
+          "requestHeaders": {
+            "type": "object",
+            "description": "The request headers(only supports json)"
+          },
+          "responseHeaders": {
+            "type": "object",
+            "description": "The response headers(only supports json)"
+          },
+          "cookies": {
+            "type": "object",
+            "description": "The request cookies(only supports json)"
+          },
+          "ip": {
+            "type": "string",
+            "description": "The ip from where the request was made"
+          },
+          "userAgent": {
+            "type": "string",
+            "description": "The user agent from where the request was made"
+          },
+          "applicationLogs": {
+            "description": "Application Logs related to this request",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateApplicationLogDto"
+            }
+          }
+        },
+        "required": [
+          "method",
+          "url",
+          "statusCode"
+        ]
+      },
+      "CreateSystemLogDto": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "description": "Timestamp of the log entry",
+            "format": "date-time"
+          },
+          "level": {
+            "$ref": "#/components/schemas/LogLevel"
+          },
+          "message": {
+            "type": "string",
+            "description": "Log message"
+          },
+          "eventType": {
+            "type": "string",
+            "description": "Type of system event"
+          },
+          "details": {
+            "type": "object",
+            "description": "Additional details"
+          }
+        },
+        "required": [
+          "level",
+          "message"
+        ]
+      },
+      "CreateLogDto": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "description": "Requests associated to this log",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestLogDTO"
+            }
+          },
+          "applicationLogs": {
+            "description": "Application logs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateApplicationLogDto"
+            }
+          },
+          "systemLogs": {
+            "description": "System logs(like when a process crashes)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateSystemLogDto"
+            }
+          }
+        }
+      },
+      "UpdateLogDto": {
+        "type": "object",
+        "properties": {
+          "requests": {
+            "description": "Requests associated to this log",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RequestLogDTO"
+            }
+          },
+          "applicationLogs": {
+            "description": "Application logs",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateApplicationLogDto"
+            }
+          },
+          "systemLogs": {
+            "description": "System logs(like when a process crashes)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CreateSystemLogDto"
+            }
           }
         }
       }

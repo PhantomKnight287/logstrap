@@ -32,11 +32,18 @@ import { Redirects } from '@/constants/redirects';
 import { Textarea } from '@/components/ui/textarea';
 import useFetchUser from '@/hooks/use-fetch-user';
 import { purgeCache } from '@/lib/revalidate';
+import { useState } from 'react';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
+import useClipboard from '@/hooks/use-clipboard';
+import { Check, Copy } from 'lucide-react';
 
 export default function CreateNewApiKeyClient({ id }: { id: string }) {
   const { replace } = useRouter();
   const { loading, toggle } = useLoading();
   const { user } = useFetchUser();
+  const [apiKey, setApiKey] = useState<string | null>(null);
+  const { copied, copy } = useClipboard();
   const form = useForm<z.infer<typeof createNewApiKeySchema>>({
     resolver: zodResolver(createNewApiKeySchema),
     defaultValues: {
@@ -68,7 +75,7 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
       toast.success(`New Key Created`);
       await purgeCache(`api-keys::${id}`);
       toggle();
-      replace(`${Redirects.AFTER_PROJECT_CREATED(id)}/keys`);
+      setApiKey(req.data.key);
     } catch (e) {
       toggle();
       toast.error((e as Error)?.message);
@@ -160,6 +167,38 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
             </Button>
           </form>
         </Form>
+        {apiKey != null ? (
+          <Alert className="mt-6">
+            <ExclamationTriangleIcon className="h-4 w-4" />
+            <AlertTitle className="leading-4">
+              Make sure to copy your key now as you will not be able to see it
+              again.
+            </AlertTitle>
+            <AlertDescription>
+              <div className="flex flex-col gap-4">
+                <div className="flex flex-row items-center gap-1 justify-center">
+                  <Input disabled value={apiKey!} />
+                  <Button
+                    variant={'secondary'}
+                    onClick={() => {
+                      copy(apiKey!);
+                    }}
+                  >
+                    {copied ? <Check size={20} /> : <Copy size={20} />}
+                  </Button>
+                </div>
+                <Button
+                  onClick={() => {
+                    replace(`${Redirects.AFTER_PROJECT_CREATED(id)}/keys`);
+                  }}
+                  variant={'outline'}
+                >
+                  I&apos;ve copied my key
+                </Button>
+              </div>
+            </AlertDescription>
+          </Alert>
+        ) : null}
       </CardContent>
     </Card>
   );
