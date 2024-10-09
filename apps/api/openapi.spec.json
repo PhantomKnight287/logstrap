@@ -703,7 +703,9 @@
             "required": true,
             "in": "path",
             "description": "Id of project",
-            "schema": {}
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "requestBody": {
