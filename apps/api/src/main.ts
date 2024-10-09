@@ -1,7 +1,6 @@
-import { config } from 'dotenv';
 import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
-import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ClassSerializerInterceptor } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import helmet from 'helmet';
 import morgan from 'morgan';
@@ -10,21 +9,6 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { WinstonModule } from 'nest-winston';
 import { loggerInstance } from '~/logger/winston.config';
 import { CustomValidationPipe } from './pipes/validation/validation.pipe';
-import * as LogsTrap from '@logstrap/core';
-import { promisify } from 'node:util';
-
-const wait = promisify(setTimeout)
-
-
-const logstrap = new LogsTrap.default(
-  {
-    apiKey: 'key_unzrxstuw5',
-    projectId: 'pj_dc5m03j76kbrku4ahn64ober',
-  },
-  {
-    transports: new winston.default.transports.Console()
-  },
-);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -116,7 +100,5 @@ async function bootstrap() {
     }),
   );
   await app.listen(process.env.PORT || 5000);
-  await wait(5000)
-  logstrap.logger.warn("IDK")
 }
 bootstrap();

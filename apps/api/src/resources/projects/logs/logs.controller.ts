@@ -14,7 +14,7 @@ import { UpdateLogDto } from './dto/update-log.dto';
 import { ApiOperation, ApiParam, ApiSecurity, ApiTags } from '@nestjs/swagger';
 import { ApiKeyGuard } from '~/guards/api-key/api-key.guard';
 
-@Controller('project/:id/logs')
+@Controller('projects/:id/logs')
 @ApiTags('Logs')
 @ApiParam({
   name: 'id',
@@ -32,7 +32,7 @@ export class LogsController {
     summary: 'Create Logs',
   })
   create(@Body() createLogDto: CreateLogDto) {
-    console.log(createLogDto);
+    console.dir(createLogDto, { depth: Infinity });
     return this.logsService.create(createLogDto);
   }
 

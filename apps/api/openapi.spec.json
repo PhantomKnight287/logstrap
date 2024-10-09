@@ -22,6 +22,27 @@
         }
       }
     },
+    "/2": {
+      "get": {
+        "operationId": "AppController_getHello2",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": ""
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/auth/login": {
       "post": {
         "operationId": "AuthController_login",
@@ -671,7 +692,7 @@
         ]
       }
     },
-    "/project/{id}/logs": {
+    "/projects/{id}/logs": {
       "post": {
         "operationId": "LogsController_create",
         "summary": "Create Logs",
@@ -750,7 +771,7 @@
         ]
       }
     },
-    "/project/{id}/logs/{id}": {
+    "/projects/{id}/logs/{id}": {
       "get": {
         "operationId": "LogsController_findOne",
         "parameters": [

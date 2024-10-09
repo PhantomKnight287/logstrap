@@ -206,6 +206,7 @@ export class CreateLogDto {
     type: [CreateApplicationLogDto],
   })
   @IsArray()
+  @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateApplicationLogDto)
   applicationLogs: CreateApplicationLogDto[];
@@ -217,5 +218,6 @@ export class CreateLogDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => CreateSystemLogDto)
+  @IsOptional()
   systemLogs: CreateSystemLogDto[];
 }

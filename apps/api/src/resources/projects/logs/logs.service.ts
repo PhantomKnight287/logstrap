@@ -6,7 +6,9 @@ import { UpdateLogDto } from './dto/update-log.dto';
 export class LogsService {
   protected logger = new Logger(LogsService.name);
   create(createLogDto: CreateLogDto) {
-    return 'This action adds a new log';
+    return {
+      message: 'Hello',
+    };
   }
 
   findAll() {
