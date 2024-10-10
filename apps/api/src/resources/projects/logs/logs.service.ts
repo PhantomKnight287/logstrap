@@ -1,83 +1,160 @@
 import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
-import { CreateLogDto } from './dto/create-log.dto';
+import {
+  CreateApplicationLogDto,
+  CreateLogDto,
+  RequestLogDTO,
+} from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 import { db } from '~/db';
-import { ApiKeys, applicationLogs, requestLogs } from '@logstrap/db';
-import { eq } from 'drizzle-orm';
-import { verify } from 'argon2';
+import {
+  ApiKeys,
+  applicationLogs as applicationLogsTable,
+  projects,
+  requestLogs as requestLogsTable,
+} from '@logstrap/db';
+import { and, desc, eq, getTableColumns, sql } from 'drizzle-orm';
+import { ITEMS_PER_QUERY } from '~/constants';
 
 @Injectable()
 export class LogsService {
   protected logger = new Logger(LogsService.name);
-  async create(body: CreateLogDto, projectId: string, apiKey: string) {
-    this.logger.log(`Creating logs for Project: ${projectId}`);
-    const apiKeys = await db
-      .select()
-      .from(ApiKeys)
-      .where(eq(ApiKeys.projectId, projectId));
-
-    if (apiKeys.length === 0) {
-      this.logger.warn(`No API keys found for Project: ${projectId}`);
-      throw new HttpException('Invalid API Key', HttpStatus.NOT_FOUND);
-    }
-
-    let isApiKeyCorrect = false;
-    let apiKeyRecord: typeof ApiKeys.$inferSelect | null = null;
-    for (const _apiKeyRecord of apiKeys) {
-      if (await verify(_apiKeyRecord.key, apiKey)) {
-        isApiKeyCorrect = true;
-        apiKeyRecord = _apiKeyRecord;
-        break;
-      }
-    }
-
-    if (!isApiKeyCorrect) {
-      this.logger.warn(`Incorrect API Key supplied for Project: ${projectId}`);
-      throw new HttpException('Invalid API Key', HttpStatus.UNAUTHORIZED);
-    }
+  async create(body: CreateLogDto, apiKey: typeof ApiKeys.$inferSelect) {
+    this.logger.log(`Creating logs for Project: ${apiKey.projectId}`);
+    // Key is already validated by the guard
     if (body.requests) {
-      const apiRequest = await db.transaction(async (tx) => {
-        for (const request of body.requests) {
-          const [baseApiRequest] = await tx
-            .insert(requestLogs)
-            //@ts-expect-error
-            .values({
-              apiKeyId: apiKeyRecord.id,
-              method: request.method,
-              projectId,
-              url: request.url,
-              // timestamp: request.timestamp ?? new Date(),
-              statusCode: request.statusCode,
-              requestBody: request.requestBody,
-              requestHeaders: request.requestHeaders,
-              responseBody: request.responseBody,
-              responseHeaders: request.responseHeaders,
-              cookies: request.cookies,
-              ip: request.ip,
-              userAgent: request.userAgent,
-            })
-            .returning();
-          for (const applicationLog of request.applicationLogs) {
-            await tx
-              .insert(applicationLogs)
-              //@ts-expect-error
-              .values({
-                apiKeyId: apiKeyRecord.id,
-                level: applicationLog.level,
-                message: applicationLog.message,
-                projectId,
-                requestId: baseApiRequest.id,
-                // timestamp: request.timestamp ?? new Date(),
-                component: applicationLog.component,
-                functionName: applicationLog.functionName,
-                additionalInfo: applicationLog.additionalInfo,
-              });
-          }
-        }
+      await this.processRequests(body.requests, apiKey.projectId, apiKey.id);
+    }
+
+    return { message: 'Logged' };
+  }
+
+  private async processRequests(
+    requests: any[],
+    projectId: string,
+    apiKeyId: string,
+  ) {
+    await db.transaction(async (tx) => {
+      for (const request of requests) {
+        const [baseApiRequest] = await this.insertRequestLog(
+          tx,
+          request,
+          projectId,
+          apiKeyId,
+        );
+        await this.insertApplicationLogs(
+          tx,
+          request.applicationLogs,
+          projectId,
+          apiKeyId,
+          baseApiRequest.id,
+        );
+      }
+    });
+  }
+
+  private async insertRequestLog(
+    tx: any,
+    request: RequestLogDTO,
+    projectId: string,
+    apiKeyId: string,
+  ) {
+    return tx
+      .insert(requestLogsTable)
+      .values({
+        apiKeyId,
+        method: request.method,
+        projectId,
+        url: request.url,
+        statusCode: request.statusCode,
+        requestBody: request.requestBody,
+        requestHeaders: request.requestHeaders,
+        responseBody: request.responseBody,
+        responseHeaders: request.responseHeaders,
+        cookies: request.cookies,
+        ip: request.ip,
+        userAgent: request.userAgent,
+        timeTaken: request.timeTaken,
+      })
+      .returning();
+  }
+
+  private async insertApplicationLogs(
+    tx: any,
+    applicationLogs: CreateApplicationLogDto[],
+    projectId: string,
+    apiKeyId: string,
+    requestId: string,
+  ) {
+    for (const log of applicationLogs) {
+      await tx.insert(applicationLogsTable).values({
+        apiKeyId,
+        level: log.level,
+        message: log.message,
+        projectId,
+        requestId,
+        component: log.component,
+        functionName: log.functionName,
+        additionalInfo: log.additionalInfo,
       });
     }
+  }
+
+  async getRequestLogs(
+    projectId: string,
+    userId: string,
+    page: number,
+    limit: number,
+  ) {
+    this.logger.log(`Getting request logs for Project: ${projectId}`);
+    const project = await db.query.projects.findFirst({
+      where: and(eq(projects.id, projectId), eq(projects.userId, userId)),
+    });
+    if (!project) {
+      this.logger.warn(`Project not found: ${projectId}`);
+      throw new HttpException('No project found', HttpStatus.NOT_FOUND);
+    }
+    const {
+      id,
+      url,
+      timestamp,
+      userAgent,
+      method,
+      statusCode,
+      apiKeyId,
+      timeTaken,
+      projectId: projectIdColumn,
+    } = getTableColumns(requestLogsTable);
+    const logs = await db
+      .select({
+        id,
+        url,
+        timestamp,
+        userAgent,
+        method,
+        statusCode,
+        apiKeyId,
+        timeTaken,
+        projectId: projectIdColumn,
+        applicationLogsCount: sql`count(*)`
+          .mapWith(Number)
+          .as('applicationLogsCount'),
+      })
+      .from(requestLogsTable)
+      .where(eq(requestLogsTable.projectId, projectId))
+      .groupBy(requestLogsTable.id)
+      .limit(limit ?? ITEMS_PER_QUERY)
+      .offset(((page <= 0 ? 1 : page) - 1) * (limit ?? ITEMS_PER_QUERY))
+      .orderBy(desc(requestLogsTable.timestamp));
+
+    const [{ count }] = await db
+      .select({ count: sql`count(*)`.mapWith(Number).as('count') })
+      .from(requestLogsTable)
+      .where(eq(requestLogsTable.projectId, projectId));
+
     return {
-      message: 'Logged',
+      items: logs,
+      totalItems: count,
+      itemsPerQuery: limit ?? ITEMS_PER_QUERY,
     };
   }
 

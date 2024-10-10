@@ -703,9 +703,7 @@
             "required": true,
             "in": "path",
             "description": "Id of project",
-            "schema": {
-              "type": "string"
-            }
+            "schema": {}
           }
         ],
         "requestBody": {
@@ -741,21 +739,52 @@
             "Api-Key": []
           }
         ]
-      },
+      }
+    },
+    "/projects/{id}/request-logs": {
       "get": {
-        "operationId": "LogsController_findAll",
+        "operationId": "LogsController_getRequestLogs",
+        "summary": "Get requests logs for a project",
+        "description": "Get requests logs for a project",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
             "description": "Id of project",
-            "schema": {}
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "The no of page",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The no of items to fetch, defaults to 6",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchRequestLogsResponseEntity"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error.",
@@ -770,10 +799,15 @@
         },
         "tags": [
           "Logs"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
         ]
       }
     },
-    "/projects/{id}/logs/{id}": {
+    "/projects/{id}/{id}": {
       "get": {
         "operationId": "LogsController_findOne",
         "parameters": [
@@ -1268,6 +1302,10 @@
             "type": "date-time",
             "description": "timestamp when log was created"
           },
+          "timeTaken": {
+            "type": "number",
+            "description": "Time taken for your service to send response"
+          },
           "method": {
             "type": "string",
             "description": "Request method"
@@ -1376,6 +1414,75 @@
             }
           }
         }
+      },
+      "PartialRequestLogEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          },
+          "applicationLogsCount": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "apiKeyId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "timeTaken": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "timestamp",
+          "userAgent",
+          "applicationLogsCount",
+          "method",
+          "statusCode",
+          "apiKeyId",
+          "projectId"
+        ]
+      },
+      "FetchRequestLogsResponseEntity": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartialRequestLogEntity"
+            }
+          },
+          "totalItems": {
+            "type": "number"
+          },
+          "itemsPerQuery": {
+            "type": "number",
+            "default": 6
+          }
+        },
+        "required": [
+          "items",
+          "totalItems",
+          "itemsPerQuery"
+        ]
       },
       "UpdateLogDto": {
         "type": "object",

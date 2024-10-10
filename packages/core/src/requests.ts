@@ -1,3 +1,4 @@
+import { LOGSTRAP_API_URL } from '@logstrap/constants';
 import { LogsTrapInitOptions } from './types';
 import type { components } from './types/api';
 
@@ -13,5 +14,5 @@ export async function logApiRequest(
 }
 
 export async function createEndpointUrl(props: LogsTrapInitOptions) {
-  return `${props.endpoint ?? 'https://logstrap-api.procrastinator.fyi'}/projects/${props.projectId}/logs`;
+  return `${props.endpoint ?? LOGSTRAP_API_URL}/projects/${props.projectId}/logs`;
 }

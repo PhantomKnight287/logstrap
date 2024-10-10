@@ -9,6 +9,7 @@ import { apiReference } from '@scalar/nestjs-api-reference';
 import { WinstonModule } from 'nest-winston';
 import { loggerInstance } from '~/logger/winston.config';
 import { CustomValidationPipe } from './pipes/validation/validation.pipe';
+import { json } from 'express';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -16,6 +17,7 @@ async function bootstrap() {
       instance: loggerInstance,
     }),
   });
+  app.use(json({ limit: '50mb' }));
   app.enableCors({});
   app.use(
     morgan('dev'),

@@ -64,7 +64,7 @@ export default function LoginClientPage() {
     toast.success(`Welcome ${req.data.user.name}`);
     createCookie(COOKIE_NAME, req.data.token, 30);
     toggle();
-    replace(search?.get('to') ?? Redirects.AFTER_AUTH);
+    replace(search.get('to') ?? Redirects.AFTER_AUTH);
   }
   return (
     <Card className="w-full max-w-md">
@@ -141,7 +141,7 @@ export default function LoginClientPage() {
               loading={loading}
               disabled={loading}
             >
-              Register
+              Login
             </Button>
           </form>
           <div className="mt-4 text-center text-sm">

@@ -4,6 +4,7 @@
   "description": "",
   "main": "dist/schema.js",
   "types": "dist/schema.d.ts",
+  "private": true,
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup"

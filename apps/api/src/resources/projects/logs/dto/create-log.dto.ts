@@ -1,6 +1,6 @@
 import { LogLevelEnum } from '@logstrap/db';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import {
   IsArray,
   IsDateString,
@@ -22,6 +22,7 @@ export class CreateApplicationLogDto {
   })
   @IsOptional()
   @IsDateString()
+  @Expose()
   timestamp?: string;
 
   @ApiProperty({
@@ -30,15 +31,18 @@ export class CreateApplicationLogDto {
     enumName: 'LogLevel',
   })
   @IsEnum(LogLevelEnum.enumValues)
+  @Expose()
   level: (typeof LogLevelEnum.enumValues)[number];
 
   @ApiProperty({ description: 'Log message' })
   @IsString()
+  @Expose()
   message: string;
 
   @ApiPropertyOptional({ description: 'Component that generated the log' })
   @IsOptional()
   @IsString()
+  @Expose()
   component?: string;
 
   @ApiPropertyOptional({
@@ -46,6 +50,7 @@ export class CreateApplicationLogDto {
   })
   @IsOptional()
   @IsString()
+  @Expose()
   functionName?: string;
 
   @ApiPropertyOptional({
@@ -54,6 +59,7 @@ export class CreateApplicationLogDto {
   })
   @IsOptional()
   @IsObject()
+  @Expose()
   additionalInfo?: Record<string, any>;
 }
 
@@ -65,6 +71,7 @@ export class CreateSystemLogDto {
   })
   @IsOptional()
   @IsDateString()
+  @Expose()
   timestamp?: string;
 
   @ApiProperty({
@@ -73,20 +80,24 @@ export class CreateSystemLogDto {
     enumName: 'LogLevel',
   })
   @IsEnum(LogLevelEnum.enumValues)
+  @Expose()
   level: (typeof LogLevelEnum.enumValues)[number];
 
   @ApiProperty({ description: 'Log message' })
   @IsString()
+  @Expose()
   message: string;
 
   @ApiPropertyOptional({ description: 'Type of system event' })
   @IsOptional()
   @IsString()
+  @Expose()
   eventType?: string;
 
   @ApiPropertyOptional({ description: 'Additional details', type: 'object' })
   @IsOptional()
   @IsObject()
+  @Expose()
   details?: Record<string, any>;
 }
 export class RequestLogDTO {
@@ -99,13 +110,23 @@ export class RequestLogDTO {
     message: 'Please provide a valid timestamp',
   })
   @IsOptional()
+  @Expose()
   timestamp: string;
+
+  @ApiProperty({
+    description: 'Time taken for your service to send response',
+    required: false,
+    type: 'number',
+  })
+  @IsOptional()
+  timeTaken: number;
 
   @ApiProperty({
     description: 'Request method',
   })
   @IsString({ message: 'Please provide a valid request method' })
   @IsNotEmpty({ message: 'Request method cannot be empty' })
+  @Expose()
   method: string;
 
   @ApiProperty({
@@ -114,6 +135,7 @@ export class RequestLogDTO {
   })
   @IsString({ message: 'Please provide a valid url' })
   @IsNotEmpty({ message: 'Url cannot be empty' })
+  @Expose()
   url: string;
 
   @ApiProperty({ description: 'Status code of this request' })
@@ -121,6 +143,7 @@ export class RequestLogDTO {
     message: 'Please enter a valid number as status code',
   })
   @IsPositive({ message: 'Status code must always be positive' })
+  @Expose()
   statusCode: number;
 
   @ApiProperty({
@@ -129,14 +152,17 @@ export class RequestLogDTO {
   })
   @IsObject({ message: 'Request body must be a valid object' })
   @IsOptional()
+  @Expose()
   requestBody: object;
 
   @ApiProperty({
     description: 'The response body(only supports json)',
     required: false,
+    type: Object,
   })
   @IsObject({ message: 'Response body must be a valid object' })
   @IsOptional()
+  @Expose()
   responseBody: object;
 
   @ApiProperty({
@@ -145,6 +171,7 @@ export class RequestLogDTO {
   })
   @IsObject({ message: 'Request headers must be a valid object' })
   @IsOptional()
+  @Expose()
   requestHeaders: object;
 
   @ApiProperty({
@@ -153,6 +180,7 @@ export class RequestLogDTO {
   })
   @IsObject({ message: 'Response headers must be a valid object' })
   @IsOptional()
+  @Expose()
   responseHeaders: object;
 
   @ApiProperty({
@@ -161,6 +189,7 @@ export class RequestLogDTO {
   })
   @IsObject({ message: 'Cookies must be a valid object' })
   @IsOptional()
+  @Expose()
   cookies: object;
 
   @ApiProperty({
@@ -170,6 +199,7 @@ export class RequestLogDTO {
   })
   @IsIP()
   @IsOptional()
+  @Expose()
   ip?: string;
 
   @ApiProperty({
@@ -178,6 +208,7 @@ export class RequestLogDTO {
   })
   @IsString()
   @IsOptional()
+  @Expose()
   userAgent?: string;
 
   @ApiPropertyOptional({
@@ -188,6 +219,7 @@ export class RequestLogDTO {
   @IsArray()
   @ValidateNested({ each: true })
   @IsOptional()
+  @Expose()
   applicationLogs?: CreateApplicationLogDto[];
 }
 
@@ -199,6 +231,7 @@ export class CreateLogDto {
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => RequestLogDTO)
+  @Expose()
   requests: RequestLogDTO[];
 
   @ApiPropertyOptional({
@@ -209,6 +242,7 @@ export class CreateLogDto {
   @IsOptional()
   @ValidateNested({ each: true })
   @Type(() => CreateApplicationLogDto)
+  @Expose()
   applicationLogs: CreateApplicationLogDto[];
 
   @ApiPropertyOptional({
@@ -219,5 +253,6 @@ export class CreateLogDto {
   @ValidateNested({ each: true })
   @Type(() => CreateSystemLogDto)
   @IsOptional()
+  @Expose()
   systemLogs: CreateSystemLogDto[];
 }

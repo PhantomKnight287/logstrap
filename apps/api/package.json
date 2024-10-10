@@ -24,6 +24,7 @@
     "@logstrap/db": "workspace:*",
     "@logstrap/core": "workspace:*",
     "@logstrap/nest": "workspace:*",
+    "@logstrap/constants": "workspace:*",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.2.3",
     "@nestjs/core": "^10.0.0",

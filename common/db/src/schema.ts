@@ -132,6 +132,7 @@ export const requestLogs = pgTable('request_logs', {
   responseBody: jsonb('response_body'),
   requestHeaders: jsonb('request_headers'),
   responseHeaders: jsonb('response_headers'),
+  timeTaken: integer('time_taken'),
   cookies: jsonb('cookies'),
   ip: text('ip'),
   userAgent: text('user_agent'),

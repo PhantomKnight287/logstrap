@@ -4,6 +4,6 @@ import { IncomingMessage } from 'http';
 export const ApiKey = createParamDecorator(
   (data: unknown, ctx: ExecutionContext) => {
     const request = ctx.switchToHttp().getRequest<IncomingMessage>();
-    return request.headers['x-api-key'];
+    return request['apiKey'];
   },
 );

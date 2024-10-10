@@ -25,7 +25,7 @@ import { LogsTrapModule } from '@logstrap/nest';
       exclude: [
         {
           method: RequestMethod.POST,
-          path: `/projects/(.*)/logs`,
+          path: `/projects/(.*)`,
         },
       ],
     }),

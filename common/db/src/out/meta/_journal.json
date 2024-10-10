@@ -64,6 +64,13 @@
       "when": 1728372740915,
       "tag": "0008_high_korvac",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1728555779448,
+      "tag": "0009_spicy_hellcat",
+      "breakpoints": true
     }
   ]
 }

@@ -20,6 +20,22 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/2": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["AppController_getHello2"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/login": {
         parameters: {
             query?: never;
@@ -164,6 +180,62 @@ export interface paths {
         patch: operations["KeysController_update"];
         trace?: never;
     };
+    "/projects/{id}/logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Logs
+         * @description Create logs
+         */
+        post: operations["LogsController_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}/request-logs": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get requests logs for a project
+         * @description Get requests logs for a project
+         */
+        get: operations["LogsController_getRequestLogs"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get: operations["LogsController_findOne"];
+        put?: never;
+        post?: never;
+        delete: operations["LogsController_remove"];
+        options?: never;
+        head?: never;
+        patch: operations["LogsController_update"];
+        trace?: never;
+    };
 }
 export type webhooks = Record<string, never>;
 export interface components {
@@ -261,6 +333,103 @@ export interface components {
             /** @description Name of the API Key, will be used for searching and sorting */
             name?: string;
         };
+        /**
+         * @description Log level
+         * @enum {string}
+         */
+        LogLevel: "debug" | "info" | "warn" | "error" | "fatal";
+        CreateApplicationLogDto: {
+            /**
+             * Format: date-time
+             * @description Timestamp of the log entry
+             */
+            timestamp?: string;
+            level: components["schemas"]["LogLevel"];
+            /** @description Log message */
+            message: string;
+            /** @description Component that generated the log */
+            component?: string;
+            /** @description Function name where the log was generated */
+            functionName?: string;
+            /** @description Additional information */
+            additionalInfo?: Record<string, never>;
+        };
+        RequestLogDTO: {
+            /** @description timestamp when log was created */
+            timestamp?: Record<string, never>;
+            /** @description Time taken for your service to send response */
+            timeTaken?: number;
+            /** @description Request method */
+            method: string;
+            /** @description The url where request was made(/api/v1..., https://api.com/v1/) */
+            url: string;
+            /** @description Status code of this request */
+            statusCode: number;
+            /** @description The request body(only supports json) */
+            requestBody?: Record<string, never>;
+            /** @description The response body(only supports json) */
+            responseBody?: Record<string, never>;
+            /** @description The request headers(only supports json) */
+            requestHeaders?: Record<string, never>;
+            /** @description The response headers(only supports json) */
+            responseHeaders?: Record<string, never>;
+            /** @description The request cookies(only supports json) */
+            cookies?: Record<string, never>;
+            /** @description The ip from where the request was made */
+            ip?: string;
+            /** @description The user agent from where the request was made */
+            userAgent?: string;
+            /** @description Application Logs related to this request */
+            applicationLogs?: components["schemas"]["CreateApplicationLogDto"][];
+        };
+        CreateSystemLogDto: {
+            /**
+             * Format: date-time
+             * @description Timestamp of the log entry
+             */
+            timestamp?: string;
+            level: components["schemas"]["LogLevel"];
+            /** @description Log message */
+            message: string;
+            /** @description Type of system event */
+            eventType?: string;
+            /** @description Additional details */
+            details?: Record<string, never>;
+        };
+        CreateLogDto: {
+            /** @description Requests associated to this log */
+            requests?: components["schemas"]["RequestLogDTO"][];
+            /** @description Application logs */
+            applicationLogs?: components["schemas"]["CreateApplicationLogDto"][];
+            /** @description System logs(like when a process crashes) */
+            systemLogs?: components["schemas"]["CreateSystemLogDto"][];
+        };
+        PartialRequestLogEntity: {
+            id: string;
+            url: string;
+            timestamp: string;
+            userAgent: string;
+            applicationLogsCount: number;
+            method: string;
+            statusCode: number;
+            apiKeyId: string;
+            projectId: string;
+            timeTaken?: string;
+        };
+        FetchRequestLogsResponseEntity: {
+            items: components["schemas"]["PartialRequestLogEntity"][];
+            totalItems: number;
+            /** @default 6 */
+            itemsPerQuery: number;
+        };
+        UpdateLogDto: {
+            /** @description Requests associated to this log */
+            requests?: components["schemas"]["RequestLogDTO"][];
+            /** @description Application logs */
+            applicationLogs?: components["schemas"]["CreateApplicationLogDto"][];
+            /** @description System logs(like when a process crashes) */
+            systemLogs?: components["schemas"]["CreateSystemLogDto"][];
+        };
     };
     responses: never;
     parameters: never;
@@ -271,6 +440,32 @@ export interface components {
 export type $defs = Record<string, never>;
 export interface operations {
     AppController_getHello: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    AppController_getHello2: {
         parameters: {
             query?: never;
             header?: never;
@@ -763,6 +958,166 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["UpdateKeyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of project */
+                id: unknown;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateLogDto"];
+            };
+        };
+        responses: {
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_getRequestLogs: {
+        parameters: {
+            query: {
+                /** @description The no of page */
+                page: string;
+                /** @description The no of items to fetch, defaults to 6 */
+                limit?: string;
+            };
+            header?: never;
+            path: {
+                /** @description Id of project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FetchRequestLogsResponseEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_findOne: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateLogDto"];
             };
         };
         responses: {

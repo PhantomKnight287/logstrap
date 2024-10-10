@@ -6,5 +6,6 @@ import { AuthService } from '~/resources/auth/auth.service';
 @Module({
   controllers: [KeysController],
   providers: [KeysService, AuthService],
+  exports: [KeysService],
 })
 export class KeysModule {}

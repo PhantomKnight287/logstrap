@@ -12,21 +12,37 @@ import { LogsTrapInitOptions as CoreLogsTrapInitOptions } from '@logstrap/core';
 import { ClsMiddleware, ClsModule } from 'nestjs-cls';
 import { RouteInfo } from '@nestjs/common/interfaces';
 
+/**
+ * Extended LogsTrap initialization options including route exclusion.
+ */
 type LogsTrapInitOptions = CoreLogsTrapInitOptions & {
   exclude: (string | RouteInfo)[];
 };
 
-export interface IdModuleAsyncOptions {
+/**
+ * Async options for LogsTrap module initialization.
+ */
+export interface LogsTrapModuleAsyncOptions {
   useFactory: (
     ...args: any[]
   ) => Promise<LogsTrapInitOptions> | LogsTrapInitOptions;
   inject?: any[];
 }
+
+/**
+ * LogsTrap module for NestJS applications.
+ * Provides request logging and application logging capabilities.
+ */
 @Module({})
 export class LogsTrapModule implements NestModule {
   constructor(
     @Inject('LOGSTRAP_OPTIONS') private readonly options: LogsTrapInitOptions,
   ) {}
+
+  /**
+   * Configures the middleware for the module.
+   * @param consumer - The MiddlewareConsumer to configure.
+   */
   configure(consumer: MiddlewareConsumer) {
     consumer.apply(ClsMiddleware).forRoutes('*');
     consumer
@@ -35,6 +51,11 @@ export class LogsTrapModule implements NestModule {
       .forRoutes('*');
   }
 
+  /**
+   * Creates a dynamic module with synchronous configuration.
+   * @param options - The LogsTrap initialization options.
+   * @returns A DynamicModule configuration.
+   */
   static forRoot(options: LogsTrapInitOptions): DynamicModule {
     return {
       module: LogsTrapModule,
@@ -44,7 +65,6 @@ export class LogsTrapModule implements NestModule {
           provide: 'LOGSTRAP_OPTIONS',
           useValue: options,
         },
-
         LogsTrapService,
       ],
       exports: [LogsTrapService],
@@ -52,9 +72,14 @@ export class LogsTrapModule implements NestModule {
     };
   }
 
-  static forRootAsync(asyncOptions: IdModuleAsyncOptions): DynamicModule {
+  /**
+   * Creates a dynamic module with asynchronous configuration.
+   * @param asyncOptions - The async options for module initialization.
+   * @returns A DynamicModule configuration.
+   */
+  static forRootAsync(asyncOptions: LogsTrapModuleAsyncOptions): DynamicModule {
     return {
-      module: LogsTrapMiddleware,
+      module: LogsTrapModule,
       global: true,
       imports: [
         ...asyncOptions.inject,
@@ -72,8 +97,13 @@ export class LogsTrapModule implements NestModule {
     };
   }
 
+  /**
+   * Creates an async options provider for the module.
+   * @param options - The async options for module initialization.
+   * @returns A Provider configuration.
+   */
   private static createAsyncOptionsProvider(
-    options: IdModuleAsyncOptions,
+    options: LogsTrapModuleAsyncOptions,
   ): Provider {
     return {
       provide: 'LOGSTRAP_OPTIONS',

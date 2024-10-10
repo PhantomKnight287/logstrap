@@ -1,6 +1,7 @@
 import type { LogsTrapInitOptions } from './types/index';
 import Logger from './logger';
-import { components } from './types/api';
+import { LOGSTRAP_API_URL } from '@logstrap/constants';
+
 export default class LogsTrap {
   protected apiKey: string;
   protected projectId: string;
@@ -9,7 +10,7 @@ export default class LogsTrap {
   logger: Logger;
   constructor({ apiKey, projectId, endpoint }: LogsTrapInitOptions) {
     this.apiKey = apiKey;
-    this.endpoint = `${endpoint ?? 'https://logstrap-api.procrastinator.fyi'}/projects/${projectId}/logs`;
+    this.endpoint = `${endpoint ?? LOGSTRAP_API_URL}/projects/${projectId}/logs`;
     this.projectId = projectId;
 
     this.logger = new Logger();

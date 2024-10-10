@@ -5,7 +5,7 @@ import { db } from '~/db';
 import { and, eq, sql } from 'drizzle-orm';
 import { ApiKeys, projects, users } from '@logstrap/db';
 import { init } from '@paralleldrive/cuid2';
-import { hash } from 'argon2';
+import { hash, verify } from 'argon2';
 import { plainToInstance } from 'class-transformer';
 import {
   CreateKeyResponse,
@@ -107,6 +107,27 @@ export class KeysService {
       totalItems: count,
       itemsPerQuery: ITEMS_PER_QUERY,
     });
+  }
+
+  async verify(projectId: string, apiKey: string) {
+    const apiKeys = await db
+      .select()
+      .from(ApiKeys)
+      .where(eq(ApiKeys.projectId, projectId));
+
+    if (apiKeys.length === 0) {
+      this.logger.warn(`No API keys found for Project: ${projectId}`);
+      throw new HttpException('Invalid API Key', HttpStatus.NOT_FOUND);
+    }
+
+    for (const apiKeyRecord of apiKeys) {
+      if (await verify(apiKeyRecord.key, apiKey)) {
+        return apiKeyRecord;
+      }
+    }
+
+    this.logger.warn(`Incorrect API Key supplied for Project: ${projectId}`);
+    throw new HttpException('Invalid API Key', HttpStatus.UNAUTHORIZED);
   }
 
   findOne(id: number) {

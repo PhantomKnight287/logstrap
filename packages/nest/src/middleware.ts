@@ -2,67 +2,93 @@ import { Inject, Injectable, NestMiddleware, Scope } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NextFunction, Response } from 'express';
 import { LogsTrapRequest } from './types';
-import { LogsTrapService } from './service';
 import {
   logApiRequest,
   LogsTrapInitOptions,
   createEndpointUrl,
 } from '@logstrap/core';
-import { promisify } from 'util';
 import { ClsService } from 'nestjs-cls';
-
-const wait = promisify(setTimeout);
-
+import {
+  LOGSTRAP_REQUEST_ID,
+  LOGSTRAP_API_KEY,
+} from '@logstrap/constants';
+/**
+ * Middleware for logging API requests and responses using LogsTrap.
+ */
 @Injectable({ scope: Scope.REQUEST })
 export class LogsTrapMiddleware implements NestMiddleware {
   constructor(
-    private readonly cls: ClsService,
-    @Inject('LOGSTRAP_OPTIONS') private readonly options: LogsTrapInitOptions,
+    private readonly clsService: ClsService,
+    @Inject('LOGSTRAP_OPTIONS')
+    private readonly logsTrapOptions: LogsTrapInitOptions,
   ) {}
-  use(req: LogsTrapRequest, res: Response, next: NextFunction) {
-    // attaching the id for each request
-    const id = randomUUID();
-    this.cls.set(id, []);
-    req['x-logstrap-id'] = id;
-    const originalJson = res.json;
-    const cls = this.cls;
-    const options = this.options;
-    res.json = function (body) {
-      const logs = cls.get(id);
+
+  /**
+   * Middleware function to intercept and log API requests and responses.
+   * @param request - The incoming request object.
+   * @param response - The outgoing response object.
+   * @param next - The next middleware function.
+   */
+  use(request: LogsTrapRequest, response: Response, next: NextFunction) {
+    // Generate a unique ID for each request
+    const requestId = randomUUID();
+    this.clsService.set(requestId, []);
+    request[LOGSTRAP_REQUEST_ID] = requestId;
+
+    const originalJsonMethod = response.json;
+    const clsServiceRef = this.clsService;
+    const logsTrapOptionsRef = this.logsTrapOptions;
+
+    const startTime = Date.now();
+
+    // Override the json method to intercept the response
+    response.json = function (responseBody) {
+      const endTime = Date.now();
+      const timeTaken = endTime - startTime;
+
+      const applicationLogs = clsServiceRef.get(requestId);
       const requestLog = {
-        statusCode: res.statusCode,
-        url: req.originalUrl,
-        requestHeaders: req.headers,
-        requestBody: req.body,
-        responseHeaders: res.getHeaders(),
-        responseBody: body,
-        method: req.method,
-        cookies: req.cookies,
-        ip: req.ip,
-        userAgent: req.headers['user-agent'],
-        applicationLogs: (logs as any) ?? [],
+        statusCode: response.statusCode,
+        url: request.originalUrl,
+        requestHeaders: JSON.parse(JSON.stringify(request.headers)),
+        requestBody: request.body,
+        responseHeaders: JSON.parse(JSON.stringify(response.getHeaders())),
+        responseBody: responseBody,
+        method: request.method,
+        cookies: request.cookies,
+        ip: request.ip,
+        userAgent: request.headers['user-agent'],
+        applicationLogs: applicationLogs ?? [],
+        timeTaken: timeTaken,
       };
-      const resp = originalJson.call(this, body);
+
+      const originalResponse = originalJsonMethod.call(this, responseBody);
+
+      // Asynchronously log the request
       (async () => {
-        const data = await logApiRequest(
-          await createEndpointUrl(options),
-          {
-            method: 'POST',
-            headers: {
-              'x-api-key': options.apiKey,
-              'content-type': 'application/json',
+        try {
+          const endpointUrl = await createEndpointUrl(logsTrapOptionsRef);
+          await logApiRequest(
+            endpointUrl,
+            {
+              method: 'POST',
+              headers: {
+                [LOGSTRAP_API_KEY]: logsTrapOptionsRef.apiKey,
+                'content-type': 'application/json',
+              },
             },
-          },
-          {
-            //@ts-ignore
-            requests: [requestLog],
-          },
-        );
-        const body = await data.json();
-        console.log(body);
+            {
+              requests: [requestLog],
+            },
+          );
+        } catch (error) {
+          console.error('Failed to log API request:', error);
+        }
       })();
-      return resp;
+
+      return originalResponse;
     };
+
     next();
   }
 }

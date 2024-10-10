@@ -4,17 +4,19 @@ import { cookies } from 'next/headers';
 import { redirect } from 'next/navigation';
 import { Redirects } from '@/constants/redirects';
 
-export const dynamic = 'force-dynamic';
 
+export const dynamic = 'force-dynamic';
 export default async function ProjectInfo({
   params,
 }: {
   params: Record<string, string>;
 }) {
+  
   const project = await getCachedProjectDetails(
     params.id!,
     getAuthToken(cookies()),
   );
+
 
   if (project.error)
     redirect(`${Redirects.ERROR}?error=${project.error.message}`);

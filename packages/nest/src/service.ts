@@ -1,55 +1,72 @@
 import { LogsTrapInitOptions, logApiRequest } from '@logstrap/core';
 import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
-
-import type { LogsTrapRequest } from './types';
 import { ClsService } from 'nestjs-cls';
+import type { LogsTrapRequest } from './types';
+import { LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
+/**
+ * Interface representing caller information
+ */
 interface CallerInfo {
   className: string;
   functionName: string;
 }
+
+/**
+ * Service for handling LogsTrap functionality
+ */
 @Injectable({ scope: Scope.REQUEST })
 export class LogsTrapService {
   constructor(
     @Inject(REQUEST) private readonly request: LogsTrapRequest,
     @Inject('LOGSTRAP_OPTIONS') private readonly options: LogsTrapInitOptions,
-    private readonly cls: ClsService,
+    private readonly clsService: ClsService,
   ) {}
 
-  private getId(): string {
-    return this.request['x-logstrap-id'];
+  /**
+   * Retrieves the unique identifier for the current request
+   */
+  private getRequestId(): string {
+    return this.request[LOGSTRAP_REQUEST_ID];
   }
 
-  private addToStorage(
-    id: string,
+  /**
+   * Adds a log entry to the storage
+   */
+  private addLogToStorage(
+    requestId: string,
     logLevel: string,
     callerName: string,
     component: string | null,
-    data: any,
+    message: any,
     ...additionalInfo: any[]
   ) {
-    const olderRecord = this.cls.get(id);
-    const newRecord = {
+    const existingLogs = this.clsService.get(requestId);
+    const newLogEntry = {
       timestamp: new Date(),
       level: logLevel,
-      message: typeof data === 'string' ? data : JSON.stringify(data),
+      message: typeof message === 'string' ? message : JSON.stringify(message),
       functionName: callerName,
       component,
       ...additionalInfo,
     };
-    if (olderRecord) {
-      this.cls.set(id, [...olderRecord, newRecord]);
+
+    if (existingLogs) {
+      this.clsService.set(requestId, [...existingLogs, newLogEntry]);
     } else {
-      this.cls.set(id, [newRecord]);
+      this.clsService.set(requestId, [newLogEntry]);
     }
   }
 
+  /**
+   * Logs a warning message
+   */
   public warn(message?: any, ...optionalParams: any[]) {
-    const id = this.getId();
+    const requestId = this.getRequestId();
     console.warn(message, ...optionalParams);
     const caller = this.getCallerInfo();
-    this.addToStorage(
-      id,
+    this.addLogToStorage(
+      requestId,
       'warn',
       caller.functionName,
       caller.className,
@@ -57,11 +74,15 @@ export class LogsTrapService {
       ...optionalParams,
     );
   }
+
+  /**
+   * Logs an informational message
+   */
   public log(message?: any, ...optionalParams: any[]) {
-    const id = this.getId();
+    const requestId = this.getRequestId();
     const caller = this.getCallerInfo();
-    this.addToStorage(
-      id,
+    this.addLogToStorage(
+      requestId,
       'log',
       caller.functionName,
       caller.className,
@@ -69,12 +90,16 @@ export class LogsTrapService {
       ...optionalParams,
     );
   }
+
+  /**
+   * Logs an error message
+   */
   public error(message?: any, ...optionalParams: any[]) {
-    const id = this.getId();
+    const requestId = this.getRequestId();
     console.error(message, ...optionalParams);
     const caller = this.getCallerInfo();
-    this.addToStorage(
-      id,
+    this.addLogToStorage(
+      requestId,
       'error',
       caller.functionName,
       caller.className,
@@ -82,12 +107,16 @@ export class LogsTrapService {
       ...optionalParams,
     );
   }
+
+  /**
+   * Logs an info message
+   */
   public info(message?: any, ...optionalParams: any[]) {
-    const id = this.getId();
+    const requestId = this.getRequestId();
     console.info(message, ...optionalParams);
     const caller = this.getCallerInfo();
-    this.addToStorage(
-      id,
+    this.addLogToStorage(
+      requestId,
       'info',
       caller.functionName,
       caller.className,
@@ -96,12 +125,15 @@ export class LogsTrapService {
     );
   }
 
+  /**
+   * Logs a trace message
+   */
   public trace(message?: any, ...optionalParams: any[]) {
-    const id = this.getId();
+    const requestId = this.getRequestId();
     console.trace(message, ...optionalParams);
     const caller = this.getCallerInfo();
-    this.addToStorage(
-      id,
+    this.addLogToStorage(
+      requestId,
       'trace',
       caller.functionName,
       caller.className,
@@ -109,31 +141,32 @@ export class LogsTrapService {
       ...optionalParams,
     );
   }
+
+  /**
+   * Retrieves information about the caller of the log method
+   */
   private getCallerInfo(): CallerInfo {
-    const err = new Error();
-    const stack = err.stack?.split('\n');
-    // The 3rd line of the stack trace should contain the caller's info
-    const callerLine = stack?.[3];
+    const errorStack = new Error().stack?.split('\n');
+    const callerStackLine = errorStack?.[3]; // The 3rd line contains the caller's info
 
     let className = 'Unknown';
     let functionName = 'Unknown';
 
-    if (callerLine) {
-      // Match for "at ClassName.methodName" pattern
-      const classMatch = callerLine.match(/at\s+([\w.]+)\s*\./);
-      if (classMatch && classMatch[1]) {
-        className = classMatch[1];
+    if (callerStackLine) {
+      const classNameMatch = callerStackLine.match(/at\s+([\w.]+)\s*\./);
+      if (classNameMatch && classNameMatch[1]) {
+        className = classNameMatch[1];
       }
 
-      // Match for method name
-      const methodMatch = callerLine.match(/\.(\w+)\s*[\(<]/);
-      if (methodMatch && methodMatch[1]) {
-        functionName = methodMatch[1];
+      const methodNameMatch = callerStackLine.match(/\.(\w+)\s*[\(<]/);
+      if (methodNameMatch && methodNameMatch[1]) {
+        functionName = methodNameMatch[1];
       } else {
-        // If no method name found, it might be a function outside a class
-        const funcMatch = callerLine.match(/at\s+(\w+)\s*[\(<]/);
-        if (funcMatch && funcMatch[1]) {
-          functionName = funcMatch[1];
+        // Check for function outside a class
+        const standaloneFunctionMatch =
+          callerStackLine.match(/at\s+(\w+)\s*[\(<]/);
+        if (standaloneFunctionMatch && standaloneFunctionMatch[1]) {
+          functionName = standaloneFunctionMatch[1];
           className = undefined;
         }
       }
