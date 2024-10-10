@@ -16,6 +16,7 @@ import { CreateLogDto } from './dto/create-log.dto';
 import { UpdateLogDto } from './dto/update-log.dto';
 import {
   ApiBearerAuth,
+  ApiNotFoundResponse,
   ApiOkResponse,
   ApiOperation,
   ApiParam,
@@ -30,11 +31,9 @@ import { AuthGuard } from '~/guards/auth/auth.guard';
 import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '~/resources/auth/entities/auth.entity';
 import { ITEMS_PER_QUERY } from '~/constants';
-import {
-  FetchRequestLogsResponseEntity,
-  PartialRequestLogEntity,
-} from './entities/response.entity';
-import { Response } from 'express';
+import { FetchRequestLogsResponseEntity } from './entities/response.entity';
+import { LogEntity } from './entities/log.entity';
+import { GenericErrorEntity } from '~/entity';
 @Controller('projects/:id')
 @ApiTags('Logs')
 @ApiParam({
@@ -98,6 +97,33 @@ export class LogsController {
           : +limit
         : ITEMS_PER_QUERY,
     );
+  }
+
+  @Get('request-logs/:logId')
+  @UseGuards(AuthGuard)
+  @ApiBearerAuth('JWT-auth')
+  @ApiOperation({
+    summary: 'Get a request log by id',
+    description: 'Get a request log by id',
+  })
+  @ApiOkResponse({
+    type: LogEntity,
+  })
+  @ApiNotFoundResponse({
+    type: GenericErrorEntity,
+    description: 'Log or Project not found',
+  })
+  @ApiParam({
+    name: 'id',
+    required: true,
+    description: 'Id of request log',
+  })
+  async getRequestLog(
+    @Param('id') projectId: string,
+    @User() user: UserEntity,
+    @Param('logId') logId: string,
+  ) {
+    return this.logsService.getApiRequestLog(logId, projectId, user.id);
   }
 
   @Get(':id')

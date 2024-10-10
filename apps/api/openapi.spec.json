@@ -807,6 +807,72 @@
         ]
       }
     },
+    "/projects/{id}/request-logs/{logId}": {
+      "get": {
+        "operationId": "LogsController_getRequestLog",
+        "summary": "Get a request log by id",
+        "description": "Get a request log by id",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of request log",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "logId",
+            "required": true,
+            "in": "path",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Log or Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Logs"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
     "/projects/{id}/{id}": {
       "get": {
         "operationId": "LogsController_findOne",
@@ -1482,6 +1548,71 @@
           "items",
           "totalItems",
           "itemsPerQuery"
+        ]
+      },
+      "LogEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "timestamp": {
+            "type": "string"
+          },
+          "userAgent": {
+            "type": "string"
+          },
+          "applicationLogsCount": {
+            "type": "number"
+          },
+          "method": {
+            "type": "string"
+          },
+          "statusCode": {
+            "type": "number"
+          },
+          "apiKeyId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "timeTaken": {
+            "type": "string"
+          },
+          "requestBody": {
+            "type": "object"
+          },
+          "responseBody": {
+            "type": "object"
+          },
+          "requestHeaders": {
+            "type": "object"
+          },
+          "responseHeaders": {
+            "type": "object"
+          },
+          "cookies": {
+            "type": "object"
+          },
+          "ip": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "timestamp",
+          "userAgent",
+          "applicationLogsCount",
+          "method",
+          "statusCode",
+          "apiKeyId",
+          "projectId",
+          "requestBody"
         ]
       },
       "UpdateLogDto": {

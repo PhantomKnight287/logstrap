@@ -158,6 +158,29 @@ export class LogsService {
     };
   }
 
+  async getApiRequestLog(logId: string, projectId: string, userId: string) {
+    this.logger.log(`Getting API log for logId: ${logId}`);
+    const project = await db.query.projects.findFirst({
+      where: and(eq(projects.id, projectId), eq(projects.userId, userId)),
+    });
+    if (!project) {
+      this.logger.warn(`Project not found: ${projectId}`);
+      throw new HttpException('No project found', HttpStatus.NOT_FOUND);
+    }
+
+    const log = await db.query.requestLogs.findFirst({
+      where: and(
+        eq(requestLogsTable.id, logId),
+        eq(requestLogsTable.projectId, projectId),
+      ),
+    });
+    if (!log) {
+      this.logger.warn(`Log not found: ${logId}`);
+      throw new HttpException('No log found', HttpStatus.NOT_FOUND);
+    }
+    return log;
+  }
+
   findAll() {
     return `This action returns all logs`;
   }

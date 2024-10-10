@@ -220,6 +220,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{id}/request-logs/{logId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get a request log by id
+         * @description Get a request log by id
+         */
+        get: operations["LogsController_getRequestLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{id}/{id}": {
         parameters: {
             query?: never;
@@ -421,6 +441,24 @@ export interface components {
             totalItems: number;
             /** @default 6 */
             itemsPerQuery: number;
+        };
+        LogEntity: {
+            id: string;
+            url: string;
+            timestamp: string;
+            userAgent: string;
+            applicationLogsCount: number;
+            method: string;
+            statusCode: number;
+            apiKeyId: string;
+            projectId: string;
+            timeTaken?: string;
+            requestBody: Record<string, never>;
+            responseBody?: Record<string, never>;
+            requestHeaders?: Record<string, never>;
+            responseHeaders?: Record<string, never>;
+            cookies?: Record<string, never>;
+            ip?: string;
         };
         UpdateLogDto: {
             /** @description Requests associated to this log */
@@ -1034,6 +1072,47 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["FetchRequestLogsResponseEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    LogsController_getRequestLog: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of request log */
+                id: string;
+                logId: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LogEntity"];
+                };
+            };
+            /** @description Log or Project not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
                 };
             };
             /** @description Internal server error. */

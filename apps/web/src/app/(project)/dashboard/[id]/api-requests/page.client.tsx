@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-
+import { useHotkeys } from 'react-hotkeys-hook';
 export function NextPage({
   disabled,
   page,
@@ -14,17 +14,17 @@ export function NextPage({
   console.log({ disabled, page });
   const { replace } = useRouter();
   const pathname = usePathname();
+  function moveToNextPage() {
+    if (disabled) return;
+    const query = new URLSearchParams(window.location.search);
+    query.set('page', (page + 1).toString());
+    replace(`${pathname}?${query.toString()}`);
+  }
+  useHotkeys('right', () => {
+    moveToNextPage();
+  });
   return (
-    <Button
-      disabled={disabled}
-      variant={'secondary'}
-      onClick={() => {
-        if (disabled) return;
-        const query = new URLSearchParams(window.location.search);
-        query.set('page', (page + 1).toString());
-        replace(`${pathname}?${query.toString()}`);
-      }}
-    >
+    <Button disabled={disabled} variant={'secondary'} onClick={moveToNextPage}>
       <ChevronRight />
     </Button>
   );
@@ -39,16 +39,20 @@ export function PreviousPage({
 }) {
   const { replace } = useRouter();
   const pathname = usePathname();
+  function moveToPreviousPage() {
+    if (disabled) return;
+    const query = new URLSearchParams(window.location.search);
+    query.set('page', (page - 1).toString());
+    replace(`${pathname}?${query.toString()}`);
+  }
+  useHotkeys('left', () => {
+    moveToPreviousPage();
+  });
   return (
     <Button
       disabled={disabled}
       variant={'secondary'}
-      onClick={() => {
-        if (disabled) return;
-        const query = new URLSearchParams(window.location.search);
-        query.set('page', (page - 1).toString());
-        replace(`${pathname}?${query.toString()}`);
-      }}
+      onClick={moveToPreviousPage}
     >
       <ChevronLeft />
     </Button>
