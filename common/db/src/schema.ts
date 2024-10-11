@@ -107,6 +107,8 @@ export const LogLevelEnum = pgEnum('log_level', [
   'warn',
   'error',
   'fatal',
+  'log',
+  'trace',
 ]);
 
 // Helper function to create prefixed IDs

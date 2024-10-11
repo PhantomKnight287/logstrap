@@ -357,7 +357,7 @@ export interface components {
          * @description Log level
          * @enum {string}
          */
-        LogLevel: "debug" | "info" | "warn" | "error" | "fatal";
+        LogLevel: "debug" | "info" | "warn" | "error" | "fatal" | "log" | "trace";
         CreateApplicationLogDto: {
             /**
              * Format: date-time
@@ -442,6 +442,17 @@ export interface components {
             /** @default 6 */
             itemsPerQuery: number;
         };
+        ApplicationLogEntity: {
+            id: string;
+            /** @enum {string} */
+            level: "debug" | "info" | "warn" | "error" | "fatal" | "log" | "trace";
+            message: string;
+            /** Format: date-time */
+            timestamp: string;
+            additionalInfo?: Record<string, never>;
+            functionName?: string;
+            component?: string;
+        };
         LogEntity: {
             id: string;
             url: string;
@@ -459,6 +470,7 @@ export interface components {
             responseHeaders?: Record<string, never>;
             cookies?: Record<string, never>;
             ip?: string;
+            applicationLogs?: components["schemas"]["ApplicationLogEntity"][];
         };
         UpdateLogDto: {
             /** @description Requests associated to this log */

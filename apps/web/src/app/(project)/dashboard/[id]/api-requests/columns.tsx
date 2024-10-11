@@ -5,6 +5,7 @@ import { components } from '@/lib/api/types';
 import { ColumnDef } from '@tanstack/react-table';
 import Link from 'next/link';
 import { formatTime } from '../keys/_components/timestamp';
+import { RequestMethodBadge, StatusCodeBadge } from '@/components/badges';
 
 export const columns: ColumnDef<
   components['schemas']['FetchRequestLogsResponseEntity']['items'][0]
@@ -12,6 +13,7 @@ export const columns: ColumnDef<
   {
     accessorKey: 'method',
     header: 'Method',
+    cell: ({ row }) => <RequestMethodBadge method={row.original.method} />,
   },
   {
     accessorKey: 'url',
@@ -30,6 +32,7 @@ export const columns: ColumnDef<
   {
     accessorKey: 'statusCode',
     header: 'Status Code',
+    cell: ({ row }) => <StatusCodeBadge statusCode={row.original.statusCode} />,
   },
   {
     accessorKey: 'timeTaken',

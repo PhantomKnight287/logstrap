@@ -4,6 +4,8 @@ import './globals.css';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from 'react-hot-toast';
 import Fetcher from '@/components/common/fetcher';
+import { TooltipProvider } from '@/components/ui/tooltip';
+
 const geistSans = localFont({
   src: './fonts/GeistVF.woff',
   variable: '--font-geist-sans',
@@ -36,9 +38,11 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange={false}
         >
-          <Fetcher />
-          <Toaster position="bottom-right" />
-          {children}
+          <TooltipProvider>
+            <Fetcher />
+            <Toaster position="bottom-right" />
+            {children}
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

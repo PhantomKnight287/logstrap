@@ -13,11 +13,14 @@ import {
   UserEntity,
 } from './entities/auth.entity';
 import { RegisterDTO } from './dto/register.dto';
+import { LogsTrapService } from '@logstrap/nest';
 
 @Injectable()
 export class AuthService {
-  protected logger = new Logger(AuthService.name);
-  constructor(protected configService: ConfigService) {}
+  constructor(
+    protected configService: ConfigService,
+    private readonly logger: LogsTrapService,
+  ) {}
   async login(body: LoginDTO) {
     const { email, password } = body;
     this.logger.log(`Login attempt initiated`);

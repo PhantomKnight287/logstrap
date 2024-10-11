@@ -1,141 +1,95 @@
 'use client';
 
-import { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-
-interface ApiRequestLogProps {
-  id: string;
-  method: string;
-  url: string;
-  statusCode: number;
-  timeTaken: number;
-  timestamp: string;
-  requestHeaders: Record<string, string>;
-  requestBody: string;
-  responseBody: string;
-  responseHeaders: Record<string, string>;
-  cookies: Record<string, string>;
-//   applicationLogs: string[];
-}
-
-export default function ApiRequestLogView({
-  id,
-  method,
-  url,
-  statusCode,
-  timeTaken,
-  timestamp,
-  requestHeaders,
-  requestBody,
-  responseBody,
-  responseHeaders,
-  cookies,
-//   applicationLogs,
-}: ApiRequestLogProps) {
-  const [expandedSections, setExpandedSections] = useState<
-    Record<string, boolean>
-  >({});
-
-  const toggleSection = (section: string) => {
-    setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
-  };
-
-  const renderExpandableSection = (title: string, content: React.ReactNode) => (
-    <div className="mt-4">
-      <Button
-        variant="outline"
-        onClick={() => toggleSection(title)}
-        className="w-full justify-between"
-      >
-        {title}
-        {expandedSections[title] ? (
-          <ChevronUp className="h-4 w-4" />
-        ) : (
-          <ChevronDown className="h-4 w-4" />
-        )}
-      </Button>
-      {expandedSections[title] && (
-        <div className="mt-2 p-2 bg-muted rounded-md">{content}</div>
-      )}
+import Code from '@/components/code';
+import { components } from '@/lib/api/types';
+import dayjs from 'dayjs';
+import { Loader2 } from 'lucide-react';
+import { Suspense } from 'react';
+export default function LogInfoPage({
+  data,
+}: {
+  data: components['schemas']['LogEntity'];
+}) {
+  return (
+    <div className="flex flex-col items-center mt-5">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-0 md:gap-5 w-full">
+        <div className="flex flex-col items-start gap-4">
+          <h3 className="text-lg font-medium">Request Body</h3>
+          <Suspense fallback={<Loader />}>
+            <Code
+              lang="json"
+              code={
+                data.requestBody !== undefined && data.requestBody !== null
+                  ? JSON.stringify(data.requestBody, null, '\t')
+                  : JSON.stringify({})
+              }
+              theme="ayu-dark"
+            />
+          </Suspense>
+        </div>
+        <div className="flex flex-col items-start gap-4">
+          <h3 className="text-lg font-medium">Request Headers</h3>
+          <Suspense fallback={<Loader />}>
+            <Code
+              lang="json"
+              code={
+                data.requestHeaders !== undefined &&
+                data.requestHeaders !== null
+                  ? JSON.stringify(data.requestHeaders, null, '\t')
+                  : JSON.stringify({})
+              }
+              theme="ayu-dark"
+            />
+          </Suspense>
+        </div>
+        <div className="flex flex-col items-start gap-4">
+          <h3 className="text-lg font-medium">Response Body</h3>
+          <Suspense fallback={<Loader />}>
+            <Code
+              lang="json"
+              code={
+                data.responseBody !== undefined && data.responseBody !== null
+                  ? JSON.stringify(data.responseBody, null, '\t')
+                  : JSON.stringify({})
+              }
+              theme="ayu-dark"
+            />
+          </Suspense>
+        </div>
+        <div className="flex flex-col items-start gap-4">
+          <h3 className="text-lg font-medium">Response Headers</h3>
+          <Suspense fallback={<Loader />}>
+            <Code
+              lang="json"
+              code={
+                data.responseHeaders !== undefined &&
+                data.responseHeaders !== null
+                  ? JSON.stringify(data.responseHeaders, null, '\t')
+                  : JSON.stringify({})
+              }
+              theme={'ayu-dark'}
+            />
+          </Suspense>
+        </div>
+      </div>
+      {/* {data.stackTrace ? (
+        <div className="w-full flex flex-col items-start mt-4">
+          <h3 className="text-lg font-medium">Stack Trace</h3>
+          <Code lang="bash" code={data.stackTrace} theme="ayu-dark" />
+        </div>
+      ) : null} */}
     </div>
   );
+}
 
-  const renderHeaders = (headers: Record<string, string>) => (
-    
-    <ul className="list-none p-0">
-      {Object.entries(headers??{}).map(([key, value]) => (
-        <li key={key} className="mb-1">
-          <span className="font-semibold">{key}:</span> {value}
-        </li>
-      ))}
-    </ul>
-  );
+export function Timestamp({ t }: { t: string }) {
+  return <span className="text-sm">{dayjs(t).format('DD/MM/YY HH:mm')}</span>;
+}
 
-  const renderJson = (json: string) => {
-    try {
-      const parsed = JSON.parse(json);
-      return (
-        <pre className="whitespace-pre-wrap overflow-x-auto">
-          {JSON.stringify(parsed, null, 2)}
-        </pre>
-      );
-    } catch {
-      return <pre className="whitespace-pre-wrap overflow-x-auto">{json}</pre>;
-    }
-  };
-
+function Loader() {
   return (
-    <Card className="w-full max-w-4xl mx-auto">
-      <CardHeader>
-        <CardTitle className="flex justify-between items-center">
-          <span>API Request Log: {id}</span>
-          <Badge variant={statusCode < 400 ? 'success' : 'destructive'}>
-            {statusCode}
-          </Badge>
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <p>
-              <span className="font-semibold">Method:</span> {method}
-            </p>
-            <p>
-              <span className="font-semibold">URL:</span> {url}
-            </p>
-            <p>
-              <span className="font-semibold">Time Taken:</span> {timeTaken}ms
-            </p>
-            <p>
-              <span className="font-semibold">Timestamp:</span>{' '}
-              {new Date(timestamp).toLocaleString()}
-            </p>
-          </div>
-        </div>
-
-        {renderExpandableSection(
-          'Request Headers',
-          renderHeaders(requestHeaders),
-        )}
-        {renderExpandableSection('Request Body', renderJson(requestBody))}
-        {renderExpandableSection(
-          'Response Headers',
-          renderHeaders(responseHeaders),
-        )}
-        {renderExpandableSection('Response Body', renderJson(responseBody))}
-        {renderExpandableSection('Cookies', renderHeaders(cookies))}
-        {/* {renderExpandableSection(
-          'Application Logs',
-          <ul className="list-disc pl-5">
-            {applicationLogs.map((log, index) => (
-              <li key={index}>{log}</li>
-            ))}
-          </ul>,
-        )} */}
-      </CardContent>
-    </Card>
+    <div className="w-full h-20 bg-muted flex items-center justify-center">
+      <Loader2 className="animate-spin" />
+    </div>
   );
 }

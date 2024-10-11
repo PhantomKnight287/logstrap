@@ -17,10 +17,10 @@ import { ITEMS_PER_QUERY } from '~/constants';
 
 @Injectable()
 export class LogsService {
-  protected logger = new Logger(LogsService.name);
+  private logger = new Logger(LogsService.name);
+  constructor() {}
   async create(body: CreateLogDto, apiKey: typeof ApiKeys.$inferSelect) {
     this.logger.log(`Creating logs for Project: ${apiKey.projectId}`);
-    // Key is already validated by the guard
     if (body.requests) {
       await this.processRequests(body.requests, apiKey.projectId, apiKey.id);
     }
@@ -173,6 +173,19 @@ export class LogsService {
         eq(requestLogsTable.id, logId),
         eq(requestLogsTable.projectId, projectId),
       ),
+      with: {
+        applicationLogs: {
+          columns: {
+            id: true,
+            level: true,
+            message: true,
+            timestamp: true,
+            additionalInfo: true,
+            functionName: true,
+            component: true,
+          },
+        },
+      },
     });
     if (!log) {
       this.logger.warn(`Log not found: ${logId}`);

@@ -17,6 +17,7 @@ export const getCachedApiRequestLog = memoize(
     return data;
   },
   {
+     
     log: ['datacache', 'dedupe', 'verbose'],
     revalidateTags(logId, projectId) {
       return [`api-request-log::${projectId}::${logId}`];

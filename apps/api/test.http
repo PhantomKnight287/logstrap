@@ -36,3 +36,8 @@ Authorization: Bearer {{token}}
 }
 
 ###
+
+
+###
+GET {{url}}/projects/pj_dc5m03j76kbrku4ahn64ober/request-logs/rl_sjtkxvqj7utnwm02henx0xdd
+Authorization: Bearer {{token}}

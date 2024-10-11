@@ -7,7 +7,7 @@ import { redirect } from 'next/navigation';
 import { Redirects } from '@/constants/redirects';
 import { DataTable } from '@/components/ui/data-table';
 import { columns } from './columns';
-import { NextPage, PreviousPage } from './page.client';
+import { ApiRequestFilters, NextPage, PreviousPage } from './page.client';
 
 export const dynamic = 'force-dynamic';
 
@@ -45,6 +45,7 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
           />
         </div>
       </div>
+      <ApiRequestFilters />
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
         <div className="flex flex-col items-center gap-1 text-center size-full p-2">
           <DataTable

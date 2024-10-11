@@ -8,10 +8,12 @@ import { ITEMS_PER_QUERY } from '~/constants';
 import { plainToInstance } from 'class-transformer';
 import { FetchAllProjectsResponse } from './entities/response.entity';
 import { Project, ProjectIdEntity } from './entities/project.entity';
+import { LogsTrapService } from '@logstrap/nest';
 
 @Injectable()
 export class ProjectsService {
-  protected logger = new Logger(ProjectsService.name);
+  constructor(private readonly logger: LogsTrapService) {}
+
   async create(body: CreateProjectDto, userId: string) {
     this.logger.log(`Creating project with name ${body.name}`);
     const [project] = await db
@@ -28,7 +30,7 @@ export class ProjectsService {
   }
 
   async findAll(userId: string, page: number, limit: number) {
-    this.logger.log(`Searching for all projects for user: ${userId}`);
+    this.logger.info(`Searching for all projects for user: ${userId}`);
 
     const projects = await db.query.projects.findMany({
       where: eq(projectsModel.userId, userId),
@@ -45,7 +47,7 @@ export class ProjectsService {
       })
       .from(projectsModel)
       .where(eq(projectsModel.userId, userId));
-    this.logger.log(`Found ${count.count} projects for user: ${userId}`);
+    this.logger.error(`Found ${count.count} projects for user: ${userId}`);
 
     return plainToInstance(FetchAllProjectsResponse, {
       items: projects,

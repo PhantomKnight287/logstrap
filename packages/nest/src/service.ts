@@ -27,7 +27,12 @@ export class LogsTrapService {
    * Retrieves the unique identifier for the current request
    */
   private getRequestId(): string {
-    return this.request[LOGSTRAP_REQUEST_ID];
+    const id = this.request[LOGSTRAP_REQUEST_ID];
+    if (!id)
+      throw new Error(
+        `You are trying to log without LogsTrap middleware. Did you add this route(${this.request.url}) in exclude array?`,
+      );
+    return id;
   }
 
   /**

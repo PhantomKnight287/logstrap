@@ -12,7 +12,9 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(
       new URL(`${Redirects.UNAUTHENTICATED}?to=${pathname}`, request.url),
     );
+  else if (pathname === '/' && cookie?.value)
+    return NextResponse.redirect(new URL(Redirects.AFTER_AUTH, request.url));
 }
 export const config = {
-  matcher: ['/auth/:path*', '/dashboard', '/dashboard/:path*'],
+  matcher: ['/auth/:path*', '/dashboard', '/dashboard/:path*', '/'],
 };

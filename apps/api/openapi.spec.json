@@ -1325,7 +1325,9 @@
           "info",
           "warn",
           "error",
-          "fatal"
+          "fatal",
+          "log",
+          "trace"
         ]
       },
       "CreateApplicationLogDto": {
@@ -1550,6 +1552,48 @@
           "itemsPerQuery"
         ]
       },
+      "ApplicationLogEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "debug",
+              "info",
+              "warn",
+              "error",
+              "fatal",
+              "log",
+              "trace"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "additionalInfo": {
+            "type": "object"
+          },
+          "functionName": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "level",
+          "message",
+          "timestamp"
+        ]
+      },
       "LogEntity": {
         "type": "object",
         "properties": {
@@ -1600,6 +1644,12 @@
           },
           "ip": {
             "type": "string"
+          },
+          "applicationLogs": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationLogEntity"
+            }
           }
         },
         "required": [

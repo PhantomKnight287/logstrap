@@ -1,7 +1,59 @@
-import { IsObject, IsString } from 'class-validator';
+import { IsArray, IsDate, IsEnum, IsObject, IsString } from 'class-validator';
 import { PartialRequestLogEntity } from './response.entity';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Expose } from 'class-transformer';
+import { LogLevelEnum } from '@logstrap/db';
+
+export class ApplicationLogEntity {
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  id: string;
+
+  @ApiProperty({
+    enum: LogLevelEnum.enumValues,
+  })
+  @IsEnum(LogLevelEnum.enumValues)
+  @Expose()
+  level: (typeof LogLevelEnum.enumValues)[number];
+
+  @ApiProperty({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  message: string;
+
+  @ApiProperty({
+    type: Date,
+  })
+  @IsDate()
+  @Expose()
+  timestamp: Date;
+
+  @ApiPropertyOptional({
+    type: Object,
+  })
+  @IsObject()
+  @Expose()
+  additionalInfo: string;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  functionName: string;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  component: string;
+}
 
 export class LogEntity extends PartialRequestLogEntity {
   @ApiProperty({
@@ -45,4 +97,11 @@ export class LogEntity extends PartialRequestLogEntity {
   @IsString()
   @Expose()
   ip: string;
+
+  @ApiPropertyOptional({
+    type: [ApplicationLogEntity],
+  })
+  @IsArray()
+  @Expose()
+  applicationLogs: ApplicationLogEntity[];
 }

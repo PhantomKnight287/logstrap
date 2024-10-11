@@ -8,10 +8,7 @@ import {
   createEndpointUrl,
 } from '@logstrap/core';
 import { ClsService } from 'nestjs-cls';
-import {
-  LOGSTRAP_REQUEST_ID,
-  LOGSTRAP_API_KEY,
-} from '@logstrap/constants';
+import { LOGSTRAP_REQUEST_ID, LOGSTRAP_API_KEY } from '@logstrap/constants';
 /**
  * Middleware for logging API requests and responses using LogsTrap.
  */
@@ -68,7 +65,7 @@ export class LogsTrapMiddleware implements NestMiddleware {
       (async () => {
         try {
           const endpointUrl = await createEndpointUrl(logsTrapOptionsRef);
-          await logApiRequest(
+          const response = await logApiRequest(
             endpointUrl,
             {
               method: 'POST',
@@ -81,6 +78,9 @@ export class LogsTrapMiddleware implements NestMiddleware {
               requests: [requestLog],
             },
           );
+          if (!response.ok) {
+            console.error(await response.json());
+          }
         } catch (error) {
           console.error('Failed to log API request:', error);
         }
