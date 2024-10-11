@@ -7,6 +7,7 @@ import { cookies } from 'next/headers';
 import Link from 'next/link';
 import { redirect } from 'next/navigation';
 import ProjectItem from './_components/item';
+import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
@@ -55,3 +56,8 @@ export default async function Dashboard({
     </main>
   );
 }
+
+export const metadata: Metadata = {
+  title: 'Projects',
+  description: 'Manage your projects',
+};

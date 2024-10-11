@@ -102,7 +102,7 @@ export function ApiRequestFilters() {
       </Select>
 
       <div className="relative">
-        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400" />
+        <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
         <Input
           ref={searchInputRef}
           className="pl-8"
