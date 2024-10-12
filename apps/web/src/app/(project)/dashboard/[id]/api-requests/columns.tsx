@@ -34,17 +34,7 @@ export const columns: ColumnDef<
     header: 'Status Code',
     cell: ({ row }) => <StatusCodeBadge statusCode={row.original.statusCode} />,
   },
-  {
-    accessorKey: 'timeTaken',
-    header: 'Time Taken',
-    cell: ({ row }) => (
-      <>
-        {row.original.timeTaken ? (
-          <span>{row.original.timeTaken} ms</span>
-        ) : null}
-      </>
-    ),
-  },
+
   {
     accessorKey: 'timestamp',
     header: 'Timestamp',
@@ -60,5 +50,28 @@ export const columns: ColumnDef<
         </div>
       );
     },
+  },
+  {
+    accessorKey: 'timeTaken',
+    header: 'Time Taken',
+    cell: ({ row }) => (
+      <>
+        {row.original.timeTaken ? (
+          <span>{row.original.timeTaken} ms</span>
+        ) : null}
+      </>
+    ),
+  },
+  {
+    accessorKey: 'apiKeyName',
+    header: 'API Key',
+    cell: ({ row }) => (
+      <Link
+        href={`${Redirects.AFTER_PROJECT_CREATED(row.original.projectId)}/api-keys/${row.original.apiKeyId}`}
+        className="line-clamp-1 text-left underline"
+      >
+        {row.original.apiKeyName}
+      </Link>
+    ),
   },
 ];

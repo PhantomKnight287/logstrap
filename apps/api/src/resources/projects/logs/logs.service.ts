@@ -135,13 +135,15 @@ export class LogsService {
         apiKeyId,
         timeTaken,
         projectId: projectIdColumn,
+        apiKeyName: ApiKeys.name,
         applicationLogsCount: sql`count(*)`
           .mapWith(Number)
           .as('applicationLogsCount'),
       })
       .from(requestLogsTable)
       .where(eq(requestLogsTable.projectId, projectId))
-      .groupBy(requestLogsTable.id)
+      .leftJoin(ApiKeys, eq(requestLogsTable.apiKeyId, ApiKeys.id))
+      .groupBy(requestLogsTable.id, ApiKeys.name, ApiKeys.id)
       .limit(limit ?? ITEMS_PER_QUERY)
       .offset(((page <= 0 ? 1 : page) - 1) * (limit ?? ITEMS_PER_QUERY))
       .orderBy(desc(requestLogsTable.timestamp));

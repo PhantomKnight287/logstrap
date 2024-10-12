@@ -75,7 +75,8 @@ export function ApiRequestFilters() {
   const [method, setMethod] = useQueryState('method');
   const [search, setSearch] = useQueryState('search');
   const [statusCode, setStatusCode] = useQueryState('statusCode');
-  const [date, setDate] = useQueryState('date');
+  const [fromDate, setFromDate] = useQueryState('fromDate');
+  const [toDate, setToDate] = useQueryState('toDate');
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   useHotkeys('mod+f', (event) => {
@@ -87,7 +88,9 @@ export function ApiRequestFilters() {
     <div className="flex flex-wrap gap-4 items-center mb-4">
       <Select
         value={method || ''}
-        onValueChange={(value) => setMethod(value || null)}
+        onValueChange={(value) => {
+          setMethod(value || null);
+        }}
       >
         <SelectTrigger className="w-[180px]">
           <SelectValue placeholder="Select method" />
@@ -101,11 +104,11 @@ export function ApiRequestFilters() {
         </SelectContent>
       </Select>
 
-      <div className="relative">
+      <div className="relative flex-1">
         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
         <Input
           ref={searchInputRef}
-          className="pl-8"
+          className="pl-8 "
           placeholder="Search... (Ctrl+F)"
           value={search || ''}
           onChange={(e) => setSearch(e.target.value || null)}
@@ -130,12 +133,15 @@ export function ApiRequestFilters() {
       </Select>
 
       <DateRangePicker
-        onUpdate={(values) => console.log(values)}
-        initialDateFrom="2023-01-01"
-        initialDateTo="2023-12-31"
+        onUpdate={(values) => {
+          console.log(values);
+          setFromDate(values.range.from.toJSON());
+          setToDate(values.range.to?.toJSON() || null);
+        }}
+        initialDateFrom={fromDate ? new Date(fromDate) : undefined}
+        initialDateTo={toDate ? new Date(toDate) : undefined}
         align="start"
         locale="en-GB"
-        showCompare={false}
       />
     </div>
   );

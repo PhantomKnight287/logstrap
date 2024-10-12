@@ -435,6 +435,7 @@ export interface components {
             apiKeyId: string;
             projectId: string;
             timeTaken?: string;
+            apiKeyName?: string;
         };
         FetchRequestLogsResponseEntity: {
             items: components["schemas"]["PartialRequestLogEntity"][];
@@ -461,9 +462,10 @@ export interface components {
             applicationLogsCount: number;
             method: string;
             statusCode: number;
-            apiKeyId: string;
+            apiKeyId?: string;
             projectId: string;
             timeTaken?: string;
+            apiKeyName?: string;
             requestBody: Record<string, never>;
             responseBody?: Record<string, never>;
             requestHeaders?: Record<string, never>;

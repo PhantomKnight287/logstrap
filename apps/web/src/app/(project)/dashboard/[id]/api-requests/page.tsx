@@ -31,6 +31,7 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
   if (logs.error) {
     redirect(`${Redirects.ERROR}?error=${logs.error.message}`);
   }
+  console.log(logs.data.items);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center flex-row justify-between">

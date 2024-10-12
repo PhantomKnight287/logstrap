@@ -1515,6 +1515,9 @@
           },
           "timeTaken": {
             "type": "string"
+          },
+          "apiKeyName": {
+            "type": "string"
           }
         },
         "required": [
@@ -1627,6 +1630,9 @@
           "timeTaken": {
             "type": "string"
           },
+          "apiKeyName": {
+            "type": "string"
+          },
           "requestBody": {
             "type": "object"
           },
@@ -1660,7 +1666,6 @@
           "applicationLogsCount",
           "method",
           "statusCode",
-          "apiKeyId",
           "projectId",
           "requestBody"
         ]

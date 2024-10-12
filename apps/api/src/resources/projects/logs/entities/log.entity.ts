@@ -104,4 +104,18 @@ export class LogEntity extends PartialRequestLogEntity {
   @IsArray()
   @Expose()
   applicationLogs: ApplicationLogEntity[];
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  apiKeyName: string;
+
+  @ApiPropertyOptional({
+    type: String,
+  })
+  @IsString()
+  @Expose()
+  apiKeyId: string;
 }

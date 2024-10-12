@@ -75,6 +75,11 @@ export class PartialRequestLogEntity {
   @IsNumber()
   @Expose()
   timeTaken: string;
+
+  @ApiPropertyOptional({})
+  @IsString()
+  @Expose()
+  apiKeyName: string;
 }
 
 export class FetchRequestLogsResponseEntity {
