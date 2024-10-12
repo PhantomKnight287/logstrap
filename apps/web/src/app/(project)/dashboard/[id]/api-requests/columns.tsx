@@ -67,7 +67,7 @@ export const columns: ColumnDef<
     header: 'API Key',
     cell: ({ row }) => (
       <Link
-        href={`${Redirects.AFTER_PROJECT_CREATED(row.original.projectId)}/api-keys/${row.original.apiKeyId}`}
+        href={`${Redirects.AFTER_PROJECT_CREATED(row.original.projectId)}/keys/${row.original.apiKeyId}`}
         className="line-clamp-1 text-left underline"
       >
         {row.original.apiKeyName}
