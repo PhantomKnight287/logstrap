@@ -16,6 +16,7 @@ import { Search } from 'lucide-react';
 import { useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
+import { components } from '@/lib/api/types';
 
 export function NextPage({
   disabled,
@@ -71,7 +72,11 @@ export function PreviousPage({
   );
 }
 
-export function ApiRequestFilters() {
+export function ApiRequestFilters({
+  methods,
+  statusCodes,
+  apiKeys,
+}: components['schemas']['ProjectApiRequestSearchFiltersResponse']) {
   const [method, setMethod] = useQueryState('method');
   const [search, setSearch] = useQueryState('search');
   const [statusCode, setStatusCode] = useQueryState('statusCode');
@@ -96,11 +101,11 @@ export function ApiRequestFilters() {
           <SelectValue placeholder="Select method" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="GET">GET</SelectItem>
-          <SelectItem value="POST">POST</SelectItem>
-          <SelectItem value="PUT">PUT</SelectItem>
-          <SelectItem value="DELETE">DELETE</SelectItem>
-          <SelectItem value="PATCH">PATCH</SelectItem>
+          {methods.map((method) => (
+            <SelectItem key={method} value={method}>
+              {method}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 
@@ -123,12 +128,11 @@ export function ApiRequestFilters() {
           <SelectValue placeholder="Status code" />
         </SelectTrigger>
         <SelectContent>
-          <SelectItem value="200">200 OK</SelectItem>
-          <SelectItem value="201">201 Created</SelectItem>
-          <SelectItem value="400">400 Bad Request</SelectItem>
-          <SelectItem value="401">401 Unauthorized</SelectItem>
-          <SelectItem value="404">404 Not Found</SelectItem>
-          <SelectItem value="500">500 Internal Server Error</SelectItem>
+          {statusCodes.map((statusCode) => (
+            <SelectItem key={statusCode} value={statusCode.toString()}>
+              {statusCode}
+            </SelectItem>
+          ))}
         </SelectContent>
       </Select>
 

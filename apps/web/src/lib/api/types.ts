@@ -134,10 +134,30 @@ export interface paths {
         get: operations["ProjectsController_findOne"];
         put?: never;
         post?: never;
-        delete: operations["ProjectsController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
-        patch: operations["ProjectsController_update"];
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}/api-request-search-filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project api request search filters
+         * @description Get project api request search filters
+         */
+        get: operations["ProjectsController_getProjectApiRequestSearchFilters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/projects/{id}/keys": {
@@ -314,10 +334,17 @@ export interface components {
             /** @default 6 */
             itemsPerQuery: number;
         };
-        UpdateProjectDto: {
-            name?: string;
-            description?: string;
-            url?: string;
+        PartialApiKeyEntity: {
+            id: string;
+            name: string;
+        };
+        ProjectApiRequestSearchFiltersResponse: {
+            /** @description List of available status codes */
+            statusCodes: number[];
+            /** @description List of available methods */
+            methods: string[];
+            /** @description List of available api keys */
+            apiKeys: components["schemas"]["PartialApiKeyEntity"][];
         };
         CreateKeyDto: {
             mode: components["schemas"]["ProjectMode"];
@@ -795,11 +822,12 @@ export interface operations {
             };
         };
     };
-    ProjectsController_remove: {
+    ProjectsController_getProjectApiRequestSearchFilters: {
         parameters: {
             query?: never;
             header?: never;
             path: {
+                /** @description The id of the project */
                 id: string;
             };
             cookie?: never;
@@ -810,39 +838,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
-            };
-            /** @description Internal server error. */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
                 content: {
-                    "application/json": components["schemas"]["GenericErrorEntity"];
+                    "application/json": components["schemas"]["ProjectApiRequestSearchFiltersResponse"];
                 };
-            };
-        };
-    };
-    ProjectsController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateProjectDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Internal server error. */
             500: {

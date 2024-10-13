@@ -3,7 +3,17 @@ import { RequestLogDTO, CreateApplicationLogDto } from '../dto/create-log.dto';
 import { Expose, Type } from 'class-transformer';
 import { IsArray, IsNumber, IsString } from 'class-validator';
 import { ITEMS_PER_QUERY } from '~/constants';
+export class PartialApiKeyEntity {
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  id: string;
 
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  name: string;
+}
 export class ExtendedApplicationLogs extends CreateApplicationLogDto {
   @Expose()
   @ApiProperty({})
@@ -98,4 +108,33 @@ export class FetchRequestLogsResponseEntity {
   @ApiProperty({ default: ITEMS_PER_QUERY })
   @IsNumber()
   itemsPerQuery: number;
+}
+
+export class ProjectApiRequestSearchFiltersResponse {
+  @ApiProperty({
+    type: [Number],
+    description: 'List of available status codes',
+  })
+  @Expose()
+  @IsArray()
+  @IsNumber({}, { each: true })
+  statusCodes: number[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'List of available methods',
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  methods: string[];
+
+  @ApiProperty({
+    type: [PartialApiKeyEntity],
+    description: 'List of available api keys',
+  })
+  @Expose()
+  @Type(() => PartialApiKeyEntity)
+  @IsArray()
+  apiKeys: PartialApiKeyEntity[];
 }

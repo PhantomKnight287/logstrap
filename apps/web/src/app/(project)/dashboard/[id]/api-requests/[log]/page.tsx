@@ -120,9 +120,25 @@ function LogItem({
         'text-gray-400': log.level === 'trace',
       })}
     >
-      {formatTime(log.timestamp, 'DD/MM/YY HH:mm')} - [{log.level}] [
-      {log.component ? `${log.component} → ` : ''}
-      {log.functionName ?? ''}] {log.message}
+      {formatTime(log.timestamp, 'DD/MM/YY HH:mm')} - [{log.level}]
+      {log.component || log.functionName ? (
+        <>
+          {' '}
+          [{log.component ? `${log.component} → ` : ''}
+          {log.functionName ?? ''}]
+        </>
+      ) : null}{' '}
+      {log.message}
+      <br />
+      {log.additionalInfo ? (
+        <>
+          {log.additionalInfo?.stack ? (
+            log.additionalInfo?.stack
+          ) : (
+            <>JSON.stringify(log.additionalInfo, null, 2)</>
+          )}
+        </>
+      ) : null}
     </div>
   );
 }

@@ -386,68 +386,34 @@
             "JWT-auth": []
           }
         ]
-      },
-      "patch": {
-        "operationId": "ProjectsController_update",
+      }
+    },
+    "/projects/{id}/api-request-search-filters": {
+      "get": {
+        "operationId": "ProjectsController_getProjectApiRequestSearchFilters",
+        "summary": "Get project api request search filters",
+        "description": "Get project api request search filters",
         "parameters": [
           {
             "name": "id",
             "required": true,
             "in": "path",
+            "description": "The id of the project",
             "schema": {
               "type": "string"
             }
           }
         ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateProjectDto"
-              }
-            }
-          }
-        },
         "responses": {
           "200": {
-            "description": ""
-          },
-          "500": {
-            "description": "Internal server error.",
+            "description": "",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/GenericErrorEntity"
+                  "$ref": "#/components/schemas/ProjectApiRequestSearchFiltersResponse"
                 }
               }
             }
-          }
-        },
-        "tags": [
-          "Projects"
-        ],
-        "security": [
-          {
-            "JWT-auth": []
-          }
-        ]
-      },
-      "delete": {
-        "operationId": "ProjectsController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
           },
           "500": {
             "description": "Internal server error.",
@@ -1197,19 +1163,51 @@
           "itemsPerQuery"
         ]
       },
-      "UpdateProjectDto": {
+      "PartialApiKeyEntity": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
           "name": {
             "type": "string"
-          },
-          "description": {
-            "type": "string"
-          },
-          "url": {
-            "type": "string"
           }
-        }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
+      "ProjectApiRequestSearchFiltersResponse": {
+        "type": "object",
+        "properties": {
+          "statusCodes": {
+            "description": "List of available status codes",
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "methods": {
+            "description": "List of available methods",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "apiKeys": {
+            "description": "List of available api keys",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartialApiKeyEntity"
+            }
+          }
+        },
+        "required": [
+          "statusCodes",
+          "methods",
+          "apiKeys"
+        ]
       },
       "CreateKeyDto": {
         "type": "object",

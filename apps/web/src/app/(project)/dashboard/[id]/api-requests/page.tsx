@@ -12,6 +12,22 @@ import { ApiRequestFilters, NextPage, PreviousPage } from './page.client';
 export const dynamic = 'force-dynamic';
 
 export default async function ApiRequests({ params, searchParams }: PageProps) {
+  const filters = await client.GET(
+    '/projects/{id}/api-request-search-filters',
+    {
+      params: {
+        path: {
+          id: params.id,
+        },
+      },
+      headers: {
+        Authorization: `Bearer ${getAuthToken(cookies())}`,
+      },
+    },
+  );
+  if (filters.error) {
+    redirect(`${Redirects.ERROR}?error=${filters.error.message}`);
+  }
   let page: number | string = searchParams.page as string;
   page = Number.isNaN(+page) ? 1 : Number(page);
   const logs = await client.GET('/projects/{id}/request-logs', {
@@ -31,7 +47,6 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
   if (logs.error) {
     redirect(`${Redirects.ERROR}?error=${logs.error.message}`);
   }
-  console.log(logs.data.items);
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center flex-row justify-between">
@@ -46,7 +61,7 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
           />
         </div>
       </div>
-      <ApiRequestFilters />
+      <ApiRequestFilters {...filters.data} />
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">
         <div className="flex flex-col items-center gap-1 text-center size-full p-2">
           <DataTable

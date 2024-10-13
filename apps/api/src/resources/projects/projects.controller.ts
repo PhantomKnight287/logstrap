@@ -30,6 +30,7 @@ import { ITEMS_PER_QUERY } from '~/constants';
 import { FetchAllProjectsResponse } from './entities/response.entity';
 import { Project, ProjectIdEntity } from './entities/project.entity';
 import { GenericErrorEntity } from '~/entity';
+import { ProjectApiRequestSearchFiltersResponse } from './logs/entities/response.entity';
 
 @Controller('projects')
 @UseGuards(AuthGuard)
@@ -101,13 +102,24 @@ export class ProjectsController {
     return this.projectsService.findOne(id, user.id);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateProjectDto: UpdateProjectDto) {
-    return this.projectsService.update(+id, updateProjectDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.projectsService.remove(+id);
+  @ApiOperation({
+    description: 'Get project api request search filters',
+    summary: 'Get project api request search filters',
+  })
+  @ApiParam({
+    type: String,
+    required: true,
+    name: 'id',
+    description: 'The id of the project',
+  })
+  @ApiOkResponse({
+    type: ProjectApiRequestSearchFiltersResponse,
+  })
+  @Get(':id/api-request-search-filters')
+  getProjectApiRequestSearchFilters(
+    @Param('id') id: string,
+    @User() user: UserEntity,
+  ) {
+    return this.projectsService.getProjectApiRequestSearchFilters(id, user.id);
   }
 }

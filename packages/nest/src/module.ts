@@ -11,6 +11,8 @@ import { LogsTrapService } from './service';
 import { LogsTrapInitOptions as CoreLogsTrapInitOptions } from '@logstrap/core';
 import { ClsMiddleware, ClsModule } from 'nestjs-cls';
 import { RouteInfo } from '@nestjs/common/interfaces';
+import { APP_FILTER } from '@nestjs/core';
+import { LogsTrapExceptionHandler } from './exception-handler';
 
 /**
  * Extended LogsTrap initialization options including route exclusion.
@@ -66,6 +68,10 @@ export class LogsTrapModule implements NestModule {
           useValue: options,
         },
         LogsTrapService,
+        {
+          provide: APP_FILTER,
+          useClass: LogsTrapExceptionHandler,
+        },
       ],
       exports: [LogsTrapService],
       imports: [ClsModule.forRoot({ middleware: { mount: false } })],
@@ -92,6 +98,10 @@ export class LogsTrapModule implements NestModule {
       providers: [
         this.createAsyncOptionsProvider(asyncOptions),
         LogsTrapService,
+        {
+          provide: APP_FILTER,
+          useClass: LogsTrapExceptionHandler,
+        },
       ],
       exports: [LogsTrapService],
     };

@@ -33,17 +33,14 @@ export class LogsTrapMiddleware implements NestMiddleware {
     request[LOGSTRAP_REQUEST_ID] = requestId;
 
     const originalJsonMethod = response.json;
-    const clsServiceRef = this.clsService;
     const logsTrapOptionsRef = this.logsTrapOptions;
-
+    const logData: Record<string, any> = {};
     const startTime = Date.now();
 
     // Override the json method to intercept the response
     response.json = function (responseBody) {
       const endTime = Date.now();
       const timeTaken = endTime - startTime;
-
-      const applicationLogs = clsServiceRef.get(requestId);
       const requestLog = {
         statusCode: response.statusCode,
         url: request.originalUrl,
@@ -55,13 +52,16 @@ export class LogsTrapMiddleware implements NestMiddleware {
         cookies: request.cookies,
         ip: request.ip,
         userAgent: request.headers['user-agent'],
-        applicationLogs: applicationLogs ?? [],
         timeTaken: timeTaken,
       };
-
+      logData.request = requestLog;
       const originalResponse = originalJsonMethod.call(this, responseBody);
 
-      // Asynchronously log the request
+      return originalResponse;
+    };
+
+    response.on('finish', () => {
+      const latestApplicationLogs = this.clsService.get(requestId);
       (async () => {
         try {
           const endpointUrl = await createEndpointUrl(logsTrapOptionsRef);
@@ -75,7 +75,9 @@ export class LogsTrapMiddleware implements NestMiddleware {
               },
             },
             {
-              requests: [requestLog],
+              requests: [
+                { ...logData.request, applicationLogs: latestApplicationLogs },
+              ],
             },
           );
           if (!response.ok) {
@@ -85,9 +87,7 @@ export class LogsTrapMiddleware implements NestMiddleware {
           console.error('Failed to log API request:', error);
         }
       })();
-
-      return originalResponse;
-    };
+    });
 
     next();
   }
