@@ -11,7 +11,7 @@ export default function LogInfoPage({
   data: components['schemas']['LogEntity'];
 }) {
   return (
-    <div className="flex flex-col items-center mt-5">
+    <div className="flex flex-col items-start mt-5">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-0 md:gap-5 w-full">
         <div className="flex flex-col items-start gap-4">
           <h3 className="text-lg font-medium">Request Body</h3>
@@ -71,6 +71,21 @@ export default function LogInfoPage({
             />
           </Suspense>
         </div>
+      </div>
+      <div className="flex flex-col items-start gap-4">
+        <h3 className="text-lg font-medium">Cookies</h3>
+        <Suspense fallback={<Loader />}>
+          <Code
+            lang="json"
+            code={
+              data.responseHeaders !== undefined &&
+              data.responseHeaders !== null
+                ? JSON.stringify(data.cookies, null, '\t')
+                : JSON.stringify({})
+            }
+            theme={'ayu-dark'}
+          />
+        </Suspense>
       </div>
       {/* {data.stackTrace ? (
         <div className="w-full flex flex-col items-start mt-4">

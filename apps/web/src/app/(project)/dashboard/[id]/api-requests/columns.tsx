@@ -39,7 +39,7 @@ export const columns: ColumnDef<
     accessorKey: 'timestamp',
     header: 'Timestamp',
     cell: ({ row }) => {
-      const formattedTime = formatTime(row.original.timestamp);
+      const formattedTime = formatTime(row.original.timestamp, 'YYYY-MM-DD HH:mm:ss');
       const validElementTime = formatTime(
         row.original.timestamp,
         'YYYY-MM-DD HH:mm:ss',

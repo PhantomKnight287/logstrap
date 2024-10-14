@@ -3,20 +3,14 @@
 import { Button } from '@/components/ui/button';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
-import { useQueryState } from 'nuqs';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
+import { parseAsArrayOf, parseAsString, useQueryState } from 'nuqs';
 import { Input } from '@/components/ui/input';
 import { Search } from 'lucide-react';
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useHotkeys } from 'react-hotkeys-hook';
 import { DateRangePicker } from '@/components/ui/date-range-picker';
 import { components } from '@/lib/api/types';
+import { MultiSelect } from '@/components/ui/multi-select';
 
 export function NextPage({
   disabled,
@@ -77,12 +71,30 @@ export function ApiRequestFilters({
   statusCodes,
   apiKeys,
 }: components['schemas']['ProjectApiRequestSearchFiltersResponse']) {
-  const [method, setMethod] = useQueryState('method');
+  const [method, setMethod] = useQueryState(
+    'method',
+    parseAsArrayOf(parseAsString),
+  );
   const [search, setSearch] = useQueryState('search');
-  const [statusCode, setStatusCode] = useQueryState('statusCode');
+  const [statusCode, setStatusCode] = useQueryState(
+    'statusCode',
+    parseAsArrayOf(parseAsString),
+  );
   const [fromDate, setFromDate] = useQueryState('fromDate');
   const [toDate, setToDate] = useQueryState('toDate');
   const searchInputRef = useRef<HTMLInputElement>(null);
+  const [apiKey, setApikey] = useQueryState(
+    'apiKey',
+    parseAsArrayOf(parseAsString),
+  );
+  const { refresh } = useRouter();
+
+  useEffect(() => {
+    window.addEventListener('focus', refresh);
+    return () => {
+      window.removeEventListener('focus', refresh);
+    };
+  }, []);
 
   useHotkeys('mod+f', (event) => {
     event.preventDefault();
@@ -90,25 +102,7 @@ export function ApiRequestFilters({
   });
 
   return (
-    <div className="flex flex-wrap gap-4 items-center mb-4">
-      <Select
-        value={method || ''}
-        onValueChange={(value) => {
-          setMethod(value || null);
-        }}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Select method" />
-        </SelectTrigger>
-        <SelectContent>
-          {methods.map((method) => (
-            <SelectItem key={method} value={method}>
-              {method}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
+    <div className="flex flex-col gap-4">
       <div className="relative flex-1">
         <Search className="absolute left-2 top-1/2 transform -translate-y-1/2 text-gray-400 size-4" />
         <Input
@@ -119,34 +113,45 @@ export function ApiRequestFilters({
           onChange={(e) => setSearch(e.target.value || null)}
         />
       </div>
+      <div className="flex flex-wrap gap-4 items-center mb-4">
+        <MultiSelect
+          options={methods.map((method) => ({ label: method, value: method }))}
+          defaultValue={method ?? []}
+          onValueChange={setMethod}
+          placeholder="Select method"
+          className="max-w-[350px]"
+        />
 
-      <Select
-        value={statusCode || ''}
-        onValueChange={(value) => setStatusCode(value || null)}
-      >
-        <SelectTrigger className="w-[180px]">
-          <SelectValue placeholder="Status code" />
-        </SelectTrigger>
-        <SelectContent>
-          {statusCodes.map((statusCode) => (
-            <SelectItem key={statusCode} value={statusCode.toString()}>
-              {statusCode}
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-
-      <DateRangePicker
-        onUpdate={(values) => {
-          console.log(values);
-          setFromDate(values.range.from.toJSON());
-          setToDate(values.range.to?.toJSON() || null);
-        }}
-        initialDateFrom={fromDate ? new Date(fromDate) : undefined}
-        initialDateTo={toDate ? new Date(toDate) : undefined}
-        align="start"
-        locale="en-GB"
-      />
+        <MultiSelect
+          options={statusCodes.map((statusCode) => ({
+            label: statusCode.toString(),
+            value: statusCode.toString(),
+          }))}
+          defaultValue={statusCode ?? []}
+          onValueChange={setStatusCode}
+          placeholder="Status Code"
+          className="max-w-[350px]"
+          maxCount={1}
+        />
+        <DateRangePicker
+          onUpdate={(values) => {
+            setFromDate(values.range.from.toJSON());
+            setToDate(values.range.to?.toJSON() || null);
+          }}
+          initialDateFrom={fromDate ? new Date(fromDate) : undefined}
+          initialDateTo={toDate ? new Date(toDate) : undefined}
+          align="start"
+          locale="en-GB"
+        />
+        <MultiSelect
+          options={apiKeys.map((key) => ({ label: key.name, value: key.id }))}
+          defaultValue={apiKey ?? []}
+          onValueChange={setApikey}
+          placeholder="Status Code"
+          className="max-w-[350px]"
+          maxCount={1}
+        />
+      </div>
     </div>
   );
 }

@@ -10,6 +10,7 @@ import { WinstonModule } from 'nest-winston';
 import { loggerInstance } from '~/logger/winston.config';
 import { CustomValidationPipe } from './pipes/validation/validation.pipe';
 import { json } from 'express';
+import cookieParser from 'cookie-parser';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
@@ -17,7 +18,7 @@ async function bootstrap() {
       instance: loggerInstance,
     }),
   });
-  app.use(json({ limit: '50mb' }));
+  app.use(json({ limit: '50mb' }), cookieParser());
   app.enableCors({});
   app.use(
     morgan('dev'),
