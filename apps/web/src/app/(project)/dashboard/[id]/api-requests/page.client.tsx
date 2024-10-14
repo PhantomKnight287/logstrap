@@ -73,19 +73,43 @@ export function ApiRequestFilters({
 }: components['schemas']['ProjectApiRequestSearchFiltersResponse']) {
   const [method, setMethod] = useQueryState(
     'method',
-    parseAsArrayOf(parseAsString),
+    parseAsArrayOf(parseAsString).withOptions({
+      history: 'replace',
+      shallow: false,
+      throttleMs: 300,
+    }),
   );
-  const [search, setSearch] = useQueryState('search');
+  const [search, setSearch] = useQueryState('q', {
+    history: 'replace',
+    shallow: false,
+    throttleMs: 300,
+  });
   const [statusCode, setStatusCode] = useQueryState(
     'statusCode',
-    parseAsArrayOf(parseAsString),
+    parseAsArrayOf(parseAsString).withOptions({
+      history: 'replace',
+      shallow: false,
+      throttleMs: 300,
+    }),
   );
-  const [fromDate, setFromDate] = useQueryState('fromDate');
-  const [toDate, setToDate] = useQueryState('toDate');
+  const [fromDate, setFromDate] = useQueryState('fromDate', {
+    history: 'replace',
+    shallow: false,
+    throttleMs: 300,
+  });
+  const [toDate, setToDate] = useQueryState('toDate', {
+    history: 'replace',
+    shallow: false,
+    throttleMs: 300,
+  });
   const searchInputRef = useRef<HTMLInputElement>(null);
   const [apiKey, setApikey] = useQueryState(
     'apiKey',
-    parseAsArrayOf(parseAsString),
+    parseAsArrayOf(parseAsString).withOptions({
+      history: 'replace',
+      shallow: false,
+      throttleMs: 300,
+    }),
   );
   const { refresh } = useRouter();
 
@@ -147,7 +171,7 @@ export function ApiRequestFilters({
           options={apiKeys.map((key) => ({ label: key.name, value: key.id }))}
           defaultValue={apiKey ?? []}
           onValueChange={setApikey}
-          placeholder="Status Code"
+          placeholder="API Key"
           className="max-w-[350px]"
           maxCount={1}
         />

@@ -436,6 +436,54 @@
         ]
       }
     },
+    "/projects/{id}/application-logs-search-filters": {
+      "get": {
+        "operationId": "ProjectsController_getProjectApplicationLogsSearchFilters",
+        "summary": "Get project application logs search filters",
+        "description": "Get project application logs search filters",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectApplicationLogsSearchFiltersResponse"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
     "/projects/{id}/keys": {
       "post": {
         "operationId": "KeysController_create",
@@ -739,6 +787,69 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "The search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "apiKey",
+            "required": false,
+            "in": "query",
+            "description": "The api keys",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "fromDate",
+            "required": false,
+            "in": "query",
+            "description": "The from date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "toDate",
+            "required": false,
+            "in": "query",
+            "description": "The to date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "method",
+            "required": false,
+            "in": "query",
+            "description": "The method",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "statusCode",
+            "required": false,
+            "in": "query",
+            "description": "The status code",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
@@ -839,9 +950,11 @@
         ]
       }
     },
-    "/projects/{id}/{id}": {
+    "/projects/{id}/application-logs": {
       "get": {
-        "operationId": "LogsController_findOne",
+        "operationId": "LogsController_getApplicationLogs",
+        "summary": "Get application logs for a project",
+        "description": "Get application logs for a project",
         "parameters": [
           {
             "name": "id",
@@ -851,11 +964,111 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "page",
+            "required": true,
+            "in": "query",
+            "description": "The no of page",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "limit",
+            "required": false,
+            "in": "query",
+            "description": "The no of items to fetch, defaults to 6",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "q",
+            "required": false,
+            "in": "query",
+            "description": "The search query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "fromDate",
+            "required": false,
+            "in": "query",
+            "description": "The from date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "toDate",
+            "required": false,
+            "in": "query",
+            "description": "The to date",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "level",
+            "required": false,
+            "in": "query",
+            "description": "The level",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "apiKey",
+            "required": false,
+            "in": "query",
+            "description": "The api keys",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "component",
+            "required": false,
+            "in": "query",
+            "description": "The component",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "name": "functionName",
+            "required": false,
+            "in": "query",
+            "description": "The function name",
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchApplicationLogsResponseEntity"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error.",
@@ -870,10 +1083,19 @@
         },
         "tags": [
           "Logs"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
         ]
-      },
-      "patch": {
-        "operationId": "LogsController_update",
+      }
+    },
+    "/projects/{id}/application-logs/{logId}": {
+      "get": {
+        "operationId": "LogsController_getApplicationLog",
+        "summary": "Get an application log by id",
+        "description": "Get an application log by id",
         "parameters": [
           {
             "name": "id",
@@ -883,21 +1105,37 @@
             "schema": {
               "type": "string"
             }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateLogDto"
-              }
+          },
+          {
+            "name": "logId",
+            "required": true,
+            "in": "path",
+            "description": "Id of log",
+            "schema": {
+              "type": "string"
             }
           }
-        },
+        ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ExtendedApplicationLogEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Log or Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
           },
           "500": {
             "description": "Internal server error.",
@@ -912,38 +1150,11 @@
         },
         "tags": [
           "Logs"
-        ]
-      },
-      "delete": {
-        "operationId": "LogsController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Id of project",
-            "schema": {
-              "type": "string"
-            }
-          }
         ],
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "500": {
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericErrorEntity"
-                }
-              }
-            }
+        "security": [
+          {
+            "JWT-auth": []
           }
-        },
-        "tags": [
-          "Logs"
         ]
       }
     }
@@ -1207,6 +1418,37 @@
           "statusCodes",
           "methods",
           "apiKeys"
+        ]
+      },
+      "ProjectApplicationLogsSearchFiltersResponse": {
+        "type": "object",
+        "properties": {
+          "logLevels": {
+            "description": "List of available log levels",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "components": {
+            "description": "List of available components",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "functionNames": {
+            "description": "List of available function names",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": [
+          "logLevels",
+          "components",
+          "functionNames"
         ]
       },
       "CreateKeyDto": {
@@ -1668,31 +1910,144 @@
           "requestBody"
         ]
       },
-      "UpdateLogDto": {
+      "PartialApplicationLogEntity": {
         "type": "object",
         "properties": {
-          "requests": {
-            "description": "Requests associated to this log",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/RequestLogDTO"
-            }
+          "id": {
+            "type": "string"
           },
-          "applicationLogs": {
-            "description": "Application logs",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateApplicationLogDto"
-            }
+          "timestamp": {
+            "type": "string"
           },
-          "systemLogs": {
-            "description": "System logs(like when a process crashes)",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CreateSystemLogDto"
-            }
+          "level": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "functionName": {
+            "type": "string"
+          },
+          "additionalInfo": {
+            "type": "object"
+          },
+          "requestId": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "apiKeyId": {
+            "type": "string"
+          },
+          "apiKeyName": {
+            "type": "string"
           }
-        }
+        },
+        "required": [
+          "id",
+          "timestamp",
+          "level",
+          "message",
+          "component",
+          "functionName",
+          "additionalInfo",
+          "requestId",
+          "projectId",
+          "apiKeyId",
+          "apiKeyName"
+        ]
+      },
+      "FetchApplicationLogsResponseEntity": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartialApplicationLogEntity"
+            }
+          },
+          "totalItems": {
+            "type": "number"
+          },
+          "itemsPerQuery": {
+            "type": "number",
+            "default": 6
+          }
+        },
+        "required": [
+          "items",
+          "totalItems",
+          "itemsPerQuery"
+        ]
+      },
+      "LogEntityWithIdAndUrl": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "url"
+        ]
+      },
+      "ExtendedApplicationLogEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "debug",
+              "info",
+              "warn",
+              "error",
+              "fatal",
+              "log",
+              "trace"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "timestamp": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "additionalInfo": {
+            "type": "object"
+          },
+          "functionName": {
+            "type": "string"
+          },
+          "component": {
+            "type": "string"
+          },
+          "apiKey": {
+            "$ref": "#/components/schemas/PartialApiKeyEntity"
+          },
+          "requestLog": {
+            "$ref": "#/components/schemas/LogEntityWithIdAndUrl"
+          }
+        },
+        "required": [
+          "id",
+          "level",
+          "message",
+          "timestamp",
+          "apiKey",
+          "requestLog"
+        ]
       }
     }
   }

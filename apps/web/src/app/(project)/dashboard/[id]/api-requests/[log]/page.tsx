@@ -31,10 +31,7 @@ export default async function ApiRequestLog(props: PageProps) {
   return (
     <div className="flex flex-col gap-4 items-center justify-center p-4">
       <div className="container mb-5 space-y-6">
-        <Back
-          url={`/dashboard/${log.projectId}/api-requests`}
-          backOnEscape={true}
-        />
+        <Back url={`/dashboard/${log.projectId}/api-requests`} />
         <h1 className="text-2xl font-bold line-clamp-2 mt-2">
           {log.method} {log.url}
         </h1>

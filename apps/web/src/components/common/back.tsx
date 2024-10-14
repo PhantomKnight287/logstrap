@@ -1,34 +1,31 @@
 'use client';
-import Link from 'next/link';
-import { buttonVariants } from '../ui/button';
+import { Button } from '../ui/button';
 import { ChevronLeft } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useHotkeys } from 'react-hotkeys-hook';
 
-export default function Back({
-  url,
-  backOnEscape = false,
-}: {
-  url: string;
-  backOnEscape?: boolean;
-}) {
+export default function Back({ url }: { url: string }) {
   const router = useRouter();
-  useHotkeys('escape', () => {
-    if (backOnEscape) {
-      router.push(url);
-    }
-  });
 
+  function handleBack() {
+    // TODO: Replace with a more robust solution.
+    // @ts-expect-error Not implemented in all browsers.
+    if (window.navigation?.canGoBack) {
+      router.back();
+    } else {
+      router.replace(url);
+    }
+  }
+
+  useHotkeys('escape', handleBack);
   return (
-    <Link
-      href={url}
-      className={buttonVariants({
-        variant: 'secondary',
-        className: 'flex flex-row items-center gap-2 dark:text-white text-black',
-      })}
+    <Button
+      className="flex flex-row items-center gap-2 dark:text-white text-black"
+      variant={'secondary'}
+      onClick={handleBack}
     >
       <ChevronLeft />
       Back
-    </Link>
+    </Button>
   );
 }

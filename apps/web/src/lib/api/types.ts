@@ -160,6 +160,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{id}/application-logs-search-filters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project application logs search filters
+         * @description Get project application logs search filters
+         */
+        get: operations["ProjectsController_getProjectApplicationLogsSearchFilters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{id}/keys": {
         parameters: {
             query?: never;
@@ -260,20 +280,44 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/projects/{id}/{id}": {
+    "/projects/{id}/application-logs": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get: operations["LogsController_findOne"];
+        /**
+         * Get application logs for a project
+         * @description Get application logs for a project
+         */
+        get: operations["LogsController_getApplicationLogs"];
         put?: never;
         post?: never;
-        delete: operations["LogsController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
-        patch: operations["LogsController_update"];
+        patch?: never;
+        trace?: never;
+    };
+    "/projects/{id}/application-logs/{logId}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get an application log by id
+         * @description Get an application log by id
+         */
+        get: operations["LogsController_getApplicationLog"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
 }
@@ -345,6 +389,14 @@ export interface components {
             methods: string[];
             /** @description List of available api keys */
             apiKeys: components["schemas"]["PartialApiKeyEntity"][];
+        };
+        ProjectApplicationLogsSearchFiltersResponse: {
+            /** @description List of available log levels */
+            logLevels: string[];
+            /** @description List of available components */
+            components: string[];
+            /** @description List of available function names */
+            functionNames: string[];
         };
         CreateKeyDto: {
             mode: components["schemas"]["ProjectMode"];
@@ -501,13 +553,41 @@ export interface components {
             ip?: string;
             applicationLogs?: components["schemas"]["ApplicationLogEntity"][];
         };
-        UpdateLogDto: {
-            /** @description Requests associated to this log */
-            requests?: components["schemas"]["RequestLogDTO"][];
-            /** @description Application logs */
-            applicationLogs?: components["schemas"]["CreateApplicationLogDto"][];
-            /** @description System logs(like when a process crashes) */
-            systemLogs?: components["schemas"]["CreateSystemLogDto"][];
+        PartialApplicationLogEntity: {
+            id: string;
+            timestamp: string;
+            level: string;
+            message: string;
+            component: string;
+            functionName: string;
+            additionalInfo: Record<string, never>;
+            requestId: string;
+            projectId: string;
+            apiKeyId: string;
+            apiKeyName: string;
+        };
+        FetchApplicationLogsResponseEntity: {
+            items: components["schemas"]["PartialApplicationLogEntity"][];
+            totalItems: number;
+            /** @default 6 */
+            itemsPerQuery: number;
+        };
+        LogEntityWithIdAndUrl: {
+            id: string;
+            url: string;
+        };
+        ExtendedApplicationLogEntity: {
+            id: string;
+            /** @enum {string} */
+            level: "debug" | "info" | "warn" | "error" | "fatal" | "log" | "trace";
+            message: string;
+            /** Format: date-time */
+            timestamp: string;
+            additionalInfo?: Record<string, never>;
+            functionName?: string;
+            component?: string;
+            apiKey: components["schemas"]["PartialApiKeyEntity"];
+            requestLog: components["schemas"]["LogEntityWithIdAndUrl"];
         };
     };
     responses: never;
@@ -853,6 +933,37 @@ export interface operations {
             };
         };
     };
+    ProjectsController_getProjectApplicationLogsSearchFilters: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectApplicationLogsSearchFiltersResponse"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
     KeysController_findAll: {
         parameters: {
             query?: never;
@@ -1068,6 +1179,18 @@ export interface operations {
                 page: string;
                 /** @description The no of items to fetch, defaults to 6 */
                 limit?: string;
+                /** @description The search query */
+                q?: string;
+                /** @description The api keys */
+                apiKey?: string[];
+                /** @description The from date */
+                fromDate?: string;
+                /** @description The to date */
+                toDate?: string;
+                /** @description The method */
+                method?: string[];
+                /** @description The status code */
+                statusCode?: string[];
             };
             header?: never;
             path: {
@@ -1138,9 +1261,28 @@ export interface operations {
             };
         };
     };
-    LogsController_findOne: {
+    LogsController_getApplicationLogs: {
         parameters: {
-            query?: never;
+            query: {
+                /** @description The no of page */
+                page: string;
+                /** @description The no of items to fetch, defaults to 6 */
+                limit?: string;
+                /** @description The search query */
+                q?: string;
+                /** @description The from date */
+                fromDate?: string;
+                /** @description The to date */
+                toDate?: string;
+                /** @description The level */
+                level?: string[];
+                /** @description The api keys */
+                apiKey?: string[];
+                /** @description The component */
+                component?: string[];
+                /** @description The function name */
+                functionName?: string[];
+            };
             header?: never;
             path: {
                 /** @description Id of project */
@@ -1154,7 +1296,9 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FetchApplicationLogsResponseEntity"];
+                };
             };
             /** @description Internal server error. */
             500: {
@@ -1167,13 +1311,15 @@ export interface operations {
             };
         };
     };
-    LogsController_remove: {
+    LogsController_getApplicationLog: {
         parameters: {
             query?: never;
             header?: never;
             path: {
                 /** @description Id of project */
                 id: string;
+                /** @description Id of log */
+                logId: string;
             };
             cookie?: never;
         };
@@ -1183,40 +1329,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ExtendedApplicationLogEntity"];
+                };
             };
-            /** @description Internal server error. */
-            500: {
+            /** @description Log or Project not found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["GenericErrorEntity"];
                 };
-            };
-        };
-    };
-    LogsController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of project */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateLogDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Internal server error. */
             500: {

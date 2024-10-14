@@ -1,7 +1,7 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { RequestLogDTO, CreateApplicationLogDto } from '../dto/create-log.dto';
 import { Expose, Type } from 'class-transformer';
-import { IsArray, IsNumber, IsString } from 'class-validator';
+import { IsArray, IsNumber, IsObject, IsString } from 'class-validator';
 import { ITEMS_PER_QUERY } from '~/constants';
 export class PartialApiKeyEntity {
   @ApiProperty({})
@@ -137,4 +137,107 @@ export class ProjectApiRequestSearchFiltersResponse {
   @Type(() => PartialApiKeyEntity)
   @IsArray()
   apiKeys: PartialApiKeyEntity[];
+}
+
+export class ProjectApplicationLogsSearchFiltersResponse {
+  @ApiProperty({
+    type: [String],
+    description: 'List of available log levels',
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  logLevels: string[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'List of available components',
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  components: string[];
+
+  @ApiProperty({
+    type: [String],
+    description: 'List of available function names',
+  })
+  @Expose()
+  @IsArray()
+  @IsString({ each: true })
+  functionNames: string[];
+}
+
+class PartialApplicationLogEntity {
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  id: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  timestamp: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  level: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  message: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  component: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  functionName: string;
+
+  @ApiProperty({})
+  @IsObject()
+  @Expose()
+  additionalInfo: Record<string, any>;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  requestId: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  projectId: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  apiKeyId: string;
+
+  @ApiProperty({})
+  @IsString()
+  @Expose()
+  apiKeyName: string;
+}
+export class FetchApplicationLogsResponseEntity {
+  @ApiProperty({ type: [PartialApplicationLogEntity] })
+  @Type(() => PartialApplicationLogEntity)
+  @IsArray()
+  @Expose()
+  items: PartialApplicationLogEntity[];
+
+  @Expose()
+  @ApiProperty()
+  @IsNumber()
+  totalItems: number;
+
+  @Expose()
+  @ApiProperty({ default: ITEMS_PER_QUERY })
+  @IsNumber()
+  itemsPerQuery: number;
 }

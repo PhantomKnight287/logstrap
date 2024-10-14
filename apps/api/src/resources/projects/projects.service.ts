@@ -9,7 +9,11 @@ import { plainToInstance } from 'class-transformer';
 import { FetchAllProjectsResponse } from './entities/response.entity';
 import { Project, ProjectIdEntity } from './entities/project.entity';
 import { LogsTrapService } from '@logstrap/nest';
-import { requestLogs as requestLogsTable, ApiKeys } from '@logstrap/db';
+import {
+  requestLogs as requestLogsTable,
+  ApiKeys,
+  applicationLogs as applicationLogsTable,
+} from '@logstrap/db';
 
 @Injectable()
 export class ProjectsService {
@@ -98,9 +102,46 @@ export class ProjectsService {
     });
 
     return {
-      statusCodes: availableStatusCodes.map((status) => status.statusCode),
-      methods: availableMethods.map((method) => method.method),
+      statusCodes: availableStatusCodes
+        .map((status) => status.statusCode)
+        .filter(Boolean),
+      methods: availableMethods.map((method) => method.method).filter(Boolean),
       apiKeys: availableApiKeys,
+    };
+  }
+
+  async getProjectApplicationLogsSearchFilters(id: string, userId: string) {
+    this.logger.log(
+      `Getting application logs search filters for project: ${id}`,
+    );
+    const project = await this.findOne(id, userId);
+    const logLevels = await db
+      .selectDistinct({
+        level: applicationLogsTable.level,
+      })
+      .from(applicationLogsTable)
+      .where(eq(applicationLogsTable.projectId, id));
+
+    const components = await db
+      .selectDistinct({
+        component: applicationLogsTable.component,
+      })
+      .from(applicationLogsTable)
+      .where(eq(applicationLogsTable.projectId, id));
+
+    const functionNames = await db
+      .selectDistinct({
+        functionName: applicationLogsTable.functionName,
+      })
+      .from(applicationLogsTable)
+      .where(eq(applicationLogsTable.projectId, id));
+
+    return {
+      logLevels: logLevels.map((level) => level.level).filter(Boolean),
+      components: components
+        .map((component) => component.component)
+        .filter(Boolean),
+      functionNames: functionNames.map((fn) => fn.functionName).filter(Boolean),
     };
   }
 

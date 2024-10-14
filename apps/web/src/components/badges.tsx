@@ -1,4 +1,5 @@
 import { Badge } from '@/components/ui/badge';
+import { components } from '@/lib/api/types';
 import { cn } from '@/lib/utils';
 
 export function StatusCodeBadge({ statusCode }: { statusCode: number }) {
@@ -32,6 +33,29 @@ export function RequestMethodBadge({ method }: { method: string }) {
       variant="outline"
     >
       {method}
+    </Badge>
+  );
+}
+
+export function LogLevelBadge({
+  level,
+}: {
+  level: components['schemas']['LogLevel'];
+}) {
+  return (
+    <Badge
+      variant="outline"
+      className={cn('text-white capitalize', {
+        'bg-blue-500': level === 'debug',
+        'bg-green-500': level === 'info',
+        'bg-yellow-500': level === 'warn',
+        'bg-red-500': level === 'error',
+        'bg-gray-500': level === 'fatal',
+        'bg-purple-500': level === 'log',
+        'bg-pink-500': level === 'trace',
+      })}
+    >
+      {level}
     </Badge>
   );
 }
