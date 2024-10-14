@@ -397,6 +397,8 @@ export interface components {
             components: string[];
             /** @description List of available function names */
             functionNames: string[];
+            /** @description List of available api keys */
+            apiKeys: components["schemas"]["PartialApiKeyEntity"][];
         };
         CreateKeyDto: {
             mode: components["schemas"]["ProjectMode"];
@@ -587,7 +589,7 @@ export interface components {
             functionName?: string;
             component?: string;
             apiKey: components["schemas"]["PartialApiKeyEntity"];
-            requestLog: components["schemas"]["LogEntityWithIdAndUrl"];
+            request: components["schemas"]["LogEntityWithIdAndUrl"];
         };
     };
     responses: never;

@@ -166,6 +166,15 @@ export class ProjectApplicationLogsSearchFiltersResponse {
   @IsArray()
   @IsString({ each: true })
   functionNames: string[];
+
+  @ApiProperty({
+    type: [PartialApiKeyEntity],
+    description: 'List of available api keys',
+  })
+  @Expose()
+  @Type(() => PartialApiKeyEntity)
+  @IsArray()
+  apiKeys: PartialApiKeyEntity[];
 }
 
 class PartialApplicationLogEntity {

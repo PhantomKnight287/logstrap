@@ -136,12 +136,21 @@ export class ProjectsService {
       .from(applicationLogsTable)
       .where(eq(applicationLogsTable.projectId, id));
 
+    const availableApiKeys = await db.query.ApiKeys.findMany({
+      where: eq(ApiKeys.projectId, id),
+      columns: {
+        id: true,
+        name: true,
+      },
+    });
+
     return {
       logLevels: logLevels.map((level) => level.level).filter(Boolean),
       components: components
         .map((component) => component.component)
         .filter(Boolean),
       functionNames: functionNames.map((fn) => fn.functionName).filter(Boolean),
+      apiKeys: availableApiKeys,
     };
   }
 

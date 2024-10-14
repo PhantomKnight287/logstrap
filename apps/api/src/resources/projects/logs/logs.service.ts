@@ -361,7 +361,6 @@ export class LogsService {
             : []),
         ),
       );
-
     return {
       items: logs,
       totalItems: count,

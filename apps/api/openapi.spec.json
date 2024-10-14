@@ -1443,12 +1443,20 @@
             "items": {
               "type": "string"
             }
+          },
+          "apiKeys": {
+            "description": "List of available api keys",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartialApiKeyEntity"
+            }
           }
         },
         "required": [
           "logLevels",
           "components",
-          "functionNames"
+          "functionNames",
+          "apiKeys"
         ]
       },
       "CreateKeyDto": {
@@ -2036,7 +2044,7 @@
           "apiKey": {
             "$ref": "#/components/schemas/PartialApiKeyEntity"
           },
-          "requestLog": {
+          "request": {
             "$ref": "#/components/schemas/LogEntityWithIdAndUrl"
           }
         },
@@ -2046,7 +2054,7 @@
           "message",
           "timestamp",
           "apiKey",
-          "requestLog"
+          "request"
         ]
       }
     }

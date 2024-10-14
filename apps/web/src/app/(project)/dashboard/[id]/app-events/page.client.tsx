@@ -15,6 +15,7 @@ export function AppEventsFilters({
   components,
   functionNames,
   logLevels,
+  apiKeys,
 }: components['schemas']['ProjectApplicationLogsSearchFiltersResponse']) {
   const [level, setLevel] = useQueryState(
     'level',
@@ -61,6 +62,16 @@ export function AppEventsFilters({
     shallow: false,
     throttleMs: 300,
   });
+
+  const [apiKey, setApiKey] = useQueryState(
+    'apiKey',
+    parseAsArrayOf(parseAsString).withOptions({
+      history: 'replace',
+      shallow: false,
+      throttleMs: 300,
+    }),
+  );
+
   const { refresh } = useRouter();
 
   useEffect(() => {
@@ -97,7 +108,6 @@ export function AppEventsFilters({
           placeholder="Select Log Level"
           className="max-w-[350px]"
         />
-
         <MultiSelect
           options={components.map((component) => ({
             label: component,
@@ -106,6 +116,17 @@ export function AppEventsFilters({
           defaultValue={component ?? []}
           onValueChange={setComponent}
           placeholder="Component"
+          className="max-w-[350px]"
+          maxCount={1}
+        />{' '}
+        <MultiSelect
+          options={functionNames.map((functionName) => ({
+            label: functionName,
+            value: functionName,
+          }))}
+          defaultValue={functionName ?? []}
+          onValueChange={setFunctionName}
+          placeholder="Function Name"
           className="max-w-[350px]"
           maxCount={1}
         />
@@ -120,13 +141,13 @@ export function AppEventsFilters({
           locale="en-GB"
         />
         <MultiSelect
-          options={functionNames.map((functionName) => ({
-            label: functionName,
-            value: functionName,
+          options={apiKeys.map((apiKey) => ({
+            label: apiKey.name,
+            value: apiKey.id,
           }))}
-          defaultValue={functionName ?? []}
-          onValueChange={setFunctionName}
-          placeholder="Function Name"
+          defaultValue={apiKey ?? []}
+          onValueChange={setApiKey}
+          placeholder="API Key"
           className="max-w-[350px]"
           maxCount={1}
         />

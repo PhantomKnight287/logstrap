@@ -87,7 +87,7 @@ export class ExtendedApplicationLogEntity extends ApplicationLogEntity {
   })
   @IsObject()
   @Expose()
-  requestLog: LogEntityWithIdAndUrl;
+  request: LogEntityWithIdAndUrl;
 }
 
 export class LogEntity extends PartialRequestLogEntity {
