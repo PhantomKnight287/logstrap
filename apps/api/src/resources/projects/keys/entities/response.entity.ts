@@ -31,3 +31,15 @@ export class FetchAllKeysResponse {
   @IsNumber()
   itemsPerQuery: number;
 }
+
+export class FetchKeyResponse extends Key {
+  @ApiProperty({ type: Number })
+  @Expose()
+  @IsNumber()
+  apiRequestsCount: number;
+
+  @ApiProperty({ type: Number })
+  @Expose()
+  @IsNumber()
+  applicationLogsCount: number;
+}

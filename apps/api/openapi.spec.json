@@ -484,6 +484,64 @@
         ]
       }
     },
+    "/projects/{id}/stats": {
+      "get": {
+        "operationId": "ProjectsController_getProjectStats",
+        "summary": "Get project stats",
+        "description": "Get project stats",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "The id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProjectStatsResponseEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Project not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Projects"
+        ],
+        "security": [
+          {
+            "JWT-auth": []
+          }
+        ]
+      }
+    },
     "/projects/{id}/keys": {
       "post": {
         "operationId": "KeysController_create",
@@ -598,9 +656,11 @@
         ]
       }
     },
-    "/projects/{id}/keys/{id}": {
+    "/projects/{id}/keys/{keyId}": {
       "get": {
         "operationId": "KeysController_findOne",
+        "summary": "Fetch a key by id",
+        "description": "Fetch a key by id",
         "parameters": [
           {
             "name": "id",
@@ -610,14 +670,30 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "keyId",
+            "required": true,
+            "in": "path",
+            "description": "Id of the key",
+            "schema": {
+              "type": "string"
+            }
           }
         ],
         "responses": {
           "200": {
-            "description": ""
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FetchKeyResponse"
+                }
+              }
+            }
           },
-          "500": {
-            "description": "Internal server error.",
+          "404": {
+            "description": "No key found",
             "content": {
               "application/json": {
                 "schema": {
@@ -625,70 +701,6 @@
                 }
               }
             }
-          }
-        },
-        "tags": [
-          "Keys"
-        ]
-      },
-      "patch": {
-        "operationId": "KeysController_update",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Id of the project",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UpdateKeyDto"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": ""
-          },
-          "500": {
-            "description": "Internal server error.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/GenericErrorEntity"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Keys"
-        ]
-      },
-      "delete": {
-        "operationId": "KeysController_remove",
-        "parameters": [
-          {
-            "name": "id",
-            "required": true,
-            "in": "path",
-            "description": "Id of the project",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": ""
           },
           "500": {
             "description": "Internal server error.",
@@ -1459,6 +1471,128 @@
           "apiKeys"
         ]
       },
+      "LogsCountResponseEntity": {
+        "type": "object",
+        "properties": {
+          "today": {
+            "type": "number"
+          },
+          "yesterday": {
+            "type": "number"
+          },
+          "percentageChange": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "today",
+          "yesterday",
+          "percentageChange"
+        ]
+      },
+      "ApiRequestsPerDayResponseEntity": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "count"
+        ]
+      },
+      "AppEventsPerDayResponseEntity": {
+        "type": "object",
+        "properties": {
+          "date": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "count"
+        ]
+      },
+      "MostUsedApiRouteResponseEntity": {
+        "type": "object",
+        "properties": {
+          "path": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "path",
+          "count"
+        ]
+      },
+      "MostFrequentAppEventResponseEntity": {
+        "type": "object",
+        "properties": {
+          "event": {
+            "type": "string"
+          },
+          "count": {
+            "type": "number"
+          }
+        },
+        "required": [
+          "event",
+          "count"
+        ]
+      },
+      "ProjectStatsResponseEntity": {
+        "type": "object",
+        "properties": {
+          "logsCount": {
+            "$ref": "#/components/schemas/LogsCountResponseEntity"
+          },
+          "totalLogs": {
+            "type": "number"
+          },
+          "apiRequestsPerDay": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiRequestsPerDayResponseEntity"
+            }
+          },
+          "appEventsPerDay": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AppEventsPerDayResponseEntity"
+            }
+          },
+          "mostUsedApiRoute": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MostUsedApiRouteResponseEntity"
+            }
+          },
+          "mostFrequentAppEvent": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MostFrequentAppEventResponseEntity"
+            }
+          }
+        },
+        "required": [
+          "logsCount",
+          "totalLogs",
+          "apiRequestsPerDay",
+          "appEventsPerDay",
+          "mostUsedApiRoute",
+          "mostFrequentAppEvent"
+        ]
+      },
       "CreateKeyDto": {
         "type": "object",
         "properties": {
@@ -1549,21 +1683,43 @@
           "itemsPerQuery"
         ]
       },
-      "UpdateKeyDto": {
+      "FetchKeyResponse": {
         "type": "object",
         "properties": {
+          "id": {
+            "type": "string"
+          },
+          "projectId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
           "mode": {
             "$ref": "#/components/schemas/ProjectMode"
           },
-          "description": {
-            "type": "string",
-            "description": "Description for the key"
-          },
           "name": {
-            "type": "string",
-            "description": "Name of the API Key, will be used for searching and sorting"
+            "type": "string"
+          },
+          "apiRequestsCount": {
+            "type": "number"
+          },
+          "applicationLogsCount": {
+            "type": "number"
           }
-        }
+        },
+        "required": [
+          "id",
+          "projectId",
+          "createdAt",
+          "mode",
+          "name",
+          "apiRequestsCount",
+          "applicationLogsCount"
+        ]
       },
       "LogLevel": {
         "type": "string",

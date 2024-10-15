@@ -180,6 +180,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{id}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get project stats
+         * @description Get project stats
+         */
+        get: operations["ProjectsController_getProjectStats"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{id}/keys": {
         parameters: {
             query?: never;
@@ -204,20 +224,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/projects/{id}/keys/{id}": {
+    "/projects/{id}/keys/{keyId}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
+        /**
+         * Fetch a key by id
+         * @description Fetch a key by id
+         */
         get: operations["KeysController_findOne"];
         put?: never;
         post?: never;
-        delete: operations["KeysController_remove"];
+        delete?: never;
         options?: never;
         head?: never;
-        patch: operations["KeysController_update"];
+        patch?: never;
         trace?: never;
     };
     "/projects/{id}/logs": {
@@ -400,6 +424,35 @@ export interface components {
             /** @description List of available api keys */
             apiKeys: components["schemas"]["PartialApiKeyEntity"][];
         };
+        LogsCountResponseEntity: {
+            today: number;
+            yesterday: number;
+            percentageChange: number;
+        };
+        ApiRequestsPerDayResponseEntity: {
+            date: string;
+            count: number;
+        };
+        AppEventsPerDayResponseEntity: {
+            date: string;
+            count: number;
+        };
+        MostUsedApiRouteResponseEntity: {
+            path: string;
+            count: number;
+        };
+        MostFrequentAppEventResponseEntity: {
+            event: string;
+            count: number;
+        };
+        ProjectStatsResponseEntity: {
+            logsCount: components["schemas"]["LogsCountResponseEntity"];
+            totalLogs: number;
+            apiRequestsPerDay: components["schemas"]["ApiRequestsPerDayResponseEntity"][];
+            appEventsPerDay: components["schemas"]["AppEventsPerDayResponseEntity"][];
+            mostUsedApiRoute: components["schemas"]["MostUsedApiRouteResponseEntity"][];
+            mostFrequentAppEvent: components["schemas"]["MostFrequentAppEventResponseEntity"][];
+        };
         CreateKeyDto: {
             mode: components["schemas"]["ProjectMode"];
             /** @description Description for the key */
@@ -427,12 +480,15 @@ export interface components {
             /** @default 6 */
             itemsPerQuery: number;
         };
-        UpdateKeyDto: {
-            mode?: components["schemas"]["ProjectMode"];
-            /** @description Description for the key */
+        FetchKeyResponse: {
+            id: string;
+            projectId: string;
+            createdAt: string;
             description?: string;
-            /** @description Name of the API Key, will be used for searching and sorting */
-            name?: string;
+            mode: components["schemas"]["ProjectMode"];
+            name: string;
+            apiRequestsCount: number;
+            applicationLogsCount: number;
         };
         /**
          * @description Log level
@@ -966,6 +1022,46 @@ export interface operations {
             };
         };
     };
+    ProjectsController_getProjectStats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description The id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ProjectStatsResponseEntity"];
+                };
+            };
+            /** @description Project not found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
     KeysController_findAll: {
         parameters: {
             query?: never;
@@ -1057,6 +1153,8 @@ export interface operations {
             path: {
                 /** @description Id of the project */
                 id: string;
+                /** @description Id of the key */
+                keyId: string;
             };
             cookie?: never;
         };
@@ -1066,69 +1164,18 @@ export interface operations {
                 headers: {
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["FetchKeyResponse"];
+                };
             };
-            /** @description Internal server error. */
-            500: {
+            /** @description No key found */
+            404: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
                     "application/json": components["schemas"]["GenericErrorEntity"];
                 };
-            };
-        };
-    };
-    KeysController_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the project */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description Internal server error. */
-            500: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["GenericErrorEntity"];
-                };
-            };
-        };
-    };
-    KeysController_update: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @description Id of the project */
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateKeyDto"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
             };
             /** @description Internal server error. */
             500: {

@@ -18,7 +18,7 @@ async function bootstrap() {
       instance: loggerInstance,
     }),
   });
-  app.use(cookieParser());
+  app.use(cookieParser(), json({ limit: '1mb' }));
   app.enableCors({});
   app.use(
     morgan('dev'),

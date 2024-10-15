@@ -2,8 +2,14 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { db } from '~/db';
-import { and, eq, sql } from 'drizzle-orm';
-import { ApiKeys, projects, users } from '@logstrap/db';
+import { and, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import {
+  ApiKeys,
+  projects,
+  users,
+  requestLogs,
+  applicationLogs,
+} from '@logstrap/db';
 import { init } from '@paralleldrive/cuid2';
 import { hash, verify } from 'argon2';
 import { plainToInstance } from 'class-transformer';
@@ -130,8 +136,47 @@ export class KeysService {
     throw new HttpException('Invalid API Key', HttpStatus.UNAUTHORIZED);
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} key`;
+  async findOne(projectId: string, userId: string, keyId: string) {
+    const { key, ...rest } = getTableColumns(ApiKeys);
+    const [apiKey] = await db
+      .select({
+        ...rest,
+      })
+      .from(ApiKeys)
+      .where(
+        and(
+          eq(ApiKeys.projectId, projectId),
+          eq(ApiKeys.userId, userId),
+          eq(ApiKeys.id, keyId),
+        ),
+      );
+
+    const [{ count: apiRequestsCount }] = await db
+      .select({
+        count: sql`count(*)`.mapWith(Number).as('count'),
+      })
+      .from(requestLogs)
+      .where(eq(requestLogs.apiKeyId, apiKey.id));
+
+    const [{ count: applicationLogsCount }] = await db
+      .select({
+        count: sql`count(*)`.mapWith(Number).as('count'),
+      })
+      .from(applicationLogs)
+      .where(eq(applicationLogs.apiKeyId, apiKey.id));
+
+    if (!apiKey) {
+      this.logger.warn(`Key with id: ${keyId} not found for ${userId}`);
+      throw new HttpException(
+        'No key found with given id.',
+        HttpStatus.NOT_FOUND,
+      );
+    }
+    return {
+      ...apiKey,
+      apiRequestsCount,
+      applicationLogsCount,
+    };
   }
 
   update(id: number, updateKeyDto: UpdateKeyDto) {

@@ -1,0 +1,3 @@
+export const DEFAULT_ERROR_STATUS_CODES = [500];
+
+export const LOGSTRAP_OPTIONS = 'LOGSTRAP_OPTIONS';

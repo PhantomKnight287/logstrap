@@ -312,6 +312,10 @@ export class LogsService {
           ...[
             filters?.apiKey &&
               inArray(applicationLogsTable.apiKeyId, filters.apiKey),
+            filters?.component &&
+              inArray(applicationLogsTable.component, filters.component),
+            filters?.functionName &&
+              inArray(applicationLogsTable.functionName, filters.functionName),
             filters?.level &&
               inArray(
                 applicationLogsTable.level,
@@ -344,6 +348,10 @@ export class LogsService {
           ...[
             filters?.apiKey &&
               inArray(applicationLogsTable.apiKeyId, filters.apiKey),
+            filters?.component &&
+              inArray(applicationLogsTable.component, filters.component),
+            filters?.functionName &&
+              inArray(applicationLogsTable.functionName, filters.functionName),
             filters?.level &&
               inArray(
                 applicationLogsTable.level,

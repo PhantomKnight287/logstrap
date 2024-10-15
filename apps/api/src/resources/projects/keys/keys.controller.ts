@@ -23,6 +23,7 @@ import {
 import {
   CreateKeyResponse,
   FetchAllKeysResponse,
+  FetchKeyResponse,
 } from './entities/response.entity';
 import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '~/resources/auth/entities/auth.entity';
@@ -74,18 +75,28 @@ export class KeysController {
     return this.keysService.findAll(id, user.id);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.keysService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateKeyDto: UpdateKeyDto) {
-    return this.keysService.update(+id, updateKeyDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.keysService.remove(+id);
+  @Get(':keyId')
+  @ApiOperation({
+    description: 'Fetch a key by id',
+    summary: 'Fetch a key by id',
+  })
+  @ApiParam({
+    name: 'keyId',
+    description: 'Id of the key',
+    required: true,
+  })
+  @ApiOkResponse({
+    type: FetchKeyResponse,
+  })
+  @ApiNotFoundResponse({
+    type: GenericErrorEntity,
+    description: 'No key found',
+  })
+  findOne(
+    @Param('id') id: string,
+    @Param('keyId') keyId: string,
+    @User() user: UserEntity,
+  ) {
+    return this.keysService.findOne(id, user.id, keyId);
   }
 }

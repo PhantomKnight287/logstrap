@@ -27,7 +27,10 @@ import {
 import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '../auth/entities/auth.entity';
 import { ITEMS_PER_QUERY } from '~/constants';
-import { FetchAllProjectsResponse } from './entities/response.entity';
+import {
+  FetchAllProjectsResponse,
+  ProjectStatsResponseEntity,
+} from './entities/response.entity';
 import { Project, ProjectIdEntity } from './entities/project.entity';
 import { GenericErrorEntity } from '~/entity';
 import {
@@ -148,5 +151,27 @@ export class ProjectsController {
       id,
       user.id,
     );
+  }
+
+  @ApiOperation({
+    description: 'Get project stats',
+    summary: 'Get project stats',
+  })
+  @ApiParam({
+    type: String,
+    required: true,
+    name: 'id',
+    description: 'The id of the project',
+  })
+  @ApiOkResponse({
+    type: ProjectStatsResponseEntity,
+  })
+  @ApiNotFoundResponse({
+    type: GenericErrorEntity,
+    description: 'Project not found',
+  })
+  @Get(':id/stats')
+  getProjectStats(@Param('id') id: string, @User() user: UserEntity) {
+    return this.projectsService.getStats(id, user.id);
   }
 }

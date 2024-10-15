@@ -8,18 +8,11 @@ import {
 } from '@nestjs/common';
 import { LogsTrapMiddleware } from './middleware';
 import { LogsTrapService } from './service';
-import { LogsTrapInitOptions as CoreLogsTrapInitOptions } from '@logstrap/core';
 import { ClsMiddleware, ClsModule } from 'nestjs-cls';
-import { RouteInfo } from '@nestjs/common/interfaces';
 import { APP_FILTER } from '@nestjs/core';
 import { LogsTrapExceptionHandler } from './exception-handler';
-
-/**
- * Extended LogsTrap initialization options including route exclusion.
- */
-type LogsTrapInitOptions = CoreLogsTrapInitOptions & {
-  exclude: (string | RouteInfo)[];
-};
+import { LOGSTRAP_OPTIONS } from './constants';
+import type { LogsTrapInitOptions } from './types';
 
 /**
  * Async options for LogsTrap module initialization.
@@ -38,7 +31,7 @@ export interface LogsTrapModuleAsyncOptions {
 @Module({})
 export class LogsTrapModule implements NestModule {
   constructor(
-    @Inject('LOGSTRAP_OPTIONS') private readonly options: LogsTrapInitOptions,
+    @Inject(LOGSTRAP_OPTIONS) private readonly options: LogsTrapInitOptions,
   ) {}
 
   /**
@@ -64,7 +57,7 @@ export class LogsTrapModule implements NestModule {
       global: true,
       providers: [
         {
-          provide: 'LOGSTRAP_OPTIONS',
+          provide: LOGSTRAP_OPTIONS,
           useValue: options,
         },
         LogsTrapService,
@@ -116,7 +109,7 @@ export class LogsTrapModule implements NestModule {
     options: LogsTrapModuleAsyncOptions,
   ): Provider {
     return {
-      provide: 'LOGSTRAP_OPTIONS',
+      provide: LOGSTRAP_OPTIONS,
       useFactory: options.useFactory,
       inject: options.inject || [],
     };

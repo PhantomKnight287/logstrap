@@ -79,12 +79,6 @@ export default async function ApiRequestLog(props: PageProps) {
             </div>
           ) : null}
         </div>
-        {/* {log.message ? (
-          <Callout title={log.name || "Error"} type="error">
-            {log.message}
-          </Callout>
-        ) : null} */}
-
         <LogInfoPage data={log} />
         {log.applicationLogs?.length ? (
           <div className="flex flex-col gap-4">

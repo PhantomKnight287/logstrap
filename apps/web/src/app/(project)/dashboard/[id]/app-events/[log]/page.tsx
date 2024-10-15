@@ -9,6 +9,12 @@ import { Badge } from '@/components/ui/badge';
 import { formatTime } from '../../keys/_components/timestamp';
 import { LogLevelBadge } from '@/components/badges';
 import Code from '@/components/code';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip';
+import Link from 'next/link';
 
 export default async function AppEventLog(props: PageProps) {
   const req = await client.GET('/projects/{id}/application-logs/{logId}', {
@@ -25,7 +31,7 @@ export default async function AppEventLog(props: PageProps) {
   if (req.error) {
     redirect(`${Redirects.ERROR}?error=${req.error.message}`);
   }
-  const log = req.data;
+  const log = req.data; 
   return (
     <div className="flex flex-col gap-4 items-center justify-center p-4">
       <div className="container mb-5 space-y-6">
@@ -42,10 +48,45 @@ export default async function AppEventLog(props: PageProps) {
             <span className="text-muted-foreground ">Level</span>
             <LogLevelBadge level={log.level} />
           </div>
+          {log.component ? (
+            <div className="flex flex-col items-center">
+              <span className="text-muted-foreground ">Component</span>
+              <Badge variant={'secondary'}>{log.component}</Badge>
+            </div>
+          ) : null}
+
+          {log.functionName ? (
+            <div className="flex flex-col items-center">
+              <span className="text-muted-foreground ">Function</span>
+              <Badge variant={'secondary'}>{log.functionName}</Badge>
+            </div>
+          ) : null}
+          {log.request?.id ? (
+            <div className="flex flex-col items-center">
+              <span className="text-muted-foreground ">Request</span>
+              <Tooltip delayDuration={0}>
+                <TooltipTrigger>
+                  <Link
+                    href={`/dashboard/${props.params.id}/api-requests/${log.request.id}`}
+                  >
+                    <Badge
+                      className="text-sm max-w-48 line-clamp-1 underline"
+                      variant={'secondary'}
+                    >
+                      {log.request.url}
+                    </Badge>
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent className="text-black bg-card-foreground text-muted ">
+                  {log.request.url}
+                </TooltipContent>
+              </Tooltip>
+            </div>
+          ) : null}
         </div>
         {log.additionalInfo?.stack ? (
           <div className="flex flex-col items-start gap-2">
-            <span className="text-muted-foreground">Stack</span>
+            <span className="text-muted-foreground">Stack Trace</span>
             <Code
               lang="bash"
               code={log.additionalInfo?.stack}

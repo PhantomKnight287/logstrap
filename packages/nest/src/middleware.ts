@@ -9,6 +9,7 @@ import {
 } from '@logstrap/core';
 import { ClsService } from 'nestjs-cls';
 import { LOGSTRAP_REQUEST_ID, LOGSTRAP_API_KEY } from '@logstrap/constants';
+import { LOGSTRAP_OPTIONS } from './constants';
 /**
  * Middleware for logging API requests and responses using LogsTrap.
  */
@@ -16,7 +17,7 @@ import { LOGSTRAP_REQUEST_ID, LOGSTRAP_API_KEY } from '@logstrap/constants';
 export class LogsTrapMiddleware implements NestMiddleware {
   constructor(
     private readonly clsService: ClsService,
-    @Inject('LOGSTRAP_OPTIONS')
+    @Inject(LOGSTRAP_OPTIONS)
     private readonly logsTrapOptions: LogsTrapInitOptions,
   ) {}
 
