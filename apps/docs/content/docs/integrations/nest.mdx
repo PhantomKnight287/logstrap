@@ -1,0 +1,120 @@
+---
+title: Nest.js
+description: Nest.js integration for LogsTrap
+---
+
+## Installation
+
+```package-install
+@logstrap/core @logstrap/nest
+```
+
+## Initialize LogsTrap Module
+
+
+```ts title="app.module.ts"
+import { LogsTrapModule } from '@logstrap/nest';
+import { RequestMethod } from '@nestjs/common';
+
+@Module({
+  imports: [
+    LogsTrapModule.forRoot({
+        apiKey:"key_...",
+        projectId:"pj_...",
+        exclude:[
+             {
+                method: RequestMethod.GET,
+                path: `/health-check/(.*)`,
+            },
+        ]
+    }),],
+})
+export class AppModule {}
+```
+
+
+
+This setup will start logging API requests
+
+
+### Application Logs
+
+You need to inject the `LogsTrapService` in the constructor of the class where you want to log the message.
+
+```ts title="app.controller.ts"
+import { LogsTrapService } from '@logstrap/nest';
+
+@Controller()
+export class AppController {
+  constructor(private readonly logger: LogsTrapService) {}
+
+  @Get()
+  async getHello() {
+    this.logger.log('Hello World');
+    return 'Hello World';
+  }
+}
+```
+
+This will associate the log message with the current request and will be shown in the dashboard.
+
+
+### Standalone Logs
+
+Sometimes you need standalone logs that are not associated with a request(eg CronJobs). You can use the `StandaloneLogsTrapService` to log messages without an associated request.
+
+```ts title="app.service.ts"
+import { StandaloneLogsTrapService } from '@logstrap/nest';
+import { Cron, CronExpression } from '@nestjs/schedule';
+
+
+@Injectable()
+export class AppService {
+  constructor(private readonly logger: StandaloneLogsTrapService) {}
+
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async handleCron() {
+    this.logger.log('Hello World');
+  }
+}
+```
+
+This will log the message as a standalone log.
+
+Standalone logs are sent to the dashboard every 5 seconds so you can expect a delay of atleast 5 seconds to see the logs in the dashboard.
+
+
+
+### LogsTrap Module Options
+
+<TypeTable
+  type={{
+    apiKey: {
+      description:
+        'The API key to use for the LogsTrap API',
+      type: 'string',
+      required: true,
+    },
+    projectId: {
+      description: 'The project ID to use for the LogsTrap API',
+      type: 'string',
+      required: true,
+    },
+    endpoint: {
+      description: 'The endpoint to use for the LogsTrap API(useful for self-hosting)',
+      type: 'string',
+      required: false,
+    },
+    exclude: {
+      description: 'Routes to exclude from logging',
+      type: 'array',
+      required: false,
+    },
+    errorStatusCodes:{
+        description: 'Status codes to consider as errors. This will also log the stack trace in the additional info',
+        type: 'array',
+        required: false,
+        default:[500]
+    }
+  }}
+/>

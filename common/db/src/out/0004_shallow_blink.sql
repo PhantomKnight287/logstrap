@@ -1,0 +1,1 @@
+ALTER TABLE "projects" ALTER COLUMN "test_public_key" DROP NOT NULL;

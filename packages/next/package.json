@@ -1,0 +1,27 @@
+{
+  "name": "@logstrap/next",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
+  "scripts": {
+    "dev": "tsup --watch",
+    "build": "tsup"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@logstrap/core": "workspace:*",
+    "@logstrap/tsconfig": "workspace:*",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.3"
+  },
+  "peerDependencies": {
+    "@logstrap/core": "*",
+    "next": ">=13.x"
+  },
+  "dependencies": {
+    "@logstrap/constants": "workspace:*"
+  }
+}

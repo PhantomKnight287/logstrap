@@ -1,31 +1,5 @@
+import { withNextJSRouteTypes } from "nextjs-route-types";
 /** @type {import('next').NextConfig} */
-const nextConfig = {
-  async rewrites() {
-    return {
-      beforeFiles: [
-        {
-          source: "/(login|register)\b/",
-          destination: "/projects",
-          has: [
-            {
-              type: "cookie",
-              key: "logstrap_token",
-            },
-          ],
-        },
-        {
-          source: "/(projects)\b/",
-          destination: "/login",
-          missing: [
-            {
-              type: "cookie",
-              key: "logstrap_token",
-            },
-          ],
-        },
-      ],
-    };
-  },
-};
+const nextConfig = {};
 
-export default nextConfig;
+export default withNextJSRouteTypes(nextConfig);
