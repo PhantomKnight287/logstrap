@@ -10,6 +10,7 @@ import {
 import { ClsService } from 'nestjs-cls';
 import { LOGSTRAP_REQUEST_ID, LOGSTRAP_API_KEY } from '@logstrap/constants';
 import { LOGSTRAP_OPTIONS } from './constants';
+
 /**
  * Middleware for logging API requests and responses using LogsTrap.
  */
@@ -54,6 +55,7 @@ export class LogsTrapMiddleware implements NestMiddleware {
         ip: request.ip,
         userAgent: request.headers['user-agent'],
         timeTaken: timeTaken,
+        host: request.headers.host,
       };
       logData.request = requestLog;
       const originalResponse = originalJsonMethod.call(this, responseBody);

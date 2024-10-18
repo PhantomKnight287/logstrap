@@ -63,7 +63,7 @@ export class LogsController {
   })
   create(
     @Body() createLogDto: CreateLogDto,
-    @ApiKey() apiKey: typeof ApiKeys.$inferSelect,
+    @ApiKey() apiKey: typeof ApiKeys.$inferSelect,  
   ) {
     return this.logsService.create(createLogDto, apiKey);
   }

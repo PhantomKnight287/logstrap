@@ -1,10 +1,178 @@
-import { LogsTrapInitOptions, logApiRequest } from '@logstrap/core';
+import {
+  LogsTrapInitOptions,
+  createEndpointUrl,
+  logApiRequest,
+} from '@logstrap/core';
 import { Injectable, Scope, Inject } from '@nestjs/common';
 import { REQUEST } from '@nestjs/core';
 import { ClsService } from 'nestjs-cls';
 import type { CallerInfo, LogsTrapRequest } from './types';
-import { LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
+import { LOGSTRAP_API_KEY, LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
 import { getCallerInfo } from './utils';
+import { LOGSTRAP_OPTIONS } from './constants';
+
+/**
+ * Logger that can be used to log messages without an active request. Does not require LogsTrap middleware.
+ */
+@Injectable({ scope: Scope.TRANSIENT })
+export class StandaloneLogsTrapService {
+  private readonly storage = new Array<any>();
+
+  constructor(
+    @Inject(LOGSTRAP_OPTIONS)
+    private readonly logsTrapOptions: LogsTrapInitOptions,
+  ) {
+    setInterval(() => {
+      this.postLogs();
+    }, 5000); // every 5 seconds
+  }
+
+  /**
+   * Adds a log entry to the storage
+   */
+  private addLogToStorage(
+    logLevel: string,
+    callerName: string,
+    component: string | null,
+    message: any,
+    additionalInfo: Record<string, any> = {},
+  ) {
+    const newLogEntry = {
+      timestamp: new Date(),
+      level: logLevel,
+      message: typeof message === 'string' ? message : JSON.stringify(message),
+      functionName: callerName,
+      component,
+      additionalInfo,
+    };
+
+    this.storage.push(newLogEntry);
+  }
+
+  private async postLogs() {
+    const currentLogs = this.storage;
+    if (!currentLogs.length) return;
+    try {
+      const endpointUrl = await createEndpointUrl(this.logsTrapOptions);
+
+      const res = await logApiRequest(
+        endpointUrl,
+        {
+          method: 'POST',
+          headers: {
+            [LOGSTRAP_API_KEY]: this.logsTrapOptions.apiKey,
+            'content-type': 'application/json',
+          },
+        },
+        {
+          applicationLogs: currentLogs,
+        },
+      );
+      if (!res.ok) {
+        console.error(await res.json());
+      }
+      // remove logs from storage which were accessed above, ensuring no new logs are deleted from the storage
+      this.storage.splice(0, currentLogs.length);
+    } catch (e) {
+      console.error('Failed to log standalone logs:', e);
+    }
+  }
+
+  private getCallerInfo(): CallerInfo {
+    return getCallerInfo(new Error().stack);
+  }
+
+  public log(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'log',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.log(message, ...optionalParams);
+  }
+
+  public error(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'error',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.error(message, ...optionalParams);
+  }
+
+  public warn(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'warn',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.warn(message, ...optionalParams);
+  }
+
+  public info(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'info',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.info(message, ...optionalParams);
+  }
+
+  public trace(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack
+      ?.split('\n')
+      .slice(2)
+      .map((line) => line.trim())
+      .join('\n');
+    this.addLogToStorage(
+      'trace',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams, stack },
+    );
+    console.trace(message, ...optionalParams);
+  }
+
+  public fatal(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'fatal',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.error(message, ...optionalParams);
+  }
+
+  public debug(message?: any, ...optionalParams: any[]) {
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'debug',
+      caller.functionName,
+      caller.className,
+      message,
+      { params: optionalParams },
+    );
+    console.debug(message, ...optionalParams);
+  }
+}
+
 /**
  * Service for handling LogsTrap functionality
  */
@@ -37,7 +205,7 @@ export class LogsTrapService {
     callerName: string,
     component: string | null,
     message: any,
-    ...additionalInfo: any[]
+    additionalInfo: Record<string, any> = {},
   ) {
     const existingLogs = this.clsService.get(requestId);
     const newLogEntry = {
@@ -46,7 +214,7 @@ export class LogsTrapService {
       message: typeof message === 'string' ? message : JSON.stringify(message),
       functionName: callerName,
       component,
-      ...additionalInfo,
+      additionalInfo,
     };
 
     if (existingLogs) {
@@ -69,7 +237,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      ...optionalParams,
+      { params: optionalParams },
     );
   }
 
@@ -85,7 +253,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      ...optionalParams,
+      { params: optionalParams },
     );
   }
 
@@ -102,7 +270,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      ...optionalParams,
+      { params: optionalParams },
     );
   }
 
@@ -119,7 +287,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      ...optionalParams,
+      { params: optionalParams },
     );
   }
 
@@ -130,13 +298,15 @@ export class LogsTrapService {
     const requestId = this.getRequestId();
     console.trace(message, ...optionalParams);
     const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack?.split('\n').slice(2).join('\n');
     this.addLogToStorage(
       requestId,
       'trace',
       caller.functionName,
       caller.className,
       message,
-      ...optionalParams,
+      { params: optionalParams, stack },
     );
   }
 

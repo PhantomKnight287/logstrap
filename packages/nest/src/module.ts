@@ -7,7 +7,7 @@ import {
   Inject,
 } from '@nestjs/common';
 import { LogsTrapMiddleware } from './middleware';
-import { LogsTrapService } from './service';
+import { LogsTrapService, StandaloneLogsTrapService } from './service';
 import { ClsMiddleware, ClsModule } from 'nestjs-cls';
 import { APP_FILTER } from '@nestjs/core';
 import { LogsTrapExceptionHandler } from './exception-handler';
@@ -61,12 +61,13 @@ export class LogsTrapModule implements NestModule {
           useValue: options,
         },
         LogsTrapService,
+        StandaloneLogsTrapService,
         {
           provide: APP_FILTER,
           useClass: LogsTrapExceptionHandler,
         },
       ],
-      exports: [LogsTrapService],
+      exports: [LogsTrapService, StandaloneLogsTrapService],
       imports: [ClsModule.forRoot({ middleware: { mount: false } })],
     };
   }
@@ -91,12 +92,13 @@ export class LogsTrapModule implements NestModule {
       providers: [
         this.createAsyncOptionsProvider(asyncOptions),
         LogsTrapService,
+        StandaloneLogsTrapService,
         {
           provide: APP_FILTER,
           useClass: LogsTrapExceptionHandler,
         },
       ],
-      exports: [LogsTrapService],
+      exports: [LogsTrapService, StandaloneLogsTrapService],
     };
   }
 

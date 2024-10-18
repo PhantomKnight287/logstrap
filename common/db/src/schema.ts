@@ -111,24 +111,26 @@ export const LogLevelEnum = pgEnum('log_level', [
   'trace',
 ]);
 
-// Helper function to create prefixed IDs
 const createPrefixedId = (prefix: string) =>
   text('id')
     .primaryKey()
     .$defaultFn(() => `${prefix}_${createId()}`);
 
-// Request logs table (serves as the base table)
+
 export const requestLogs = pgTable('request_logs', {
   id: createPrefixedId('rl'),
   projectId: text('project_id')
     .references(() => projects.id)
     .notNull(),
   apiKeyId: text('api_key_id')
-    .references(() => ApiKeys.id)
+    .references(() => ApiKeys.id, {
+      onDelete: 'cascade',
+    })
     .notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
   method: text('method').notNull(),
   url: text('url').notNull(),
+  host:text('host').default(null),
   statusCode: text('status_code'),
   requestBody: jsonb('request_body'),
   responseBody: jsonb('response_body'),
@@ -140,17 +142,20 @@ export const requestLogs = pgTable('request_logs', {
   userAgent: text('user_agent'),
 });
 
-// Application logs table
 export const applicationLogs = pgTable('application_logs', {
   id: createPrefixedId('al'),
   requestId: text('request_id')
-    .references(() => requestLogs.id)
-    .notNull(),
+    .references(() => requestLogs.id, {
+      onDelete: 'set null',
+    })
+    .default(null),
   projectId: text('project_id')
     .references(() => projects.id)
     .notNull(),
   apiKeyId: text('api_key_id')
-    .references(() => ApiKeys.id)
+    .references(() => ApiKeys.id, {
+      onDelete: 'cascade',
+    })
     .notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
   level: LogLevelEnum('level').notNull(),
@@ -160,16 +165,21 @@ export const applicationLogs = pgTable('application_logs', {
   additionalInfo: jsonb('additional_info'),
 });
 
-// System logs table
 export const systemLogs = pgTable('system_logs', {
   id: createPrefixedId('sl'),
   requestId: text('request_id')
-    .references(() => requestLogs.id)
-    .notNull(),
+    .references(() => requestLogs.id, {
+      onDelete: 'set null',
+    })
+    .default(null),
   projectId: text('project_id')
     .references(() => projects.id)
     .notNull(),
-  apiKeyId: text('api_key_id').references(() => ApiKeys.id),
+  apiKeyId: text('api_key_id')
+    .references(() => ApiKeys.id, {
+      onDelete: 'cascade',
+    })
+    .notNull(),
   timestamp: timestamp('timestamp').defaultNow().notNull(),
   level: LogLevelEnum('level').notNull(),
   message: text('message').notNull(),
@@ -177,7 +187,6 @@ export const systemLogs = pgTable('system_logs', {
   details: jsonb('details'),
 });
 
-// Relationships
 export const projectsRelations = relations(projects, ({ many }) => ({
   apiKeys: many(ApiKeys),
   requestLogs: many(requestLogs),

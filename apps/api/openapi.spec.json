@@ -1818,6 +1818,10 @@
             "type": "string",
             "description": "The user agent from where the request was made"
           },
+          "host": {
+            "type": "string",
+            "description": "The host from where the request was made"
+          },
           "applicationLogs": {
             "description": "Application Logs related to this request",
             "type": "array",

@@ -10,6 +10,8 @@ import { AuthModule } from './resources/auth/auth.module';
 import { ConfigModule } from '@nestjs/config';
 import { ProjectsModule } from './resources/projects/projects.module';
 import { LogsTrapModule } from '@logstrap/nest';
+import { ScheduleModule } from '@nestjs/schedule';
+
 @Module({
   imports: [
     AuthModule,
@@ -29,6 +31,7 @@ import { LogsTrapModule } from '@logstrap/nest';
         },
       ],
     }),
+    ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
   providers: [AppService],

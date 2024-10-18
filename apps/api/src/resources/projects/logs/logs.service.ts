@@ -4,7 +4,6 @@ import {
   CreateLogDto,
   RequestLogDTO,
 } from './dto/create-log.dto';
-import { UpdateLogDto } from './dto/update-log.dto';
 import { db } from '~/db';
 import {
   ApiKeys,
@@ -12,6 +11,7 @@ import {
   LogLevelEnum,
   projects,
   requestLogs as requestLogsTable,
+  systemLogs,
 } from '@logstrap/db';
 import {
   and,
@@ -25,6 +25,9 @@ import {
   sql,
 } from 'drizzle-orm';
 import { ITEMS_PER_QUERY } from '~/constants';
+import { Cron, CronExpression } from '@nestjs/schedule';
+import { sub } from 'date-fns';
+import { StandaloneLogsTrapService } from '@logstrap/nest';
 
 type Filters = {
   q?: string;
@@ -48,11 +51,20 @@ type ApplicationLogFilters = {
 @Injectable()
 export class LogsService {
   private logger = new Logger(LogsService.name);
-  constructor() {}
+  constructor(
+    private readonly standaloneLogsTrapService: StandaloneLogsTrapService,
+  ) {}
   async create(body: CreateLogDto, apiKey: typeof ApiKeys.$inferSelect) {
     this.logger.log(`Creating logs for Project: ${apiKey.projectId}`);
     if (body.requests) {
       await this.processRequests(body.requests, apiKey.projectId, apiKey.id);
+    }
+    if (body.applicationLogs) {
+      await this.processApplicationLogs(
+        body.applicationLogs,
+        apiKey.projectId,
+        apiKey.id,
+      );
     }
 
     return { message: 'Logged' };
@@ -79,6 +91,22 @@ export class LogsService {
           baseApiRequest.id,
         );
       }
+    });
+  }
+
+  private async processApplicationLogs(
+    applicationLogs: CreateApplicationLogDto[],
+    projectId: string,
+    apiKeyId: string,
+  ) {
+    await db.transaction(async (tx) => {
+      await this.insertApplicationLogs(
+        tx,
+        applicationLogs,
+        projectId,
+        apiKeyId,
+        undefined,
+      );
     });
   }
 
@@ -113,7 +141,7 @@ export class LogsService {
     applicationLogs: CreateApplicationLogDto[],
     projectId: string,
     apiKeyId: string,
-    requestId: string,
+    requestId: string | undefined,
   ) {
     for (const log of applicationLogs) {
       await tx.insert(applicationLogsTable).values({
@@ -412,19 +440,52 @@ export class LogsService {
     return log;
   }
 
-  findAll() {
-    return `This action returns all logs`;
-  }
+  @Cron(CronExpression.EVERY_10_MINUTES)
+  async deleteTestLogs() {
+    const projects = await db.query.projects.findMany({
+      columns: {
+        id: true,
+      },
+    });
 
-  findOne(id: number) {
-    return `This action returns a #${id} log`;
-  }
+    for (const project of projects) {
+      const testingApiKeys = await db.query.ApiKeys.findMany({
+        where: and(eq(ApiKeys.projectId, project.id), eq(ApiKeys.mode, 'test')),
+        columns: {
+          id: true,
+        },
+      });
 
-  update(id: number, updateLogDto: UpdateLogDto) {
-    return `This action updates a #${id} log`;
-  }
+      await db.delete(requestLogsTable).where(
+        and(
+          lte(requestLogsTable.timestamp, sub(new Date(), { hours: 1 })),
+          inArray(
+            requestLogsTable.apiKeyId,
+            testingApiKeys.map((key) => key.id),
+          ),
+        ),
+      );
+      await db.delete(applicationLogsTable).where(
+        and(
+          lte(applicationLogsTable.timestamp, sub(new Date(), { hours: 1 })),
+          inArray(
+            applicationLogsTable.apiKeyId,
+            testingApiKeys.map((key) => key.id),
+          ),
+        ),
+      );
 
-  remove(id: number) {
-    return `This action removes a #${id} log`;
+      await db.delete(systemLogs).where(
+        and(
+          lte(systemLogs.timestamp, sub(new Date(), { hours: 1 })),
+          inArray(
+            systemLogs.apiKeyId,
+            testingApiKeys.map((key) => key.id),
+          ),
+        ),
+      );
+    }
+
+    this.standaloneLogsTrapService.trace('Deleted test logs older than 1 hour');
   }
 }

@@ -222,6 +222,15 @@ export class RequestLogDTO {
   @Expose()
   userAgent?: string;
 
+  @ApiProperty({
+    description: 'The host from where the request was made',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  @Expose()
+  host?: string;
+
   @ApiPropertyOptional({
     description: 'Application Logs related to this request',
     type: [CreateApplicationLogDto],
@@ -243,6 +252,7 @@ export class CreateLogDto {
   @ValidateNested({ each: true })
   @Type(() => RequestLogDTO)
   @Expose()
+  @IsOptional()
   requests: RequestLogDTO[];
 
   @ApiPropertyOptional({
