@@ -2,6 +2,9 @@
   LogsTrap
 </h1>
 
+<img width="2032" alt="image" src="https://github.com/user-attachments/assets/7886024b-927b-415d-84f2-63d147bd0f72">
+
+
 <h3 align="center">
   A powerful logging service for your applications.
 </h3>
