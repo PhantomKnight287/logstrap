@@ -29,7 +29,9 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
       headers: {
         Authorization: `Bearer ${getAuthToken(cookies())}`,
       },
-      revalidate: 10,
+      fetch: (request: unknown) => {
+        return fetch(request as Request, { next: { revalidate: 10 } });
+      },
     },
   );
   if (filters.error) {

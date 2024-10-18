@@ -22,7 +22,9 @@ export default async function ApiKeyPage({ params }: PageProps) {
     headers: {
       Authorization: `Bearer ${getAuthToken(cookies())}`,
     },
-    revalidate: 60, // every min
+    fetch: (request: unknown) => {
+      return fetch(request as Request, { next: { revalidate: 60 } });
+    },
   });
   if (req.error)
     return redirect(`${Redirects.ERROR}?error=${req.error.message}`);

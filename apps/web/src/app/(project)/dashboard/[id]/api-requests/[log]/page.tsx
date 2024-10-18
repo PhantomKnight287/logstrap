@@ -126,7 +126,11 @@ function LogItem({
           {log.additionalInfo?.stack ? (
             log.additionalInfo?.stack
           ) : (
-            <>{JSON.stringify(log.additionalInfo, null, 2)}</>
+            <>
+              {Object.keys(log.additionalInfo).length > 1
+                ? JSON.stringify(log.additionalInfo, null, 2)
+                : null}
+            </>
           )}
         </>
       ) : null}

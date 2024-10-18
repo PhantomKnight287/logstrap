@@ -15,7 +15,6 @@ import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-export const dynamic = 'force-dynamic';
 export default async function ProjectInfo({ params }: PageProps) {
   const projectStats = await client.GET('/projects/{id}/stats', {
     params: {
@@ -26,7 +25,10 @@ export default async function ProjectInfo({ params }: PageProps) {
     headers: {
       Authorization: `Bearer ${getAuthToken(cookies())}`,
     },
-    revalidate: 60,
+    // WARN: this is a hack as openapi-fetch strips away all the non standard fetch options
+    fetch: (request: unknown) => {
+      return fetch(request as Request, { next: { revalidate: 60 } });
+    },
   });
   if (projectStats.error)
     redirect(`${Redirects.ERROR}?error=${projectStats.error.message}`);

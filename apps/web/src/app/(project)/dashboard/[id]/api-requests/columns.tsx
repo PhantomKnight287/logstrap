@@ -67,7 +67,10 @@ export const columns: ColumnDef<
     cell: ({ row }) => (
       <>
         {row.original.timeTaken ? (
-          <span>{row.original.timeTaken} ms</span>
+          <span>
+            {row.original.timeTaken}
+            <span className="text-muted-foreground text-xs">ms</span>
+          </span>
         ) : null}
       </>
     ),

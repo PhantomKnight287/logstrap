@@ -3,7 +3,7 @@ import { CreateProjectDto } from './dto/create-project.dto';
 import { UpdateProjectDto } from './dto/update-project.dto';
 import { db } from '~/db';
 import { projects as projectsModel } from '@logstrap/db';
-import { and, desc, eq, gte, lt, lte, sql } from 'drizzle-orm';
+import { and, asc, desc, eq, gte, lt, lte, sql } from 'drizzle-orm';
 import { ITEMS_PER_QUERY } from '~/constants';
 import { plainToInstance } from 'class-transformer';
 import { FetchAllProjectsResponse } from './entities/response.entity';
@@ -198,17 +198,24 @@ export class ProjectsService {
           : 0
     ).toFixed(2);
 
+    const sevenDaysAgo = new Date(today);
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6); // Set to 7 days ago (including today)
+
     const apiRequestsPerDay = await db
       .select({
         date: sql`DATE(${requestLogsTable.timestamp})`.as('date'),
         count: sql`COUNT(*)`.mapWith(Number).as('count'),
       })
       .from(requestLogsTable)
-      .where(eq(requestLogsTable.projectId, id))
+      .where(
+        and(
+          eq(requestLogsTable.projectId, id),
+          gte(requestLogsTable.timestamp, sevenDaysAgo),
+        ),
+      )
       .groupBy(sql`DATE(${requestLogsTable.timestamp})`)
-      .orderBy(desc(sql`DATE(${requestLogsTable.timestamp})`))
+      .orderBy(asc(sql`DATE(${requestLogsTable.timestamp})`))
       .limit(7);
-
     const appEventsPerDay = await db
       .select({
         date: sql`DATE(${applicationLogsTable.timestamp})`.as('date'),

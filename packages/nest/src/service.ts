@@ -89,7 +89,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.log(message, ...optionalParams);
   }
@@ -101,7 +101,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.error(message, ...optionalParams);
   }
@@ -113,7 +113,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.warn(message, ...optionalParams);
   }
@@ -125,7 +125,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.info(message, ...optionalParams);
   }
@@ -143,7 +143,10 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams, stack },
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
     );
     console.trace(message, ...optionalParams);
   }
@@ -155,7 +158,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.error(message, ...optionalParams);
   }
@@ -167,7 +170,7 @@ export class StandaloneLogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
     console.debug(message, ...optionalParams);
   }
@@ -237,7 +240,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
   }
 
@@ -253,7 +256,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
   }
 
@@ -270,7 +273,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
   }
 
@@ -287,7 +290,7 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams },
+      optionalParams.length ? { params: optionalParams } : {},
     );
   }
 
@@ -306,7 +309,10 @@ export class LogsTrapService {
       caller.functionName,
       caller.className,
       message,
-      { params: optionalParams, stack },
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
     );
   }
 

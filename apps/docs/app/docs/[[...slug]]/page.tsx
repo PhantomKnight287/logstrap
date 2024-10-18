@@ -9,6 +9,7 @@ import {
 import { notFound } from 'next/navigation';
 import defaultMdxComponents from 'fumadocs-ui/mdx';
 import { Tab, Tabs } from 'fumadocs-ui/components/tabs';
+import { TypeTable } from 'fumadocs-ui/components/type-table';
 
 export default async function Page({
   params,
@@ -25,7 +26,14 @@ export default async function Page({
       <DocsTitle>{page.data.title}</DocsTitle>
       <DocsDescription>{page.data.description}</DocsDescription>
       <DocsBody>
-        <MDX components={{ ...defaultMdxComponents, Tabs, Tab }} />
+        <MDX
+          components={{
+            ...defaultMdxComponents,
+            Tabs,
+            Tab,
+            TypeTable,
+          }}
+        />
       </DocsBody>
     </DocsPage>
   );
