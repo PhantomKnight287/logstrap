@@ -132,6 +132,7 @@ export class LogsService {
         ip: request.ip,
         userAgent: request.userAgent,
         timeTaken: request.timeTaken,
+        host: request.host,
       })
       .returning();
   }
@@ -182,6 +183,7 @@ export class LogsService {
       apiKeyId,
       timeTaken,
       projectId: projectIdColumn,
+      host,
     } = getTableColumns(requestLogsTable);
     const logs = await db
       .select({
@@ -193,6 +195,7 @@ export class LogsService {
         statusCode,
         apiKeyId,
         timeTaken,
+        host,
         projectId: projectIdColumn,
         apiKeyName: ApiKeys.name,
         applicationLogsCount: sql`count(*)`

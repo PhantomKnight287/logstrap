@@ -1926,6 +1926,9 @@
           },
           "apiKeyName": {
             "type": "string"
+          },
+          "host": {
+            "type": "string"
           }
         },
         "required": [
@@ -2039,6 +2042,9 @@
             "type": "string"
           },
           "apiKeyName": {
+            "type": "string"
+          },
+          "host": {
             "type": "string"
           },
           "requestBody": {

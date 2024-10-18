@@ -536,6 +536,8 @@ export interface components {
             ip?: string;
             /** @description The user agent from where the request was made */
             userAgent?: string;
+            /** @description The host from where the request was made */
+            host?: string;
             /** @description Application Logs related to this request */
             applicationLogs?: components["schemas"]["CreateApplicationLogDto"][];
         };
@@ -573,6 +575,7 @@ export interface components {
             projectId: string;
             timeTaken?: string;
             apiKeyName?: string;
+            host?: string;
         };
         FetchRequestLogsResponseEntity: {
             items: components["schemas"]["PartialRequestLogEntity"][];
@@ -603,6 +606,7 @@ export interface components {
             projectId: string;
             timeTaken?: string;
             apiKeyName?: string;
+            host?: string;
             requestBody: Record<string, never>;
             responseBody?: Record<string, never>;
             requestHeaders?: Record<string, never>;

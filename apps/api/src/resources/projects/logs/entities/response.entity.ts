@@ -1,7 +1,13 @@
 import { ApiProperty, ApiPropertyOptional, OmitType } from '@nestjs/swagger';
 import { RequestLogDTO, CreateApplicationLogDto } from '../dto/create-log.dto';
 import { Expose, Type } from 'class-transformer';
-import { IsArray, IsNumber, IsObject, IsString } from 'class-validator';
+import {
+  IsArray,
+  IsNumber,
+  IsObject,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 import { ITEMS_PER_QUERY } from '~/constants';
 export class PartialApiKeyEntity {
   @ApiProperty({})
@@ -90,6 +96,11 @@ export class PartialRequestLogEntity {
   @IsString()
   @Expose()
   apiKeyName: string;
+
+  @ApiPropertyOptional({})
+  @IsString()
+  @Expose()
+  host: string;
 }
 
 export class FetchRequestLogsResponseEntity {

@@ -16,8 +16,15 @@ export const columns: ColumnDef<
     cell: ({ row }) => <RequestMethodBadge method={row.original.method} />,
   },
   {
+    accessorKey: 'host',
+    header: () => <div className="text-left">Host</div>,
+    cell: ({ row }) => {
+      return <span>{row.original.host}</span>;
+    },
+  },
+  {
     accessorKey: 'url',
-    header: () => <div className="text-left">Url</div>,
+    header: () => <div className="text-left">Pathname</div>,
     cell: ({ row }) => {
       return (
         <Link
@@ -39,7 +46,10 @@ export const columns: ColumnDef<
     accessorKey: 'timestamp',
     header: 'Timestamp',
     cell: ({ row }) => {
-      const formattedTime = formatTime(row.original.timestamp, 'DD/MM/YYYY HH:mm:ss');
+      const formattedTime = formatTime(
+        row.original.timestamp,
+        'DD/MM/YYYY HH:mm:ss',
+      );
       const validElementTime = formatTime(
         row.original.timestamp,
         'YYYY-MM-DD HH:mm:ss',
