@@ -1,6 +1,26 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
-    "config:recommended"
+    "config:recommended",
+    "helpers:pinGitHubActionDigests",
+    ":preserveSemverRanges",
+    "group:allNonMajor"
+  ],
+  "baseBranches": [
+    "dev"
+  ],
+  "labels": [
+    "dependencies"
+  ],
+  "ignorePaths": [
+    "apps/*",
+    "examples/*"
+  ],
+  "ignoreDeps": [
+    "@types/react",
+    "@types/node",
+    "@types/react-dom",
+    "typescript",
+    "eslint"
   ]
 }
