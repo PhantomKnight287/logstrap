@@ -20,6 +20,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       isGlobal: true,
     }),
     ProjectsModule,
+    // These keys are of my local logstrap instance :)
     LogsTrapModule.forRoot({
       apiKey: 'key_unzrxstuw5',
       projectId: 'pj_dc5m03j76kbrku4ahn64ober',
