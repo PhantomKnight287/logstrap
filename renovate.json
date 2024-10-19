@@ -17,9 +17,7 @@
     "examples/*"
   ],
   "ignoreDeps": [
-    "@types/react",
-    "@types/node",
-    "@types/react-dom",
+    "@types/*",
     "typescript",
     "eslint"
   ]
