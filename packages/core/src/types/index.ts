@@ -1,3 +1,11 @@
+/**
+ * Interface representing caller information
+ */
+export interface CallerInfo {
+  className: string;
+  functionName: string;
+}
+
 export interface LogsTrapInitOptions {
   /**
    * Your Api Key, starts with `key_`
@@ -13,4 +21,3 @@ export interface LogsTrapInitOptions {
    */
   endpoint?: string;
 }
-

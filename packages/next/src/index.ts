@@ -1,50 +1,134 @@
-import { getCrypto, LogsTrapInitOptions } from '@logstrap/core';
+import { LogsTrapInitOptions } from '@logstrap/core';
 import { NextRequest } from 'next/server';
-import { LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
-import { AsyncLocalStorage } from 'async_hooks';
-import { headers } from 'next/headers';
-
-const asyncLocalStorage = new AsyncLocalStorage<string[]>();
+import { createRouteHandlerWithLogger } from './app';
+import { CallerInfo, getCallerInfo } from '@logstrap/core';
+import { getLogsStorage, storage } from './utils';
 
 class Logger {
-  private getRequestId() {
-    const headersList = headers();
-    const id = headersList.get(LOGSTRAP_REQUEST_ID);
-    if (!id)
-      throw new Error(
-        `You are using logger without middleware. Did you forget to add it for this route(${headersList.get('x-url')})?`,
-      );
-    return id;
-  }
-  
-  info(message: string) {
-    const id = this.getRequestId();
-    console.log(`[${id}] ${message}`);
+  private addLogToStorage(
+    logLevel: string,
+    callerName: string,
+    component: string | null,
+    message: any,
+    additionalInfo: Record<string, any> = {},
+  ) {
+    const newLogEntry = {
+      timestamp: new Date(),
+      level: logLevel,
+      message: typeof message === 'string' ? message : JSON.stringify(message),
+      functionName: callerName,
+      component,
+      additionalInfo,
+    };
+
+    this.addToStorage(newLogEntry);
   }
 
-  addToStorage(item: string) {
-    const currentStorage = asyncLocalStorage.getStore() || [];
-    asyncLocalStorage.enterWith([...currentStorage, item]);
+  private getCallerInfo(): CallerInfo {
+    return getCallerInfo(new Error().stack);
+  }
+
+  log(message?: any, ...optionalParams: any[]) {
+    console.log(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'log',
+      caller.functionName,
+      caller.className,
+      message,
+      optionalParams.length ? { params: optionalParams } : {},
+    );
+  }
+
+  warn(message?: any, ...optionalParams: any[]) {
+    console.warn(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'warn',
+      caller.functionName,
+      caller.className,
+      message,
+      optionalParams.length ? { params: optionalParams } : {},
+    );
+  }
+
+  error(message?: any, ...optionalParams: any[]) {
+    console.error(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'error',
+      caller.functionName,
+      caller.className,
+      message,
+      optionalParams.length ? { params: optionalParams } : {},
+    );
+  }
+
+  info(message?: any, ...optionalParams: any[]) {
+    console.info(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'info',
+      caller.functionName,
+      caller.className,
+      message,
+      optionalParams.length ? { params: optionalParams } : {},
+    );
+  }
+
+  trace(message?: any, ...optionalParams: any[]) {
+    console.trace(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack
+      ?.split('\n')
+      .slice(2)
+      .map((line) => line.trim())
+      .join('\n');
+    this.addLogToStorage(
+      'trace',
+      caller.functionName,
+      caller.className,
+      message,
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
+    );
+  }
+
+  debug(message?: any, ...optionalParams: any[]) {
+    console.debug(message, ...optionalParams);
+    const caller = this.getCallerInfo();
+    this.addLogToStorage(
+      'debug',
+      caller.functionName,
+      caller.className,
+      message,
+      optionalParams.length ? { params: optionalParams } : {},
+    );
+  }
+
+  private addToStorage(item: Record<string, any>) {
+    const currentStorage = getLogsStorage();
+    if (!currentStorage) throw new Error('Unable to access Logs Storage');
+    storage.enterWith({
+      ...currentStorage,
+      applicationLogs: [...currentStorage.applicationLogs, item],
+    });
   }
 }
 
 function middleware(func: Function) {
   return async function (request: NextRequest) {
-    const requestId = (await getCrypto()).randomUUID();
-    asyncLocalStorage.enterWith([]);
-    const newHeaders = new Headers(request.headers);
-    newHeaders.set(LOGSTRAP_REQUEST_ID, requestId);
-    const newRequest = new NextRequest(request, { headers: newHeaders });
-    const response = await func(newRequest);
-    response.headers.set(LOGSTRAP_REQUEST_ID, requestId);
-    return response;
+    await func(request);
   };
 }
 
 export default function initLogstrap(options: LogsTrapInitOptions) {
-  options;
   return {
     middleware,
     logger: new Logger(),
+    createRouteHandler: createRouteHandlerWithLogger(options),
   };
 }

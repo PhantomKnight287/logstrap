@@ -27,7 +27,7 @@ import { ScheduleModule } from '@nestjs/schedule';
       exclude: [
         {
           method: RequestMethod.POST,
-          path: `/projects/(.*)`,
+          path: `/projects/(.*)/logs`,
         },
       ],
     }),

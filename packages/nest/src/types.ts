@@ -20,11 +20,3 @@ export type LogsTrapInitOptions = CoreLogsTrapInitOptions & {
    */
   errorStatusCodes?: number[];
 };
-
-/**
- * Interface representing caller information
- */
-export interface CallerInfo {
-  className: string;
-  functionName: string;
-}

@@ -19,7 +19,14 @@ function middleware(request: NextRequest) {
   return NextResponse.next(); // this is required for logstrap to work
 }
 export const config = {
-  matcher: ['/auth/:path*', '/dashboard', '/dashboard/:path*', '/'],
+  matcher: [
+    '/auth/:path*',
+    '/dashboard',
+    '/dashboard/:path*',
+    '/',
+    '/api',
+    '/api/:path*',
+  ],
 };
 
 export default logstrapMiddleware(middleware);

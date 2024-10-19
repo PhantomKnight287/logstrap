@@ -2,14 +2,15 @@ import {
   LogsTrapInitOptions,
   createEndpointUrl,
   logApiRequest,
+  getCallerInfo,
+  CallerInfo,
 } from '@logstrap/core';
 import { Injectable, Scope, Inject } from '@nestjs/common';
-import { REQUEST } from '@nestjs/core';
 import { ClsService } from 'nestjs-cls';
-import type { CallerInfo, LogsTrapRequest } from './types';
+import type { LogsTrapRequest } from './types';
 import { LOGSTRAP_API_KEY, LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
-import { getCallerInfo } from './utils';
 import { LOGSTRAP_OPTIONS } from './constants';
+import { REQUEST } from '@nestjs/core';
 
 /**
  * Logger that can be used to log messages without an active request. Does not require LogsTrap middleware.

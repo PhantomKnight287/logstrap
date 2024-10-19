@@ -21,9 +21,14 @@ export default async function ApiKeys({
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center">
-        <h1 className="text-lg font-semibold md:text-2xl w-fit">
-          API Keys ({keys.data.totalItems})
-        </h1>
+        <div className="flex flex-col items-start">
+          <h1 className="text-lg font-semibold md:text-2xl w-fit">
+            API Keys ({keys.data.totalItems})
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            Project ID: {params.id}
+          </p>
+        </div>
         <CreateNewApiKeyButton />
       </div>
       <div className="flex flex-1 items-center justify-center rounded-lg border border-dashed shadow-sm">

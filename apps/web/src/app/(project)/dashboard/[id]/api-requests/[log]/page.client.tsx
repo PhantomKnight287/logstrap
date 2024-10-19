@@ -5,6 +5,9 @@ import { components } from '@/lib/api/types';
 import dayjs from 'dayjs';
 import { Loader2 } from 'lucide-react';
 import { Suspense } from 'react';
+import { LOGSTRAP_REQUEST_EXTENSION } from '@logstrap/constants';
+import { BundledLanguage } from 'shiki';
+
 export default function LogInfoPage({
   data,
 }: {
@@ -45,15 +48,9 @@ export default function LogInfoPage({
         <div className="flex flex-col items-start gap-4">
           <h3 className="text-lg font-medium">Response Body</h3>
           <Suspense fallback={<Loader />}>
-            <Code
-              lang="json"
-              code={
-                data.responseBody !== undefined && data.responseBody !== null
-                  ? JSON.stringify(data.responseBody, null, '\t')
-                  : JSON.stringify({})
-              }
-              theme="ayu-dark"
-            />
+            {data.responseBody !== undefined && data.responseBody !== null ? (
+              <RenderBody body={data.responseBody} />
+            ) : null}
           </Suspense>
         </div>
         <div className="flex flex-col items-start gap-4">
@@ -71,28 +68,22 @@ export default function LogInfoPage({
             />
           </Suspense>
         </div>
-      </div>
-      <div className="flex flex-col items-start gap-4">
-        <h3 className="text-lg font-medium">Cookies</h3>
-        <Suspense fallback={<Loader />}>
-          <Code
-            lang="json"
-            code={
-              data.responseHeaders !== undefined &&
-              data.responseHeaders !== null
-                ? JSON.stringify(data.cookies, null, '\t')
-                : JSON.stringify({})
-            }
-            theme={'ayu-dark'}
-          />
-        </Suspense>
-      </div>
-      {/* {data.stackTrace ? (
-        <div className="w-full flex flex-col items-start mt-4">
-          <h3 className="text-lg font-medium">Stack Trace</h3>
-          <Code lang="bash" code={data.stackTrace} theme="ayu-dark" />
+        <div className="flex flex-col items-start gap-4">
+          <h3 className="text-lg font-medium">Cookies</h3>
+          <Suspense fallback={<Loader />}>
+            <Code
+              lang="json"
+              code={
+                data.responseHeaders !== undefined &&
+                data.responseHeaders !== null
+                  ? JSON.stringify(data.cookies, null, '\t')
+                  : JSON.stringify({})
+              }
+              theme={'ayu-dark'}
+            />
+          </Suspense>
         </div>
-      ) : null} */}
+      </div>
     </div>
   );
 }
@@ -106,5 +97,35 @@ function Loader() {
     <div className="w-full h-20 bg-muted flex items-center justify-center">
       <Loader2 className="animate-spin" />
     </div>
+  );
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function RenderBody({ body }: { body: Record<string, any> }) {
+  const keys = Object.values(LOGSTRAP_REQUEST_EXTENSION);
+  let validKey = undefined;
+  for (const key of keys) {
+    if (body[key]) {
+      validKey = key;
+      break;
+    }
+  }
+  if (!validKey)
+    return (
+      <Code
+        lang="json"
+        code={JSON.stringify(body, null, '\t')}
+        theme="ayu-dark"
+      />
+    );
+  const elements = validKey.split('-');
+  const language = elements[elements.length - 1];
+
+  return (
+    <Code
+      lang={language === 'text' ? 'bash' : (language as BundledLanguage)}
+      code={JSON.stringify(body[validKey], null, '\t')}
+      theme="ayu-dark"
+    />
   );
 }

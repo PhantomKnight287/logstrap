@@ -33,10 +33,19 @@ import { Textarea } from '@/components/ui/textarea';
 import useFetchUser from '@/hooks/use-fetch-user';
 import { purgeCache } from '@/lib/revalidate';
 import { useState } from 'react';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { ExclamationTriangleIcon } from '@radix-ui/react-icons';
 import useClipboard from '@/hooks/use-clipboard';
 import { Check, Copy } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 
 export default function CreateNewApiKeyClient({ id }: { id: string }) {
   const { replace } = useRouter();
@@ -76,6 +85,7 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
       await purgeCache(`api-keys::${id}`);
       toggle();
       setApiKey(req.data.key);
+      form.reset();
     } catch (e) {
       toggle();
       toast.error((e as Error)?.message);
@@ -157,6 +167,7 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
                 )}
               />
             </div>
+
             <Button
               className="w-full mt-4"
               type="submit"
@@ -167,17 +178,23 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
             </Button>
           </form>
         </Form>
-        {apiKey != null ? (
-          <Alert className="mt-6">
-            <ExclamationTriangleIcon className="h-4 w-4" />
-            <AlertTitle className="leading-4">
+      </CardContent>
+
+      <AlertDialog
+        open={apiKey != null}
+        onOpenChange={() => {
+          setApiKey(null);
+        }}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>API Key Created</AlertDialogTitle>
+            <AlertDialogDescription>
               Make sure to copy your key now as you will not be able to see it
               again.
-            </AlertTitle>
-            <AlertDescription>
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 mt-4">
                 <div className="flex flex-row items-center gap-1 justify-center">
-                  <Input disabled value={apiKey!} />
+                  <Input value={apiKey!} readOnly />
                   <Button
                     variant={'secondary'}
                     onClick={() => {
@@ -187,19 +204,14 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
                     {copied ? <Check size={20} /> : <Copy size={20} />}
                   </Button>
                 </div>
-                <Button
-                  onClick={() => {
-                    replace(`${Redirects.AFTER_PROJECT_CREATED(id)}/keys`);
-                  }}
-                  variant={'outline'}
-                >
-                  I&apos;ve copied my key
-                </Button>
               </div>
-            </AlertDescription>
-          </Alert>
-        ) : null}
-      </CardContent>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex flex-row items-center gap-2 !justify-center">
+            <AlertDialogAction>I have copied my key</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Card>
   );
 }

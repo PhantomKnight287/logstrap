@@ -13,7 +13,15 @@ export class CreateProjectDto {
   description: string;
 
   @ApiProperty({ required: false })
-  @IsUrl(undefined, { message: 'Please enter a valid url' })
+  @IsUrl(
+    {
+      require_tld: false,
+      require_protocol: true,
+      require_host: false,
+      host_whitelist: ['localhost'],
+    },
+    { message: 'Please enter a valid url' },
+  )
   @IsOptional()
   url: string;
 }

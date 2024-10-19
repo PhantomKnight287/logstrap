@@ -56,6 +56,7 @@ export class LogsService {
   ) {}
   async create(body: CreateLogDto, apiKey: typeof ApiKeys.$inferSelect) {
     this.logger.log(`Creating logs for Project: ${apiKey.projectId}`);
+
     if (body.requests) {
       await this.processRequests(body.requests, apiKey.projectId, apiKey.id);
     }
@@ -83,13 +84,15 @@ export class LogsService {
           projectId,
           apiKeyId,
         );
-        await this.insertApplicationLogs(
-          tx,
-          request.applicationLogs,
-          projectId,
-          apiKeyId,
-          baseApiRequest.id,
-        );
+        if (Array.isArray(request.applicationLogs)) {
+          await this.insertApplicationLogs(
+            tx,
+            request.applicationLogs,
+            projectId,
+            apiKeyId,
+            baseApiRequest.id,
+          );
+        }
       }
     });
   }

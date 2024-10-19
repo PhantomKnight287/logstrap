@@ -110,58 +110,61 @@ export default async function ProjectInfo({ params }: PageProps) {
           </Card>
         </div>
         <div className="grid grid-cols-2 gap-4">
-          {/* Show list of most used routes per date and count */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-center">
-                Most Used Routes
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                {stats.mostUsedApiRoute.map((route) => (
-                  <li
-                    key={route.path}
-                    className="flex items-center justify-between gap-4"
-                  >
-                    <Link
-                      href={`/dashboard/${params.id}/api-requests?q=${route.path}`}
-                      className="text-sm font-medium underline"
+          {stats.mostUsedApiRoute.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-center">
+                  Most Used Routes
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul>
+                  {stats.mostUsedApiRoute.map((route) => (
+                    <li
+                      key={route.path}
+                      className="flex items-center justify-between gap-4"
                     >
-                      {route.path}
-                    </Link>
-                    <span>{route.count}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+                      <Link
+                        href={`/dashboard/${params.id}/api-requests?q=${route.path}`}
+                        className="text-sm font-medium underline"
+                      >
+                        {route.path}
+                      </Link>
+                      <span>{route.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ) : null}
 
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-xl font-semibold text-center">
-                Most Frequent Logs
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ul>
-                {stats.mostFrequentAppEvent.map((event, index) => (
-                  <li
-                    key={index}
-                    className="flex items-center justify-between gap-4"
-                  >
-                    <Link
-                      href={`/dashboard/${params.id}/app-events?q=${event.event}`}
-                      className="text-sm font-medium underline"
+          {stats.mostFrequentAppEvent.length > 0 ? (
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-xl font-semibold text-center">
+                  Most Frequent Logs
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ul>
+                  {stats.mostFrequentAppEvent.map((event, index) => (
+                    <li
+                      key={index}
+                      className="flex items-center justify-between gap-4"
                     >
-                      {event.event}
-                    </Link>
-                    <span>{event.count}</span>
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
+                      <Link
+                        href={`/dashboard/${params.id}/app-events?q=${event.event}`}
+                        className="text-sm font-medium underline"
+                      >
+                        {event.event}
+                      </Link>
+                      <span>{event.count}</span>
+                    </li>
+                  ))}
+                </ul>
+              </CardContent>
+            </Card>
+          ) : null}
         </div>
       </div>
     </main>
