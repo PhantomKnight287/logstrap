@@ -15,6 +15,11 @@
 - Log errors and exceptions
 - Provides a logger instance to your services
 
+
+## Usage
+
+Before going to the dashboard and signing up, please remember that I recommend you to self host the service given the sensitive data(stack traces, request payloads, etc.) it handles. There is no encryption as of now. If you are dealing with sensitive data, please host it on your own but if you are not, you can use the hosted version of the service(coming soon:tm:)
+
 ## Adapters
 
 - [Nestjs](./packages/nest)
@@ -24,6 +29,6 @@
 
 Refer to projects tab for more information.
 
-### ✨ Want to contribute?
+## ✨ Want to contribute?
 
 Please see the [`LOCAL.md`](/LOCAL.md) on how to get set up.
