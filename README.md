@@ -18,7 +18,7 @@
 
 ## Usage
 
-Before going to the dashboard and signing up, please remember that I recommend you to self host the service given the sensitive data(stack traces, request payloads, etc.) it handles. There is no encryption as of now. If you are dealing with sensitive data, please host it on your own but if you are not, you can use the hosted version of the service(coming soon:tm:)
+Before going to the dashboard and signing up, please remember that I recommend you to self host the service given the sensitive data(stack traces, request payloads, etc.) it handles. There is no encryption as of now. If you are dealing with sensitive data, please host it on your own but if you are not, you can use the hosted version of the service(coming soon™️)
 
 ## Adapters
 
