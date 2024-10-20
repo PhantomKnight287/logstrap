@@ -1,4 +1,4 @@
-import initLogstrap from '@logstrap/next';
+import { initLogstrap } from '@logstrap/next';
 
 // These keys are of my local logstrap instance :)
 export const { middleware, logger, createRouteHandler } = initLogstrap({

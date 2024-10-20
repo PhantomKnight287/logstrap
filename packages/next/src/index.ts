@@ -125,7 +125,7 @@ function middleware(func: Function) {
   };
 }
 
-export default function initLogstrap(options: LogsTrapInitOptions) {
+export function initLogstrap(options: LogsTrapInitOptions) {
   return {
     middleware,
     logger: new Logger(),
