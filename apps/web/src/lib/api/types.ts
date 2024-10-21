@@ -244,6 +244,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/projects/{id}/keys/verify": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Verify a key
+         * @description Verify a key
+         */
+        post: operations["KeysController_verifyKey"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/projects/{id}/logs": {
         parameters: {
             query?: never;
@@ -490,6 +510,15 @@ export interface components {
             apiRequestsCount: number;
             applicationLogsCount: number;
         };
+        VerifyKeyDto: {
+            key: string;
+        };
+        VerifyKeyEntity: {
+            /** @description The id of the key */
+            id: string;
+            /** @description The name of the key */
+            name: string;
+        };
         /**
          * @description Log level
          * @enum {string}
@@ -590,9 +619,12 @@ export interface components {
             message: string;
             /** Format: date-time */
             timestamp: string;
-            additionalInfo?: Record<string, never>;
+            /** @description Additional info(encrypted) */
+            additionalInfo?: string;
             functionName?: string;
             component?: string;
+            /** @description Initialization vector */
+            iv: string;
         };
         LogEntity: {
             id: string;
@@ -607,13 +639,21 @@ export interface components {
             timeTaken?: string;
             apiKeyName?: string;
             host?: string;
-            requestBody: Record<string, never>;
-            responseBody?: Record<string, never>;
-            requestHeaders?: Record<string, never>;
-            responseHeaders?: Record<string, never>;
-            cookies?: Record<string, never>;
+            /** @description Request body(encrypted) */
+            requestBody: string;
+            /** @description Response body(encrypted) */
+            responseBody?: string;
+            /** @description Request headers(encrypted) */
+            requestHeaders?: string;
+            /** @description Response headers(encrypted) */
+            responseHeaders?: string;
+            /** @description Cookies(encrypted) */
+            cookies?: string;
+            /** @description IP address */
             ip?: string;
             applicationLogs?: components["schemas"]["ApplicationLogEntity"][];
+            /** @description Initialization vector */
+            iv: string;
         };
         PartialApplicationLogEntity: {
             id: string;
@@ -622,7 +662,8 @@ export interface components {
             message: string;
             component: string;
             functionName: string;
-            additionalInfo: Record<string, never>;
+            /** @description Additional info(encrypted) */
+            additionalInfo: string;
             requestId: string;
             projectId: string;
             apiKeyId: string;
@@ -645,9 +686,12 @@ export interface components {
             message: string;
             /** Format: date-time */
             timestamp: string;
-            additionalInfo?: Record<string, never>;
+            /** @description Additional info(encrypted) */
+            additionalInfo?: string;
             functionName?: string;
             component?: string;
+            /** @description Initialization vector */
+            iv: string;
             apiKey: components["schemas"]["PartialApiKeyEntity"];
             request: components["schemas"]["LogEntityWithIdAndUrl"];
         };
@@ -1173,6 +1217,59 @@ export interface operations {
                 };
             };
             /** @description No key found */
+            404: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+            /** @description Internal server error. */
+            500: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+        };
+    };
+    KeysController_verifyKey: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                /** @description Id of the project */
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["VerifyKeyDto"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifyKeyEntity"];
+                };
+            };
+            /** @description Invalid API Key */
+            401: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["GenericErrorEntity"];
+                };
+            };
+            /** @description Either this API Key does not belong to this project or is incorrect. */
             404: {
                 headers: {
                     [name: string]: unknown;

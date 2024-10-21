@@ -97,12 +97,21 @@ export class StandaloneLogsTrapService {
 
   public error(message?: any, ...optionalParams: any[]) {
     const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack
+      ?.split('\n')
+      .slice(2)
+      .map((line) => line.trim())
+      .join('\n');
     this.addLogToStorage(
       'error',
       caller.functionName,
       caller.className,
       message,
-      optionalParams.length ? { params: optionalParams } : {},
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
     );
     console.error(message, ...optionalParams);
   }
@@ -154,12 +163,21 @@ export class StandaloneLogsTrapService {
 
   public fatal(message?: any, ...optionalParams: any[]) {
     const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack
+      ?.split('\n')
+      .slice(2)
+      .map((line) => line.trim())
+      .join('\n');
     this.addLogToStorage(
       'fatal',
       caller.functionName,
       caller.className,
       message,
-      optionalParams.length ? { params: optionalParams } : {},
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
     );
     console.error(message, ...optionalParams);
   }
@@ -268,13 +286,22 @@ export class LogsTrapService {
     const requestId = this.getRequestId();
     console.error(message, ...optionalParams);
     const caller = this.getCallerInfo();
+    const error = new Error();
+    const stack = error.stack
+      ?.split('\n')
+      .slice(2)
+      .map((line) => line.trim())
+      .join('\n');
     this.addLogToStorage(
       requestId,
       'error',
       caller.functionName,
       caller.className,
       message,
-      optionalParams.length ? { params: optionalParams } : {},
+      {
+        ...(optionalParams.length ? { params: optionalParams } : {}),
+        stack,
+      },
     );
   }
 

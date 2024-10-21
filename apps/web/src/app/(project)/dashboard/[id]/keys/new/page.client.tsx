@@ -25,7 +25,11 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { readCookie } from '@/utils/cookie';
+import {
+  createCookie,
+  generateKeyCookieName,
+  readCookie,
+} from '@/utils/cookie';
 import { COOKIE_NAME } from '@/constants';
 import { useRouter } from 'next/navigation';
 import { Redirects } from '@/constants/redirects';
@@ -85,6 +89,7 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
       await purgeCache(`api-keys::${id}`);
       toggle();
       setApiKey(req.data.key);
+      createCookie(generateKeyCookieName(id, req.data.id), req.data.key, 365);
       form.reset();
     } catch (e) {
       toggle();
@@ -208,7 +213,14 @@ export default function CreateNewApiKeyClient({ id }: { id: string }) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter className="flex flex-row items-center gap-2 !justify-center">
-            <AlertDialogAction>I have copied my key</AlertDialogAction>
+            <AlertDialogAction
+              onClick={() => {
+                setApiKey(null);
+                replace(`${Redirects.AFTER_PROJECT_CREATED(id)}/api-keys`);
+              }}
+            >
+              I have copied my key
+            </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

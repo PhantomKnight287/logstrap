@@ -99,6 +99,27 @@
       "when": 1729239547491,
       "tag": "0013_regular_susan_delgado",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1729441971065,
+      "tag": "0014_acoustic_terrax",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1729442111182,
+      "tag": "0015_loud_magus",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1729443504297,
+      "tag": "0016_glossy_gamora",
+      "breakpoints": true
     }
   ]
 }

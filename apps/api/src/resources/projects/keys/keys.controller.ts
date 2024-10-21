@@ -19,6 +19,7 @@ import {
   ApiOperation,
   ApiParam,
   ApiTags,
+  ApiUnauthorizedResponse,
 } from '@nestjs/swagger';
 import {
   CreateKeyResponse,
@@ -29,6 +30,8 @@ import { User } from '~/decorators/user/user.decorator';
 import { UserEntity } from '~/resources/auth/entities/auth.entity';
 import { GenericErrorEntity } from '~/entity';
 import { AuthGuard } from '~/guards/auth/auth.guard';
+import { VerifyKeyDto } from './dto/verify-key.dto';
+import { VerifyKeyEntity } from './entities/verify-key.entity';
 
 @ApiParam({
   name: 'id',
@@ -98,5 +101,26 @@ export class KeysController {
     @User() user: UserEntity,
   ) {
     return this.keysService.findOne(id, user.id, keyId);
+  }
+
+  @Post('verify')
+  @ApiOperation({
+    description: 'Verify a key',
+    summary: 'Verify a key',
+  })
+  @ApiOkResponse({
+    type: VerifyKeyEntity,
+  })
+  @ApiNotFoundResponse({
+    type: GenericErrorEntity,
+    description:
+      'Either this API Key does not belong to this project or is incorrect.',
+  })
+  @ApiUnauthorizedResponse({
+    type: GenericErrorEntity,
+    description: 'Invalid API Key',
+  })
+  verifyKey(@Body() body: VerifyKeyDto, @Param('id') id: string) {
+    return this.keysService.isKeyCorrect(id, body);
   }
 }

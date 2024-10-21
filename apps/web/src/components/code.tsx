@@ -1,3 +1,4 @@
+import { cn } from '@/lib/utils';
 import { codeToHtml } from 'shiki';
 import type { BundledLanguage, BundledTheme } from 'shiki';
 
@@ -6,16 +7,17 @@ type Props = {
   lang?: BundledLanguage;
   theme?: BundledTheme;
   filename?: string;
+  className?: string;
 };
 export default async function Code({
   code,
   lang = 'javascript',
   theme = 'nord',
+  className,
 }: Props) {
   const html = await codeToHtml(code, {
     lang,
     theme,
-
     transformers: [
       {
         line(node) {
@@ -30,7 +32,7 @@ export default async function Code({
 
   return (
     <div
-      className="overflow-x-hidden max-w-full "
+      className={cn('overflow-x-hidden max-w-full', className)}
       dangerouslySetInnerHTML={{
         __html: html,
       }}

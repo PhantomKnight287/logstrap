@@ -28,6 +28,9 @@ import { ITEMS_PER_QUERY } from '~/constants';
 import { Cron, CronExpression } from '@nestjs/schedule';
 import { sub } from 'date-fns';
 import { StandaloneLogsTrapService } from '@logstrap/nest';
+import { getKeyFromPrefixedKey } from '~/utils';
+import { EncryptionService } from '~/services/encryption/encryption.service';
+import { randomBytes } from 'crypto';
 
 type Filters = {
   q?: string;
@@ -53,18 +56,29 @@ export class LogsService {
   private logger = new Logger(LogsService.name);
   constructor(
     private readonly standaloneLogsTrapService: StandaloneLogsTrapService,
+    private readonly encryptionService: EncryptionService,
   ) {}
-  async create(body: CreateLogDto, apiKey: typeof ApiKeys.$inferSelect) {
-    this.logger.log(`Creating logs for Project: ${apiKey.projectId}`);
-
+  async create(
+    body: CreateLogDto,
+    apiKeyRecord: typeof ApiKeys.$inferSelect,
+    apiKeyHeader: string,
+  ) {
+    this.logger.log(`Creating logs for Project: ${apiKeyRecord.projectId}`);
+    const apiKey = getKeyFromPrefixedKey(apiKeyHeader);
     if (body.requests) {
-      await this.processRequests(body.requests, apiKey.projectId, apiKey.id);
+      await this.processRequests(
+        body.requests,
+        apiKeyRecord.projectId,
+        apiKeyRecord.id,
+        apiKey,
+      );
     }
     if (body.applicationLogs) {
       await this.processApplicationLogs(
         body.applicationLogs,
-        apiKey.projectId,
-        apiKey.id,
+        apiKeyRecord.projectId,
+        apiKeyRecord.id,
+        apiKey,
       );
     }
 
@@ -75,6 +89,7 @@ export class LogsService {
     requests: any[],
     projectId: string,
     apiKeyId: string,
+    apiKey: string,
   ) {
     await db.transaction(async (tx) => {
       for (const request of requests) {
@@ -83,6 +98,7 @@ export class LogsService {
           request,
           projectId,
           apiKeyId,
+          apiKey,
         );
         if (Array.isArray(request.applicationLogs)) {
           await this.insertApplicationLogs(
@@ -90,6 +106,7 @@ export class LogsService {
             request.applicationLogs,
             projectId,
             apiKeyId,
+            apiKey,
             baseApiRequest.id,
           );
         }
@@ -101,6 +118,7 @@ export class LogsService {
     applicationLogs: CreateApplicationLogDto[],
     projectId: string,
     apiKeyId: string,
+    apiKey: string,
   ) {
     await db.transaction(async (tx) => {
       await this.insertApplicationLogs(
@@ -108,6 +126,7 @@ export class LogsService {
         applicationLogs,
         projectId,
         apiKeyId,
+        apiKey,
         undefined,
       );
     });
@@ -118,7 +137,10 @@ export class LogsService {
     request: RequestLogDTO,
     projectId: string,
     apiKeyId: string,
+    apiKey: string,
   ) {
+    const iv = randomBytes(16);
+
     return tx
       .insert(requestLogsTable)
       .values({
@@ -127,15 +149,47 @@ export class LogsService {
         projectId,
         url: request.url,
         statusCode: request.statusCode,
-        requestBody: request.requestBody,
-        requestHeaders: request.requestHeaders,
-        responseBody: request.responseBody,
-        responseHeaders: request.responseHeaders,
-        cookies: request.cookies,
-        ip: request.ip,
+        requestBody: (
+          await this.encryptionService.encrypt(
+            JSON.stringify(request.requestBody ?? {}),
+            apiKey,
+            iv,
+          )
+        ).encryptedData,
+        requestHeaders: (
+          await this.encryptionService.encrypt(
+            JSON.stringify(request.requestHeaders ?? {}),
+            apiKey,
+            iv,
+          )
+        ).encryptedData,
+        responseBody: (
+          await this.encryptionService.encrypt(
+            JSON.stringify(request.responseBody ?? {}),
+            apiKey,
+            iv,
+          )
+        ).encryptedData,
+        responseHeaders: (
+          await this.encryptionService.encrypt(
+            JSON.stringify(request.responseHeaders ?? {}),
+            apiKey,
+            iv,
+          )
+        ).encryptedData,
+        cookies: (
+          await this.encryptionService.encrypt(
+            JSON.stringify(request.cookies ?? {}),
+            apiKey,
+            iv,
+          )
+        ).encryptedData,
+        ip: (await this.encryptionService.encrypt(request.ip ?? '', apiKey, iv))
+          .encryptedData,
         userAgent: request.userAgent,
         timeTaken: request.timeTaken,
         host: request.host,
+        iv: iv.toString('hex'),
       })
       .returning();
   }
@@ -145,18 +199,29 @@ export class LogsService {
     applicationLogs: CreateApplicationLogDto[],
     projectId: string,
     apiKeyId: string,
+    apiKey: string,
     requestId: string | undefined,
   ) {
+    const iv = randomBytes(16);
     for (const log of applicationLogs) {
       await tx.insert(applicationLogsTable).values({
         apiKeyId,
+        iv: iv.toString('hex'),
         level: log.level,
         message: log.message,
         projectId,
         requestId,
         component: log.component,
         functionName: log.functionName,
-        additionalInfo: log.additionalInfo,
+        additionalInfo: log.additionalInfo
+          ? (
+              await this.encryptionService.encrypt(
+                JSON.stringify(log.additionalInfo ?? {}),
+                apiKey,
+                iv,
+              )
+            ).encryptedData
+          : null,
       });
     }
   }
@@ -290,6 +355,7 @@ export class LogsService {
             additionalInfo: true,
             functionName: true,
             component: true,
+            iv: true,
           },
         },
       },

@@ -3,16 +3,14 @@ import {
   index,
   pgEnum,
   pgTable,
-  serial,
   text,
   decimal,
   timestamp,
-  jsonb,
   integer,
+  varchar,
 } from 'drizzle-orm/pg-core';
 import { createId } from '@paralleldrive/cuid2';
 
-import 'source-map-support';
 import { relations } from 'drizzle-orm';
 
 export const users = pgTable(
@@ -116,7 +114,6 @@ const createPrefixedId = (prefix: string) =>
     .primaryKey()
     .$defaultFn(() => `${prefix}_${createId()}`);
 
-
 export const requestLogs = pgTable('request_logs', {
   id: createPrefixedId('rl'),
   projectId: text('project_id')
@@ -130,16 +127,17 @@ export const requestLogs = pgTable('request_logs', {
   timestamp: timestamp('timestamp').defaultNow().notNull(),
   method: text('method').notNull(),
   url: text('url').notNull(),
-  host:text('host').default(null),
+  host: text('host').default(null),
   statusCode: text('status_code'),
-  requestBody: jsonb('request_body'),
-  responseBody: jsonb('response_body'),
-  requestHeaders: jsonb('request_headers'),
-  responseHeaders: jsonb('response_headers'),
+  requestBody: text('request_body'),
+  responseBody: text('response_body'),
+  requestHeaders: text('request_headers'),
+  responseHeaders: text('response_headers'),
   timeTaken: integer('time_taken'),
-  cookies: jsonb('cookies'),
+  cookies: text('cookies'),
   ip: text('ip'),
   userAgent: text('user_agent'),
+  iv: varchar('iv', { length: 32 }).notNull(),
 });
 
 export const applicationLogs = pgTable('application_logs', {
@@ -162,7 +160,8 @@ export const applicationLogs = pgTable('application_logs', {
   message: text('message').notNull(),
   component: text('component'),
   functionName: text('function_name'),
-  additionalInfo: jsonb('additional_info'),
+  additionalInfo: text('additional_info'),
+  iv: varchar('iv', { length: 32 }).notNull(),
 });
 
 export const systemLogs = pgTable('system_logs', {
@@ -184,7 +183,8 @@ export const systemLogs = pgTable('system_logs', {
   level: LogLevelEnum('level').notNull(),
   message: text('message').notNull(),
   eventType: text('event_type'),
-  details: jsonb('details'),
+  details: text('details'),
+  iv: varchar('iv', { length: 32 }).notNull(),
 });
 
 export const projectsRelations = relations(projects, ({ many }) => ({

@@ -37,9 +37,10 @@ export class ApplicationLogEntity {
   timestamp: Date;
 
   @ApiPropertyOptional({
-    type: Object,
+    type: String,
+    description: 'Additional info(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   additionalInfo: string;
 
@@ -56,6 +57,14 @@ export class ApplicationLogEntity {
   @IsString()
   @Expose()
   component: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Initialization vector',
+  })
+  @IsString()
+  @Expose()
+  iv: string;
 }
 export class LogEntityWithIdAndUrl {
   @ApiProperty({
@@ -88,46 +97,60 @@ export class ExtendedApplicationLogEntity extends ApplicationLogEntity {
   @IsObject()
   @Expose()
   request: LogEntityWithIdAndUrl;
+
+  @ApiProperty({
+    type: String,
+    description: 'Initialization vector',
+  })
+  @IsString()
+  @Expose()
+  iv: string;
 }
 
 export class LogEntity extends PartialRequestLogEntity {
   @ApiProperty({
-    type: Object,
+    type: String,
+    description: 'Request body(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   requestBody: string;
 
   @ApiPropertyOptional({
-    type: Object,
+    type: String,
+    description: 'Response body(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   responseBody: string;
 
   @ApiPropertyOptional({
-    type: Object,
+    type: String,
+    description: 'Request headers(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   requestHeaders: string;
 
   @ApiPropertyOptional({
-    type: Object,
+    type: String,
+    description: 'Response headers(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   responseHeaders: string;
 
   @ApiPropertyOptional({
-    type: Object,
+    type: String,
+    description: 'Cookies(encrypted)',
   })
-  @IsObject()
+  @IsString()
   @Expose()
   cookies: string;
 
   @ApiPropertyOptional({
     type: String,
+    description: 'IP address',
   })
   @IsString()
   @Expose()
@@ -153,4 +176,12 @@ export class LogEntity extends PartialRequestLogEntity {
   @IsString()
   @Expose()
   apiKeyId: string;
+
+  @ApiProperty({
+    type: String,
+    description: 'Initialization vector',
+  })
+  @IsString()
+  @Expose()
+  iv: string;
 }

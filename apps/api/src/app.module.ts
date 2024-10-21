@@ -11,6 +11,7 @@ import { ConfigModule } from '@nestjs/config';
 import { ProjectsModule } from './resources/projects/projects.module';
 import { LogsTrapModule } from '@logstrap/nest';
 import { ScheduleModule } from '@nestjs/schedule';
+import { EncryptionService } from './services/encryption/encryption.service';
 
 @Module({
   imports: [
@@ -22,7 +23,8 @@ import { ScheduleModule } from '@nestjs/schedule';
     ProjectsModule,
     // These keys are of my local logstrap instance :)
     LogsTrapModule.forRoot({
-      apiKey: 'key_unzrxstuw5',
+      apiKey:
+        'key_9ae71fa03dbd60a88eadfc9e95f0de358c630eefcff4807d74fa8b559bb63533',
       projectId: 'pj_dc5m03j76kbrku4ahn64ober',
       endpoint: 'http://localhost:5000',
       exclude: [
@@ -35,6 +37,7 @@ import { ScheduleModule } from '@nestjs/schedule';
     ScheduleModule.forRoot(),
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, EncryptionService],
+  exports: [],
 })
 export class AppModule {}

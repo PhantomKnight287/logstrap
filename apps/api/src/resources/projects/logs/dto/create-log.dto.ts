@@ -151,9 +151,15 @@ export class RequestLogDTO {
     description: 'The request body(only supports json)',
     required: false,
   })
-  @IsType([Object, Array], {
-    message: 'Request body must be a valid object or array',
-  })
+  @IsType(
+    [Object, Array],
+    {
+      isOptional: true,
+    },
+    {
+      message: 'Request body must be a valid object or array',
+    },
+  )
   @IsOptional()
   @Expose()
   requestBody: object;
@@ -163,9 +169,15 @@ export class RequestLogDTO {
     required: false,
     type: Object,
   })
-  @IsType([Object, Array], {
-    message: 'Response body must be a valid object or array',
-  })
+  @IsType(
+    [Object, Array],
+    {
+      isOptional: true,
+    },
+    {
+      message: 'Response body must be a valid object or array',
+    },
+  )
   @IsOptional()
   @Expose()
   responseBody: object;
@@ -174,9 +186,15 @@ export class RequestLogDTO {
     description: 'The request headers(only supports json)',
     required: false,
   })
-  @IsType([Object, Array], {
-    message: 'Request headers must be a valid object or array',
-  })
+  @IsType(
+    [Object, Array],
+    {
+      isOptional: true,
+    },
+    {
+      message: 'Request headers must be a valid object or array',
+    },
+  )
   @IsOptional()
   @Expose()
   requestHeaders: object;
@@ -185,9 +203,15 @@ export class RequestLogDTO {
     description: 'The response headers(only supports json)',
     required: false,
   })
-  @IsType([Object, Array], {
-    message: 'Response headers must be a valid object or array',
-  })
+  @IsType(
+    [Object, Array],
+    {
+      isOptional: true,
+    },
+    {
+      message: 'Response headers must be a valid object or array',
+    },
+  )
   @IsOptional()
   @Expose()
   responseHeaders: object;
@@ -196,9 +220,15 @@ export class RequestLogDTO {
     description: 'The request cookies(only supports json)',
     required: false,
   })
-  @IsType([Object, Array], {
-    message: 'Cookies must be a valid object or array',
-  })
+  @IsType(
+    [Object, Array],
+    {
+      isOptional: true,
+    },
+    {
+      message: 'Cookies must be a valid object or array',
+    },
+  )
   @IsOptional()
   @Expose()
   cookies: object;

@@ -4,7 +4,11 @@ import {
   ValidationArguments,
 } from 'class-validator';
 
-export function IsType(types: any[], validationOptions?: ValidationOptions) {
+export function IsType(
+  types: any[],
+  { isOptional }: { isOptional?: boolean } = {},
+  validationOptions?: ValidationOptions,
+) {
   return function (object: Object, propertyName: string) {
     registerDecorator({
       name: 'isType',
@@ -16,6 +20,12 @@ export function IsType(types: any[], validationOptions?: ValidationOptions) {
         validate(value: any, args: ValidationArguments) {
           const [types] = args.constraints;
           return types.some((type: any) => {
+            if (
+              isOptional &&
+              (value === null || value === undefined || value === '')
+            ) {
+              return true;
+            }
             if (type === String) {
               return typeof value === 'string';
             } else if (type === Number) {

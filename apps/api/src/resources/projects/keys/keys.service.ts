@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { CreateKeyDto } from './dto/create-key.dto';
 import { UpdateKeyDto } from './dto/update-key.dto';
 import { db } from '~/db';
-import { and, count, eq, getTableColumns, sql } from 'drizzle-orm';
+import { and, eq, getTableColumns, sql } from 'drizzle-orm';
 import {
   ApiKeys,
   projects,
@@ -10,7 +10,6 @@ import {
   requestLogs,
   applicationLogs,
 } from '@logstrap/db';
-import { init } from '@paralleldrive/cuid2';
 import { hash, verify } from 'argon2';
 import { plainToInstance } from 'class-transformer';
 import {
@@ -18,10 +17,8 @@ import {
   FetchAllKeysResponse,
 } from './entities/response.entity';
 import { ITEMS_PER_QUERY } from '~/constants';
-
-const createId = init({
-  length: 10,
-});
+import { randomBytes } from 'node:crypto';
+import { VerifyKeyDto } from './dto/verify-key.dto';
 
 @Injectable()
 export class KeysService {
@@ -52,7 +49,8 @@ export class KeysService {
         HttpStatus.FORBIDDEN,
       );
     }
-    const projectKey = `key_${createId()}`;
+
+    const projectKey = `key_${randomBytes(32).toString('hex')}`;
     const hashedKey = await hash(projectKey);
     const [key] = await db
       .insert(ApiKeys)
@@ -115,7 +113,7 @@ export class KeysService {
     });
   }
 
-  async verify(projectId: string, apiKey: string) {
+  async verify(projectId: string, apiKey: string, errorMessage?: string) {
     const apiKeys = await db
       .select()
       .from(ApiKeys)
@@ -123,7 +121,10 @@ export class KeysService {
 
     if (apiKeys.length === 0) {
       this.logger.warn(`No API keys found for Project: ${projectId}`);
-      throw new HttpException('Invalid API Key', HttpStatus.NOT_FOUND);
+      throw new HttpException(
+        "The project doesn't have any API keys.",
+        HttpStatus.NOT_FOUND,
+      );
     }
 
     for (const apiKeyRecord of apiKeys) {
@@ -133,7 +134,10 @@ export class KeysService {
     }
 
     this.logger.warn(`Incorrect API Key supplied for Project: ${projectId}`);
-    throw new HttpException('Invalid API Key', HttpStatus.UNAUTHORIZED);
+    throw new HttpException(
+      errorMessage ?? 'Invalid API Key',
+      HttpStatus.UNAUTHORIZED,
+    );
   }
 
   async findOne(projectId: string, userId: string, keyId: string) {
@@ -167,15 +171,24 @@ export class KeysService {
 
     if (!apiKey) {
       this.logger.warn(`Key with id: ${keyId} not found for ${userId}`);
-      throw new HttpException(
-        'No key found with given id.',
-        HttpStatus.NOT_FOUND,
-      );
+      throw new HttpException('Invalid API Key', HttpStatus.NOT_FOUND);
     }
     return {
       ...apiKey,
       apiRequestsCount,
       applicationLogsCount,
+    };
+  }
+
+  async isKeyCorrect(projectId: string, body: VerifyKeyDto) {
+    const key = await this.verify(
+      projectId,
+      body.key,
+      'Either this API Key does not belong to this project or is incorrect.',
+    );
+    return {
+      id: key.id,
+      name: key.name,
     };
   }
 

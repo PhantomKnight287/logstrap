@@ -38,12 +38,9 @@ import {
   FetchApplicationLogsResponseEntity,
   FetchRequestLogsResponseEntity,
 } from './entities/response.entity';
-import {
-  ApplicationLogEntity,
-  ExtendedApplicationLogEntity,
-  LogEntity,
-} from './entities/log.entity';
+import { ExtendedApplicationLogEntity, LogEntity } from './entities/log.entity';
 import { GenericErrorEntity } from '~/entity';
+import { ApiKeyHeader } from '~/decorators/api-key-header/api-key-header.decorator';
 @Controller('projects/:id')
 @ApiTags('Logs')
 @ApiParam({
@@ -63,9 +60,10 @@ export class LogsController {
   })
   create(
     @Body() createLogDto: CreateLogDto,
-    @ApiKey() apiKey: typeof ApiKeys.$inferSelect,  
+    @ApiKey() apiKeyRecord: typeof ApiKeys.$inferSelect,
+    @ApiKeyHeader() apiKeyHeader: string,
   ) {
-    return this.logsService.create(createLogDto, apiKey);
+    return this.logsService.create(createLogDto, apiKeyRecord, apiKeyHeader);
   }
 
   @UseGuards(AuthGuard)

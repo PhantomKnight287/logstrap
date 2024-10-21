@@ -9,7 +9,7 @@ import { formatTime } from '../../keys/_components/timestamp';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import Back from '@/components/common/back';
-import LogInfoPage from './page.client';
+import LogInfoPage, { RenderBody } from './page.client';
 import { components } from '@/lib/api/types';
 import {
   Tooltip,
@@ -17,19 +17,36 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { RequestMethodBadge, StatusCodeBadge } from '@/components/badges';
+import EncryptedCodeBlock from '../../_components/render-encrypted-codeblocks';
+import { Suspense } from 'react';
+import { Loader } from 'lucide-react';
+import { ApiKeyInputModal } from '../../_components/api-key-input-modal';
+import { generateKeyCookieName } from '@/utils/cookie';
+import Code from '@/components/code';
 
 export default async function ApiRequestLog(props: PageProps) {
+  const authToken = getAuthToken(cookies());
   const data = await getCachedApiRequestLog(
     props.params.log,
     props.params.id,
-    getAuthToken(cookies()),
+    authToken,
   );
   if (data.error) {
     redirect(`${Redirects.ERROR}?error=${data.error.message}`);
   }
   const log = data.data;
+  const cookieIdentifier = generateKeyCookieName(
+    props.params.id,
+    log.apiKeyId!,
+  );
+  const apiKeyCookie = cookies().get(cookieIdentifier)?.value;
   return (
     <div className="flex flex-col gap-4 items-center justify-center p-4">
+      <ApiKeyInputModal
+        open={!apiKeyCookie}
+        projectId={props.params.id}
+        authToken={authToken}
+      />
       <div className="container mb-5 space-y-6">
         <Back url={`/dashboard/${log.projectId}/api-requests`} />
         <h1 className="text-2xl font-bold line-clamp-2 mt-2">
@@ -56,7 +73,16 @@ export default async function ApiRequestLog(props: PageProps) {
             <div className="flex flex-col items-center">
               <span className="text-muted-foreground ">IP</span>
               <Badge className="text-sm" variant={'secondary'}>
-                {log.ip}
+                <Suspense fallback={<Loader />}>
+                  {/* @ts-expect-error Server component */}
+                  <EncryptedCodeBlock
+                    encryptedData={log.ip}
+                    cookieIdentifier={cookieIdentifier}
+                    iv={log.iv}
+                    renderInCodeBlock={false}
+                    defaultValue={"No IP"}
+                  />
+                </Suspense>
               </Badge>
             </div>
           ) : null}
@@ -79,13 +105,70 @@ export default async function ApiRequestLog(props: PageProps) {
             </div>
           ) : null}
         </div>
-        <LogInfoPage data={log} />
+        <LogInfoPage
+          data={log}
+          ResponseBodyComponent={
+            //@ts-expect-error Server component
+            <EncryptedCodeBlock
+              encryptedData={log.responseBody ?? ''}
+              cookieIdentifier={cookieIdentifier}
+              iv={log.iv}
+              parseJson
+              customRenderer={(data) => {
+                const parsed = JSON.parse(data);
+                if (!parsed || Object.keys(parsed).length === 0)
+                  return <RenderBody body={{}} />;
+                return <RenderBody body={parsed} />;
+              }}
+            />
+          }
+          CookiesComponent={
+            //@ts-expect-error Server component
+            <EncryptedCodeBlock
+              encryptedData={log.cookies ?? ''}
+              cookieIdentifier={cookieIdentifier}
+              iv={log.iv}
+              parseJson
+            />
+          }
+          RequestHeadersComponent={
+            //@ts-expect-error Server component
+            <EncryptedCodeBlock
+              encryptedData={log.requestHeaders ?? ''}
+              cookieIdentifier={cookieIdentifier}
+              iv={log.iv}
+              parseJson
+            />
+          }
+          RequestBodyComponent={
+            //@ts-expect-error Server component
+            <EncryptedCodeBlock
+              encryptedData={log.requestBody ?? ''}
+              cookieIdentifier={cookieIdentifier}
+              iv={log.iv}
+              parseJson
+            />
+          }
+          ResponseHeadersComponent={
+            //@ts-expect-error Server component
+            <EncryptedCodeBlock
+              encryptedData={log.responseHeaders ?? ''}
+              cookieIdentifier={cookieIdentifier}
+              iv={log.iv}
+              parseJson
+            />
+          }
+        />
         {log.applicationLogs?.length ? (
           <div className="flex flex-col gap-4">
             <h2 className="text-lg font-medium">Logs</h2>
             <div className="flex flex-col gap-4 bg-secondary p-4 rounded-md font-mono">
               {log.applicationLogs.map((log) => (
-                <LogItem key={log.id} log={log} />
+                <LogItem
+                  key={log.id}
+                  log={log}
+                  cookieIdentifier={cookieIdentifier}
+                />
               ))}
             </div>
           </div>
@@ -97,8 +180,10 @@ export default async function ApiRequestLog(props: PageProps) {
 
 function LogItem({
   log,
+  cookieIdentifier,
 }: {
   log: components['schemas']['ApplicationLogEntity'];
+  cookieIdentifier: string;
 }) {
   return (
     <div
@@ -123,15 +208,23 @@ function LogItem({
       <br />
       {log.additionalInfo ? (
         <>
-          {log.additionalInfo?.stack ? (
-            log.additionalInfo?.stack
-          ) : (
-            <>
-              {Object.keys(log.additionalInfo).length > 1
-                ? JSON.stringify(log.additionalInfo, null, 2)
-                : null}
-            </>
-          )}
+          {/* @ts-expect-error Server component */}
+          <EncryptedCodeBlock
+            encryptedData={log.additionalInfo ?? ''}
+            cookieIdentifier={cookieIdentifier}
+            iv={log.iv}
+            parseJson
+            customRenderer={(data) => {
+              const parsed = JSON.parse(data);
+              if (!parsed || Object.keys(parsed).length === 0) return null;
+              if (parsed.stack) {
+                return (
+                  <Code code={parsed.stack} lang="bash" theme="ayu-dark" />
+                );
+              }
+              return <Code code={data} lang="bash" theme="ayu-dark" />;
+            }}
+          />
         </>
       ) : null}
     </div>

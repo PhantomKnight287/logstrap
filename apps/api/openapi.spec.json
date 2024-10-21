@@ -718,6 +718,79 @@
         ]
       }
     },
+    "/projects/{id}/keys/verify": {
+      "post": {
+        "operationId": "KeysController_verifyKey",
+        "summary": "Verify a key",
+        "description": "Verify a key",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "path",
+            "description": "Id of the project",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyKeyDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyKeyEntity"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Invalid API Key",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Either this API Key does not belong to this project or is incorrect.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal server error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GenericErrorEntity"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Keys"
+        ]
+      }
+    },
     "/projects/{id}/logs": {
       "post": {
         "operationId": "LogsController_create",
@@ -1721,6 +1794,34 @@
           "applicationLogsCount"
         ]
       },
+      "VerifyKeyDto": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "key"
+        ]
+      },
+      "VerifyKeyEntity": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "The id of the key"
+          },
+          "name": {
+            "type": "string",
+            "description": "The name of the key"
+          }
+        },
+        "required": [
+          "id",
+          "name"
+        ]
+      },
       "LogLevel": {
         "type": "string",
         "description": "Log level",
@@ -1992,20 +2093,26 @@
             "type": "string"
           },
           "additionalInfo": {
-            "type": "object"
+            "type": "string",
+            "description": "Additional info(encrypted)"
           },
           "functionName": {
             "type": "string"
           },
           "component": {
             "type": "string"
+          },
+          "iv": {
+            "type": "string",
+            "description": "Initialization vector"
           }
         },
         "required": [
           "id",
           "level",
           "message",
-          "timestamp"
+          "timestamp",
+          "iv"
         ]
       },
       "LogEntity": {
@@ -2048,28 +2155,38 @@
             "type": "string"
           },
           "requestBody": {
-            "type": "object"
+            "type": "string",
+            "description": "Request body(encrypted)"
           },
           "responseBody": {
-            "type": "object"
+            "type": "string",
+            "description": "Response body(encrypted)"
           },
           "requestHeaders": {
-            "type": "object"
+            "type": "string",
+            "description": "Request headers(encrypted)"
           },
           "responseHeaders": {
-            "type": "object"
+            "type": "string",
+            "description": "Response headers(encrypted)"
           },
           "cookies": {
-            "type": "object"
+            "type": "string",
+            "description": "Cookies(encrypted)"
           },
           "ip": {
-            "type": "string"
+            "type": "string",
+            "description": "IP address"
           },
           "applicationLogs": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ApplicationLogEntity"
             }
+          },
+          "iv": {
+            "type": "string",
+            "description": "Initialization vector"
           }
         },
         "required": [
@@ -2081,7 +2198,8 @@
           "method",
           "statusCode",
           "projectId",
-          "requestBody"
+          "requestBody",
+          "iv"
         ]
       },
       "PartialApplicationLogEntity": {
@@ -2106,7 +2224,8 @@
             "type": "string"
           },
           "additionalInfo": {
-            "type": "object"
+            "type": "string",
+            "description": "Additional info(encrypted)"
           },
           "requestId": {
             "type": "string"
@@ -2199,13 +2318,18 @@
             "type": "string"
           },
           "additionalInfo": {
-            "type": "object"
+            "type": "string",
+            "description": "Additional info(encrypted)"
           },
           "functionName": {
             "type": "string"
           },
           "component": {
             "type": "string"
+          },
+          "iv": {
+            "type": "string",
+            "description": "Initialization vector"
           },
           "apiKey": {
             "$ref": "#/components/schemas/PartialApiKeyEntity"
@@ -2219,6 +2343,7 @@
           "level",
           "message",
           "timestamp",
+          "iv",
           "apiKey",
           "request"
         ]

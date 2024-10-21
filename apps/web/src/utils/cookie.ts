@@ -32,3 +32,10 @@ export function readCookie(name: string) {
 export function eraseCookie(name: string) {
   createCookie(name, '', -1);
 }
+
+export function generateKeyCookieName(
+  projectId: string,
+  keyId: string,
+): string {
+  return `${projectId}-key-${keyId}`;
+}
