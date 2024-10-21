@@ -32,9 +32,19 @@ import { RequestMethod } from '@nestjs/common';
 export class AppModule {}
 ```
 
-
-
 This setup will start logging API requests
+
+<Callout  type="warn">
+  Cookies, by default, will not show up as `request.cookies` is empty in nestjs. If you want to also log cookies, install `cookie-parser` and add it to your application in `main.ts` as below:
+
+  ```ts
+  import cookieParser from 'cookie-parser'
+
+  // ... rest of your code
+  const app = await NestFactory.create(AppModule)
+  app.use(cookieParser())
+  ```
+</Callout>
 
 
 ### Application Logs

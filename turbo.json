@@ -13,6 +13,9 @@
                 "out"
             ]
         },
+        "test": {
+            "cache": false
+        },
         "lint": {},
         "types:check": {
             "dependsOn": [],
