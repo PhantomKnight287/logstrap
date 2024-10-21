@@ -19,6 +19,8 @@
   "ignoreDeps": [
     "@types/*",
     "typescript",
-    "eslint"
+    "eslint",
+    "drizzle-orm",
+    "drizzle-kit"
   ]
 }
