@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 import { COOKIE_NAME } from './constants';
 import { Redirects } from './constants/redirects';
-import { middleware as logstrapMiddleware } from '../logstrap';
+import { withTracing } from './logstrap';
 
 function middleware(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
@@ -29,4 +29,4 @@ export const config = {
   ],
 };
 
-export default logstrapMiddleware(middleware);
+export default withTracing()(middleware);

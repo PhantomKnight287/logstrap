@@ -1,0 +1,15 @@
+{
+  "extends": "@logstrap/tsconfig/base.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+    "declaration": true,
+    "outDir": "dist",
+    "incremental": true,
+    "tsBuildInfoFile": ".tsbuildinfo",
+    "strict": true,
+    "removeComments": false
+  },
+  "exclude": ["node_modules", "dist"]
+}

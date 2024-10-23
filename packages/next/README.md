@@ -5,3 +5,7 @@ The nextjs adapter for LogsTrap. It cannot log the response of request you get o
 It can log the request and response of your api routes if you use the wrap you api routes.
 
 Usage: [See here](../../apps/web/src/app/api/route.ts)
+
+
+> ![Note]
+> This package needs more work.

@@ -1,4 +1,4 @@
-import { createRouteHandler, logger } from '../../../logstrap';
+import { createRouteHandler, logger } from '../../logstrap';
 
 export const GET = createRouteHandler(async (req: Request) => {
   logger.info('hello world');

@@ -1,6 +1,7 @@
 import { LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
 import { asyncLocalStorage } from '@nextwrappers/async-local-storage';
 import type { NextRequest } from 'next/server';
+import { generateId } from '@logstrap/core';
 
 export const {
   wrapper: asyncLocalStorageWrapped,
@@ -16,7 +17,7 @@ export const {
       requestHeaders[key] = value;
     }
     return {
-      [LOGSTRAP_REQUEST_ID]: crypto.randomUUID(),
+      [LOGSTRAP_REQUEST_ID]: generateId(),
       url: request.nextUrl.pathname,
       requestHeaders,
       method: request.method,

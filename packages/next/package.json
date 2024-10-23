@@ -2,9 +2,8 @@
   "name": "@logstrap/next",
   "version": "0.0.1",
   "description": "",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "module": "dist/index.mjs",
+  "main": "dist/index.mjs",
+  "types": "dist/index.d.mts",
   "scripts": {
     "dev": "tsup --watch",
     "build": "tsup"
@@ -15,7 +14,6 @@
   "devDependencies": {
     "@logstrap/core": "workspace:*",
     "@logstrap/tsconfig": "workspace:*",
-    "@types/webpack": "^5.28.5",
     "tsup": "^8.3.0",
     "typescript": "^5.6.3"
   },
@@ -24,8 +22,8 @@
     "next": ">=13.x"
   },
   "dependencies": {
+    "@epic-web/remember": "^1.1.0",
     "@logstrap/constants": "workspace:*",
-    "@nextwrappers/async-local-storage": "^1.0.1",
-    "webpack": "^5.95.0"
+    "@nextwrappers/async-local-storage": "^1.0.1"
   }
 }
