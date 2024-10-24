@@ -11,7 +11,8 @@ import { Badge } from '@/components/ui/badge';
 import { Tooltip } from '@/components/ui/tooltip';
 import Link from 'next/link';
 
-export default async function ApiKeyPage({ params }: PageProps) {
+export default async function ApiKeyPage(props: PageProps) {
+  const params = await props.params;
   const req = await client.GET('/projects/{id}/keys/{keyId}', {
     params: {
       path: {
@@ -20,7 +21,7 @@ export default async function ApiKeyPage({ params }: PageProps) {
       },
     },
     headers: {
-      Authorization: `Bearer ${getAuthToken(cookies())}`,
+      Authorization: `Bearer ${getAuthToken(await cookies())}`,
     },
     fetch: (request: unknown) => {
       return fetch(request as Request, { next: { revalidate: 60 } });

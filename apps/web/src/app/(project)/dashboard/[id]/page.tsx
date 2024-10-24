@@ -15,7 +15,8 @@ import { ArrowDownIcon, ArrowUpIcon } from '@radix-ui/react-icons';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 
-export default async function ProjectInfo({ params }: PageProps) {
+export default async function ProjectInfo(props: PageProps) {
+  const params = await props.params;
   const projectStats = await client.GET('/projects/{id}/stats', {
     params: {
       path: {
@@ -23,7 +24,7 @@ export default async function ProjectInfo({ params }: PageProps) {
       },
     },
     headers: {
-      Authorization: `Bearer ${getAuthToken(cookies())}`,
+      Authorization: `Bearer ${getAuthToken(await cookies())}`,
     },
     // WARN: this is a hack as openapi-fetch strips away all the non standard fetch options
     fetch: (request: unknown) => {

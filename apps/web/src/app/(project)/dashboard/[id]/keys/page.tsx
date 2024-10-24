@@ -10,12 +10,13 @@ import { columns } from './columns';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ApiKeys({
-  params,
-}: {
-  params: { [key: string]: string };
-}) {
-  const keys = await getCachedApiKeys(params.id!, getAuthToken(cookies()));
+export default async function ApiKeys(
+  props: {
+    params: Promise<{ [key: string]: string }>;
+  }
+) {
+  const params = await props.params;
+  const keys = await getCachedApiKeys(params.id!, getAuthToken(await cookies()));
   if (keys.error) redirect(`${Redirects.ERROR}?error=${keys.error.message}`);
 
   return (

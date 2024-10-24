@@ -16,11 +16,11 @@ export default async function AppEventsPage(props: PageProps) {
     {
       params: {
         path: {
-          id: props.params.id,
+          id: (await props.params).id,
         },
       },
       headers: {
-        Authorization: `Bearer ${getAuthToken(cookies())}`,
+        Authorization: `Bearer ${getAuthToken(await cookies())}`,
       },
     },
   );
@@ -28,10 +28,10 @@ export default async function AppEventsPage(props: PageProps) {
     redirect(`${Redirects.ERROR}?error=${filters.error.message}`);
   }
   const { page, fromDate, toDate, apiKey, q, component, functionName, level } =
-    searchParamsCache.parse(props.searchParams);
+    searchParamsCache.parse((await props.searchParams));
   const suspenseKey = `${page}-${fromDate}-${toDate}-${apiKey}-${q}-${component}-${functionName}-${level}`;
   return (
-    <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+    (<main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="flex items-center flex-row justify-between">
         <h1 className="text-lg font-semibold md:text-2xl w-fit">
           Application Events
@@ -41,10 +41,11 @@ export default async function AppEventsPage(props: PageProps) {
       <div className="flex flex-1 items-center justify-center rounded-lg shadow-sm">
         <div className="flex flex-col items-center gap-1 text-center size-full">
           <Suspense key={suspenseKey} fallback={<Loading />}>
-            <AppEventsServerPage {...props} />
+            <AppEventsServerPage /* @next-codemod-error 'props' is used with spread syntax (...). Any asynchronous properties of 'props' must be awaited when accessed. */
+            {...props} />
           </Suspense>
         </div>
       </div>
-    </main>
+    </main>)
   );
 }

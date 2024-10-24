@@ -14,7 +14,9 @@ import { searchParamsCache } from './utils';
 
 export const dynamic = 'force-dynamic';
 
-export default async function ApiRequests({ params, searchParams }: PageProps) {
+export default async function ApiRequests(props: PageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
   const { apiKey, fromDate, method, page, q, statusCode, toDate } =
     searchParamsCache.parse(searchParams);
   const suspenseKey = `${page}-${method}-${statusCode}-${fromDate}-${toDate}-${apiKey}-${q}`;
@@ -27,7 +29,7 @@ export default async function ApiRequests({ params, searchParams }: PageProps) {
         },
       },
       headers: {
-        Authorization: `Bearer ${getAuthToken(cookies())}`,
+        Authorization: `Bearer ${getAuthToken(await cookies())}`,
       },
       fetch: (request: unknown) => {
         return fetch(request as Request, { next: { revalidate: 10 } });

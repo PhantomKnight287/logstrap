@@ -11,12 +11,13 @@ import { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
 
-export default async function Dashboard({
-  searchParams,
-}: {
-  searchParams: Record<string, string>;
-}) {
-  const token = getAuthToken(cookies());
+export default async function Dashboard(
+  props: {
+    searchParams: Promise<Record<string, string>>;
+  }
+) {
+  const searchParams = await props.searchParams;
+  const token = getAuthToken(await cookies());
   const req = await client.GET('/projects', {
     params: { query: { page: searchParams.page || '1' } },
     headers: {

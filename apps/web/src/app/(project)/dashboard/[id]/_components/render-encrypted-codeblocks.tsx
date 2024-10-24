@@ -21,7 +21,7 @@ export default async function EncryptedCodeBlock({
   customRenderer?: (decryptedData: string) => ReactNode;
   defaultValue?: string;
 }) {
-  const cookiesStore = cookies();
+  const cookiesStore = await cookies();
   const cookie = cookiesStore.get(cookieIdentifier);
   try {
     if (!cookie?.value) throw new Error('Decryption key not found');

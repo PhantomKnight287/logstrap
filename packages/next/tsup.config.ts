@@ -5,6 +5,6 @@ export default defineConfig({
   dts: true,
   format: ['esm'],
   target: 'node18',
-  external: ['next', 'typescript'],
+  external: ['next', 'typescript', 'react'],
   sourcemap: true,
 });

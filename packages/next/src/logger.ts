@@ -1,41 +1,13 @@
 import { LOGSTRAP_REQUEST_ID } from '@logstrap/constants';
-import { CallerInfo, getCallerInfo, logApiRequest } from '@logstrap/core';
+import { CallerInfo, getCallerInfo } from '@logstrap/core';
 import { headers } from 'next/headers';
+import { getStorage } from './storage';
 
 // const { remember } = await import('@epic-web/remember');
 
 export class Logger {
-  private storage: Map<string, Record<string, any> | Record<string, any>[]>;
-  constructor() {
-    this.storage = this.getStorage();
-  }
-
-  async addRequestToStorage(
-    requestId: string,
-    store: Exclude<
-      Parameters<typeof logApiRequest>[2]['requests'],
-      undefined
-    >[0],
-  ): Promise<void> {
-    return new Promise<void>((resolve) => {
-      this.storage.set(requestId, store);
-      resolve();
-    });
-  }
-
-  private getStorage(): Map<
-    string,
-    Record<string, any> | Record<string, any>[]
-  > {
-    let storage = (globalThis as any).logstrap_storage;
-    if (!storage) {
-      storage = new Map<string, Record<string, any> | Record<string, any>[]>();
-      (globalThis as any).logstrap_storage = storage;
-    }
-    return storage;
-  }
-
-  private addLogToStorage(
+  constructor() {}
+  private async addLogToStorage(
     logLevel: string,
     callerName: string,
     component: string | null,
@@ -51,14 +23,14 @@ export class Logger {
       additionalInfo,
     };
 
-    this.addToStorage(newLogEntry);
+    await this.addToStorage(newLogEntry);
   }
 
   /**
    * Get the request id from the server. Without it, the logs will be treated as standalone logs.
    */
-  private getRequestId(): string | undefined | null {
-    const headersList = headers();
+  private async getRequestId(): Promise<string | null | undefined> {
+    const headersList = await headers();
     const requestId = headersList.get(LOGSTRAP_REQUEST_ID);
     return requestId;
   }
@@ -76,7 +48,7 @@ export class Logger {
       caller.className,
       message,
       optionalParams.length ? { params: optionalParams } : {},
-    );
+    ).catch(console.error);
   }
 
   warn(message?: any, ...optionalParams: any[]) {
@@ -148,24 +120,34 @@ export class Logger {
     );
   }
 
-  private addToStorage(item: Record<string, any>) {
-    const requestId = this.getRequestId();
-    const storage = this.getStorage();
+  private async addToStorage(item: Record<string, any>) {
+    const requestId = await this.getRequestId();
+    const storage = getStorage();
+    const isMap = storage instanceof Map;
     if (!requestId) {
-      const olderStandaloneLogs = storage.get('STANDALONE_LOGS') || [];
-      storage.set('STANDALONE_LOGS', [
-        ...(olderStandaloneLogs as Record<string, any>[]),
-        item,
-      ]);
+      const olderStandaloneLogs =
+        (isMap ? storage.get('STANDALONE_LOGS') : storage['STANDALONE_LOGS']) ||
+        [];
+
+      if (isMap) {
+        storage.set('STANDALONE_LOGS', [
+          ...(olderStandaloneLogs as Record<string, any>[]),
+          item,
+        ]);
+      } else {
+        storage['STANDALONE_LOGS'] = [
+          ...(olderStandaloneLogs as Record<string, any>[]),
+          item,
+        ];
+      }
     } else {
-      const currentRequestLogs = storage.get(requestId) || {};
-      storage.set(requestId, {
-        ...currentRequestLogs,
-        additionalLogs: [
-          ...((currentRequestLogs as any).additionalLogs || []),
-          { ...item, requestId },
-        ],
-      });
+      const currentRequestLogs =
+        (isMap ? storage.get(requestId) : storage[requestId]) || [];
+      if (isMap) {
+        storage.set(requestId, [...currentRequestLogs, { ...item, requestId }]);
+      } else {
+        storage[requestId] = [...currentRequestLogs, { ...item, requestId }];
+      }
     }
   }
 }

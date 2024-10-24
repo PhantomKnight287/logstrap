@@ -32,7 +32,7 @@ export default async function ApiRequestsServer({
       },
     },
     headers: {
-      Authorization: `Bearer ${getAuthToken(cookies())}`,
+      Authorization: `Bearer ${getAuthToken(await cookies())}`,
     },
   });
   if (logs.error) {

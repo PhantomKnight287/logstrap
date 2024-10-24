@@ -6,11 +6,12 @@ export const metadata: Metadata = {
   description: 'Create New API Key',
 };
 
-export default function CreateNewApiKey({
-  params,
-}: {
-  params: { id: string };
-}) {
+export default async function CreateNewApiKey(
+  props: {
+    params: Promise<{ id: string }>;
+  }
+) {
+  const params = await props.params;
   return (
     <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
       <div className="h-full bg-background flex flex-col">

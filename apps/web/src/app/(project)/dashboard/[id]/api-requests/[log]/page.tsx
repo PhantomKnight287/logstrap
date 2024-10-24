@@ -25,10 +25,10 @@ import { generateKeyCookieName } from '@/utils/cookie';
 import Code from '@/components/code';
 
 export default async function ApiRequestLog(props: PageProps) {
-  const authToken = getAuthToken(cookies());
+  const authToken = getAuthToken(await cookies());
   const data = await getCachedApiRequestLog(
-    props.params.log,
-    props.params.id,
+    (await props.params).log,
+    (await props.params).id,
     authToken,
   );
   if (data.error) {
@@ -36,15 +36,15 @@ export default async function ApiRequestLog(props: PageProps) {
   }
   const log = data.data;
   const cookieIdentifier = generateKeyCookieName(
-    props.params.id,
+    (await props.params).id,
     log.apiKeyId!,
   );
-  const apiKeyCookie = cookies().get(cookieIdentifier)?.value;
+  const apiKeyCookie = (await cookies()).get(cookieIdentifier)?.value;
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-4">
+    (<div className="flex flex-col gap-4 items-center justify-center p-4">
       <ApiKeyInputModal
         open={!apiKeyCookie}
-        projectId={props.params.id}
+        projectId={(await props.params).id}
         authToken={authToken}
       />
       <div className="container mb-5 space-y-6">
@@ -174,7 +174,7 @@ export default async function ApiRequestLog(props: PageProps) {
           </div>
         ) : null}
       </div>
-    </div>
+    </div>)
   );
 }
 

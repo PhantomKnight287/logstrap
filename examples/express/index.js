@@ -2,15 +2,15 @@ import express from "express"
 import { withLogstrap } from "@logstrap/express"
 
 const app = express();
-const { middleware } = withLogstrap({
+const { middleware, logger, } = withLogstrap({
     apiKey: "",
     projectId: "",
 
 })
 
-app.use(middleware)
-
-app.get("/", (req, res) => {
+app.use(middleware,)
+app.get("/", (req, res, next) => {
+    logger.log("hello world")
     res.json({
         message: "Hello World"
     })

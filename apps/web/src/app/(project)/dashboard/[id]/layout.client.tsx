@@ -13,7 +13,7 @@ export default async function DynamicLayout({
   id,
   children,
 }: PropsWithChildren & { id: string }) {
-  const token = getAuthToken(cookies());
+  const token = getAuthToken(await cookies());
   const project = await getCachedProjectDetails(id, token);
   if (project.error) {
     redirect(`${Redirects.ERROR}?error=${project.error.message}`);

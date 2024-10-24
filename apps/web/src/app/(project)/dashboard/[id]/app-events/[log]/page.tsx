@@ -22,12 +22,12 @@ import { generateKeyCookieName } from '@/utils/cookie';
 import { ApiKeyInputModal } from '../../_components/api-key-input-modal';
 
 export default async function AppEventLog(props: PageProps) {
-  const authToken = getAuthToken(cookies());
+  const authToken = getAuthToken(await cookies());
   const req = await client.GET('/projects/{id}/application-logs/{logId}', {
     params: {
       path: {
-        id: props.params.id,
-        logId: props.params.log,
+        id: (await props.params).id,
+        logId: (await props.params).log,
       },
     },
     headers: {
@@ -39,19 +39,19 @@ export default async function AppEventLog(props: PageProps) {
   }
   const log = req.data;
   const cookieIdentifier = generateKeyCookieName(
-    props.params.id,
+    (await props.params).id,
     log.apiKey.id!,
   );
-  const apiKeyCookie = cookies().get(cookieIdentifier)?.value;
+  const apiKeyCookie = (await cookies()).get(cookieIdentifier)?.value;
   return (
-    <div className="flex flex-col gap-4 items-center justify-center p-4">
+    (<div className="flex flex-col gap-4 items-center justify-center p-4">
       <ApiKeyInputModal
         open={!apiKeyCookie}
         authToken={authToken}
-        projectId={props.params.id}
+        projectId={(await props.params).id}
       />
       <div className="container mb-5 space-y-6">
-        <Back url={`/dashboard/${props.params.id}/app-events`} />
+        <Back url={`/dashboard/${(await props.params).id}/app-events`} />
         <h1 className="text-2xl font-bold line-clamp-2 mt-2">{log.message}</h1>
         <div className="mt-2 flex items-center flex-row gap-4 text-base flex-wrap justify-center md:justify-start">
           <div className="flex flex-col items-center h-full justify-between">
@@ -83,7 +83,7 @@ export default async function AppEventLog(props: PageProps) {
               <Tooltip delayDuration={0}>
                 <TooltipTrigger>
                   <Link
-                    href={`/dashboard/${props.params.id}/api-requests/${log.request.id}`}
+                    href={`/dashboard/${(await props.params).id}/api-requests/${log.request.id}`}
                   >
                     <Badge
                       className="text-sm max-w-48 line-clamp-1 underline"
@@ -123,6 +123,6 @@ export default async function AppEventLog(props: PageProps) {
           </Suspense>
         </div>
       </div>
-    </div>
+    </div>)
   );
 }

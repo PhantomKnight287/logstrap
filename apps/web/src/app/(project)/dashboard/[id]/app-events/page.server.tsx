@@ -30,7 +30,7 @@ export default async function AppEventsServerPage(props: PageProps) {
       },
     },
     headers: {
-      Authorization: `Bearer ${getAuthToken(cookies())}`,
+      Authorization: `Bearer ${getAuthToken(await cookies())}`,
     },
   });
   if (logs.error) {

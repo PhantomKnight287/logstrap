@@ -1,0 +1,130 @@
+---
+title: Next.js
+description: Next.js integration for LogsTrap
+---
+<Callout type="warn">
+    Logstrap requires Nextjs v15 to work
+</Callout>
+## Setup
+
+### Install required packages
+
+```package-install
+@logstrap/core @logstrap/next
+```
+
+
+### Enable experimental `after`
+Logstrap uses `unstable_after` api to log the requests which is only available in nextjs v15 and needs to be enabled explicitly.
+
+```js title="next.config.ts"
+import type { NextConfig } from 'next';
+
+const nextConfig: NextConfig = {
+  experimental: {
+    after: true,
+  },
+};
+
+export default nextConfig;
+
+```
+
+### Initialize LogsTrap
+
+Create a `logstrap.ts` in root of your project
+
+```ts title="logstrap.ts"
+export const { logger, createRouteHandler, withTracing, withLoggerFactory } =
+  initLogstrap({
+    apiKey:
+      'key_...', // Paste your api key here
+    projectId: 'pj_...', // paste your project id here
+  });
+```
+
+### Setup LogsTrap middleware
+
+Create a `middleware.ts` and add LogsTrap middleware.
+
+
+```ts title="middleware.ts"
+import { NextResponse } from 'next/server';
+import { withTracing } from './logstrap';
+
+export default withTracing()((req) => {
+    // Add your middleware logic here
+  return NextResponse.next(); // this line is necessary for LogsTrap to work
+});
+
+```
+
+<Callout type="warn">
+    Make sure to return an instance of `NextResponse` from the middleware.
+</Callout>
+
+The setup is now done.
+
+
+
+## Usage
+
+You need to wrap your routes, route handlers and server actions with HOF returned by `withLoggerFactory`.
+
+### Routes
+
+```tsx title="page.tsx"
+import { logger, withLoggerFactory } from '@/logstrap';
+import Image from 'next/image';
+import Client from './page.client';
+
+function Home() {
+  logger.log('hello world');
+  logger.warn('skill issue');
+  return (
+    <div>
+      <Client />
+    </div>
+  );
+}
+
+export default withLoggerFactory.pageWithLogger(Home, {
+  name: '@/page', // this name will show up in LogsTrap dashboard
+});
+
+```
+
+### Server Actions
+
+```ts title="actions.ts"
+'use server';
+
+import { logger, withLoggerFactory } from '@/logstrap';
+
+const { serverActionWithLogger } = withLoggerFactory.createLoggers();
+
+async function action() {
+  logger.log('Hello World');
+  return "hey"
+}
+
+export const testServerAction = serverActionWithLogger(action, {
+  name: '@/actions/first-server-action',
+});
+
+```
+
+### Route Handlers
+
+
+```ts title="route.ts"
+import { logger, withLoggerFactory } from '@/logstrap';
+
+const GetHandler = (req:Request)=>{
+    return Response.json({message:"Hello World"})
+}
+
+export const GET = withLoggerFactory.routeHandlerWithLogger(GetHandler,{
+    name:"@/route.ts"
+})
+```
