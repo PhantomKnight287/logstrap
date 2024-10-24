@@ -9,7 +9,7 @@
     "postinstall": "fumadocs-mdx"
   },
   "dependencies": {
-    "fumadocs-core": "13.4.10",
+    "fumadocs-core": "14.0.2",
     "fumadocs-docgen": "^1.2.0",
     "fumadocs-mdx": "10.0.2",
     "fumadocs-ui": "13.4.10",
