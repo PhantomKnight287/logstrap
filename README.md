@@ -9,6 +9,11 @@
   A powerful logging service for your applications.
 </h3>
 
+## Why?
+
+I made this to use at work but then decided to host it as a separate entity too(we already selfhost our own private instance at work).
+
+
 ## Features
 
 - Log API requests and responses
@@ -20,6 +25,11 @@
 
 - [Nestjs](./packages/nest)
 - [Nextjs](./packages/next)
+- [Express](./packages/express)
+
+
+## Example
+We dogfood our own service but if you want to see minimal examples. You can see [examples](./examples) directory
 
 ## Roadmap
 
